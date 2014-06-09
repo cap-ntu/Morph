@@ -7,6 +7,7 @@ from common import *
 from gevent import monkey
 from random import Random
 from gevent.queue import Queue, Empty
+from gevent.coros import BoundedSemaphore
 from SocketServer import ThreadingMixIn
 from SimpleXMLRPCServer import SimpleXMLRPCServer, SimpleXMLRPCRequestHandler
 
@@ -24,8 +25,9 @@ tasks_queue = {}
 split_queue = Queue(maxsize = 100)
 #the video blocks after slicing
 block_queue = Queue(maxsize = 10000)
-merge_queue = Queue(maxsize = 10000)
 
+#the lock used to access the tasks_queue
+sem = BoundedSemaphore(1)
 
 class TXMLRPCServer(ThreadingMixIn, SimpleXMLRPCServer): pass
 
@@ -51,6 +53,17 @@ class task:
         self.height     = -1
         self.num        = -1
 
+'''
+task status: 0, 1, 2
+
+'''
+
+class task_status:
+    def __init__(self):
+        self.block      = None
+        self.status     = 0
+
+
 
 def add_task(file_path, bitrate, width, height):
 
@@ -65,6 +78,10 @@ def add_task(file_path, bitrate, width, height):
     new_item.num        = -1
     split_queue.put_nowait(new_item)
     print 'put the task into the queue'
+
+    sem.acquire()
+    tasks_queue[key_val] = {}
+    sem.release()
 
     return 0
 
@@ -249,6 +266,17 @@ def recv_data(s, sleep):
             new_block.file_path = new_path
             new_block.path_len  = len(new_path)
 
+            new_task = task_status()
+            new_task.block  = new_block
+            new_task.status = 2
+
+            task_id     = new_block.task_id
+            block_id    = new_block.block_no
+
+            sem.acquire()
+            tasks           = tasks_queue[task_id]
+            tasks[block_id] = new_task
+            sem.release()
 
             f = open(new_path, 'wb')
             f.write(content[struct.calcsize(block_format):])
@@ -289,6 +317,47 @@ def receiver(port):
         gevent.spawn(recv_data, cli, gevent.sleep)
 
 
+def concat_block(task):
+    print 'concatenate the blocks:'
+    total_no    = task[0].block.total_no
+    file_path   = task[0].block.file_path
+
+    dir_name    = os.path.dirname(file_path)
+    task_id     = task[0].block.task_id
+    list_name   = dir_name + '/' + task_id + '.list'
+    new_file    = dir_name + '/' + task_id + '.mp4'
+
+    f = open(list_name, 'w')
+    for key in range(0, total_no):
+        line = 'file ' + '\'' + task[key].block.file_path + '\'' + '\n'
+        print line
+        f.write(line)
+    f.close()
+
+    cmd = 'ffmpeg -f concat -i ' + list_name + ' -c copy ' + new_file
+    os.system(cmd)
+
+
+
+def task_status_checker():
+    while True:
+        sem.acquire()
+        task = None
+        print 'current task number:', len(tasks_queue)
+        for task_id in tasks_queue.keys():
+            task = tasks_queue[task_id]
+            blk_no = len(task.keys())
+
+            if blk_no > 0:
+                block_0 = task[task.keys()[0]].block
+                if blk_no == block_0.total_no:
+                    print 'job finished'
+                    tasks_queue.pop(task_id)
+                    concat_block(task)
+        sem.release()
+        gevent.sleep(5)
+
+
 server = TXMLRPCServer(('', 8089), SimpleXMLRPCRequestHandler)
 
 server.register_function(add_task, "add_task")
@@ -300,6 +369,9 @@ gevent.spawn(master_server, 7777)
 gevent.sleep(0)
 
 gevent.spawn(receiver, 8888)
+gevent.sleep(0)
+
+gevent.spawn(task_status_checker)
 gevent.sleep(0)
 
 server.serve_forever()
