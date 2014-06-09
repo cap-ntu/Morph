@@ -133,7 +133,7 @@ def send_back_data(new_block):
         s.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 1024*1024*10)
         s.setsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF, 1024*1024*10)
 
-        host = "localhost"          # Get local machine name
+        host = "155.69.55.92"          # Get local machine name
         port = 8888                 # Reserve a port for your service.
 
         s.connect((host, port))
@@ -168,10 +168,10 @@ def send_back_data(new_block):
 
 if __name__ == '__main__':
 
-    host = "localhost"                 # Get local machine name
+    host = "155.69.55.92"                 # Get local machine name
     port = 7777                        # Reserve a port for your service.
 
-    server = ServerProxy("http://localhost:8089")
+    server = ServerProxy("http://155.69.55.92:8089")
 
     while True:
 
