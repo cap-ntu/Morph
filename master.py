@@ -98,7 +98,7 @@ ffmpeg -i china.mp4 -f segment -segment_time 10 -c copy -map 0 \
 
 def split_video(item):
 
-    seg_time        = 60*30
+    seg_time        = 60 * 30
     file_path       = item.file_path
     base_name       = os.path.basename(file_path)
     dir_name        = os.path.dirname(file_path)

@@ -100,11 +100,11 @@ def transcode_data(new_block):
     cmd = "ffmpeg -y -i " + new_block.file_path + " -threads 4 -s 600x300 -strict -2 " + new_path
 
     print cmd
-    #os.system(cmd)
-    p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    os.system(cmd)
+    #p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     #for line in p.stdout.readlines():
     #    print line,
-    retval = p.wait()
+    #retval = p.wait()
 
     #we still to check the result at here
     f       = open(new_path, 'rb')
