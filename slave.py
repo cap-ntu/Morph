@@ -69,20 +69,20 @@ def recv_data( ):
             f.write(content[struct.calcsize(format):])
             f.close()
             s.send('okay')
-            sucess = 1
+            success = 1
         else:
             print 'md5 check fail'
             s.send('fail')
-            sucess = 0
+            success = 0
 
 
     except Exception, ex:
         print ex
         s.send('fail')
-        sucess = 0
+        success = 0
     finally:
         s.close()
-        if sucess == 1:
+        if success == 1:
             return new_block
         else:
             return None
