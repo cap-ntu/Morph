@@ -2,6 +2,7 @@ import os
 import md5
 import struct
 import gevent
+import config
 import subprocess
 from common import *
 from gevent import socket
@@ -168,17 +169,18 @@ def send_back_data(new_block):
 
 if __name__ == '__main__':
 
-    host = "155.69.55.92"                 # Get local machine name
-    port = 7777                        # Reserve a port for your service.
+    master_ip   = config.master_ip
+    master_port = config.master_port
+    master_addr = "http://" + master_ip + ":" + master_port
 
-    server = ServerProxy("http://155.69.55.92:8089")
+    server = xmlrpclib.ServerProxy(master_addr)
 
     while True:
 
         num = server.get_blk_num()
-        print num
+        print "The current number of blocks in the master:", num
         if num == 0:
-            gevent.sleep(5)
+            time.sleep(1)
             continue
 
         new_block     =   recv_data()

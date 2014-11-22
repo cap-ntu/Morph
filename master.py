@@ -29,8 +29,8 @@ block_queue = Queue(maxsize = 10000)
 #the lock used to access the tasks_queue
 sem = BoundedSemaphore(1)
 
-class TXMLRPCServer(ThreadingMixIn, SimpleXMLRPCServer): pass
-
+class MasterServer(ThreadingMixIn, SimpleXMLRPCServer):
+    pass
 
 
 # This function is used to generate a random string as the key of the task
@@ -358,7 +358,7 @@ def task_status_checker():
         gevent.sleep(5)
 
 
-server = TXMLRPCServer(('', 8089), SimpleXMLRPCRequestHandler)
+server = MasterServer(('', 8089), SimpleXMLRPCRequestHandler)
 
 server.register_function(add_task, "add_task")
 server.register_function(query_result, "query_result")
