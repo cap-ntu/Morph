@@ -1,23 +1,11 @@
 import os
 import md5
 import struct
-import gevent
 import subprocess
 from common import *
-from gevent import monkey
 from random import Random
-from gevent.queue import Queue, Empty
-from gevent.coros import BoundedSemaphore
 from SocketServer import ThreadingMixIn
 from SimpleXMLRPCServer import SimpleXMLRPCServer, SimpleXMLRPCRequestHandler
-
-
-'''
-use the monkey patch to enable greenlet of socket, thread and select
-'''
-monkey.patch_socket()
-monkey.patch_thread()
-monkey.patch_select()
 
 
 tasks_queue = {}
