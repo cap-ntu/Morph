@@ -11,7 +11,7 @@ s.setsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF, 1024*1024*10)
 print s.getsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF)
 print s.getsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF)
 
-host = "155.69.52.195"      # Get local machine name
+host = "155.69.151.159"      # Get local machine name
 port = 7777                 # Reserve a port for your service.
 file_path = '/home/guanyu/Videos/lvjuren.mp4'
 

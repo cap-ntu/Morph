@@ -4,6 +4,8 @@ import time
 import struct
 import SocketServer
 
+class ThreadedTCPServer(SocketServer.ThreadingMixIn, SocketServer.TCPServer):
+    pass
 
 class MyTCPHandler(SocketServer.BaseRequestHandler):
 
@@ -51,8 +53,8 @@ class MyTCPHandler(SocketServer.BaseRequestHandler):
 
 
 if __name__ == '__main__':
-    HOST, PORT = "localhost", 7777
-    server = SocketServer.TCPServer((HOST, PORT), MyTCPHandler)
+    HOST, PORT = "155.69.151.159", 7777
+    server = ThreadedTCPServer((HOST, PORT), MyTCPHandler)
     server.serve_forever()
 
 

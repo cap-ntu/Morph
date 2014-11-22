@@ -56,8 +56,6 @@ def handle_request(s, sleep):
         key.update(content[40:])
         val = key.hexdigest()
 
-        print len(val)
-        print len(md5_val)
 
         if md5_val == val:
             print 'md5 check okay'
