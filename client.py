@@ -4,10 +4,10 @@ from xmlrpclib import ServerProxy
 
 if __name__ == "__main__":
 
-    master_ip   = config.master_ip
-    master_port = config.master_port
-    master_addr = "http://" + master_ip + ":" + master_port
-    server = ServerProxy(master_addr)
+    master_ip       = config.master_ip
+    master_rpc_port = config.master_rpc_port
+    rpc_addr = "http://" + master_ip + ":" + master_rpc_port
+    server = ServerProxy(rpc_addr)
 
     #please replace it with the program command line
     file_path = '/home/guanyu/Project/hope/lvjuren.mp4'
