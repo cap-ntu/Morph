@@ -17,7 +17,7 @@ block_queue = Queue(maxsize = 10000)
 #the lock used to access the tasks_queue
 sem = BoundedSemaphore(1)
 
-class MasterServer(ThreadingMixIn, SimpleXMLRPCServer):
+class master_rpc_server(ThreadingMixIn, SimpleXMLRPCServer):
     pass
 
 
@@ -53,7 +53,7 @@ class task_status:
 
 
 
-def add_task(file_path, bitrate, width, height):
+def add_trans_task(file_path, bitrate, width, height):
 
     key_val             = gen_key()
     new_item            = task()
@@ -145,11 +145,9 @@ def worker(n):
 
 
 
-def create_workers(num):
+def start_split_workers(num):
     for i in range(num):
         gevent.spawn(worker, i)
-        #the function sleep can let the Greenlet run
-        gevent.sleep(0)
 
 
 def get_blk_num():
@@ -346,23 +344,28 @@ def task_status_checker():
         gevent.sleep(5)
 
 
-server = MasterServer(('', 8089), SimpleXMLRPCRequestHandler)
+if __name__ == '__main__':
 
-server.register_function(add_task, "add_task")
-server.register_function(query_result, "query_result")
-server.register_function(get_blk_num,  "get_blk_num")
+    master_ip       = config.master_ip
+    master_rpc_port = config.master_rpc_port
+    master_rev_port = config.master_rev_port
+    master_snd_port = config.master_snd_port
 
-create_workers(10)
-gevent.spawn(master_server, 7777)
-gevent.sleep(0)
+    #start the rpc thread to handle the request
+    server = master_rpc_server((master_ip, int(master_rpc_port)))
+    server.register_function(add_trans_task, "add_trans_task")
+    server.register_function(query_result, "query_result")
+    server.register_function(get_blk_num,  "get_blk_num")
 
-gevent.spawn(receiver, 8888)
-gevent.sleep(0)
+    #create the thread for splitting video files
+    start_split_workers(3)
+    gevent.spawn(master_server, 7777)
 
-gevent.spawn(task_status_checker)
-gevent.sleep(0)
+    gevent.spawn(receiver, 8888)
 
-server.serve_forever()
+    gevent.spawn(task_status_checker)
+
+    server.serve_forever()
 
 
 
