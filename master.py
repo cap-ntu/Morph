@@ -1,5 +1,6 @@
 import os
 import md5
+import Queue
 import struct
 import threading
 import subprocess
@@ -11,13 +12,21 @@ from SimpleXMLRPCServer import SimpleXMLRPCServer, SimpleXMLRPCRequestHandler
 
 
 tasks_queue = {}
+
 #the original videos which needs to be split into blocks
-split_queue = Queue(maxsize = 100)
+split_queue = Queue.Queue(maxsize = 100)
+
 #the video blocks after slicing
-block_queue = Queue(maxsize = 10000)
+block_queue = Queue.Queue(maxsize = 1000)
 
 #the lock used to access the tasks_queue
-sem = BoundedSemaphore(1)
+lock = threading.Lock()
+
+master_ip       = config.master_ip
+master_rev_port = config.master_rev_port
+master_snd_port = config.master_snd_port
+master_rpc_port = int(config.master_rpc_port)
+
 
 class master_rpc_server(ThreadingMixIn, SimpleXMLRPCServer):
     pass
@@ -71,9 +80,9 @@ def add_trans_task(file_path, bitrate, width, height):
     split_queue.put_nowait(new_item)
     print 'put the task into the queue'
 
-    sem.acquire()
+    lock.acquire()
     tasks_queue[key_val] = {}
-    sem.release()
+    lock.release()
 
     return 0
 
@@ -213,6 +222,17 @@ class send_data_thread(threading.Thread):
         server = ThreadedTCPServer((HOST, PORT), MyTCPHandler)
         server.serve_forever()
 
+class recv_data_thread(threading.Thread):
+
+    def __init__(self, lock, index):
+        threading.Thread.__init__(self)
+        self.lock   = lock
+        self.index  = index
+
+    def run(self):
+        server = ThreadedTCPServer((HOST, PORT), MyTCPHandler)
+        server.serve_forever()
+
 
 def recv_data(s, sleep):
 
@@ -272,10 +292,10 @@ def recv_data(s, sleep):
             task_id     = new_block.task_id
             block_id    = new_block.block_no
 
-            sem.acquire()
+            lock.acquire()
             tasks           = tasks_queue[task_id]
             tasks[block_id] = new_task
-            sem.release()
+            lock.release()
 
             f = open(new_path, 'wb')
             f.write(content[struct.calcsize(block_format):])
@@ -338,41 +358,43 @@ def concat_block(task):
 
 
 
-def task_status_checker():
-    while True:
-        sem.acquire()
-        task = None
-        print 'current task number:', len(tasks_queue)
-        for task_id in tasks_queue.keys():
-            task = tasks_queue[task_id]
-            blk_no = len(task.keys())
+class task_status_checker(threading.Thread):
 
-            if blk_no > 0:
-                block_0 = task[task.keys()[0]].block
-                if blk_no == block_0.total_no:
-                    print 'job finished'
-                    tasks_queue.pop(task_id)
-                    concat_block(task)
-        sem.release()
-        gevent.sleep(5)
+    def __init__(self, lock, index):
+        threading.Thread.__init__(self)
+        self.lock   = lock
+        self.index  = index
+
+    def run(self):
+        while True:
+            lock.acquire()
+            task = None
+            print 'current task number:', len(tasks_queue)
+            for task_id in tasks_queue.keys():
+                task = tasks_queue[task_id]
+                blk_no = len(task.keys())
+
+                if blk_no > 0:
+                    block_0 = task[task.keys()[0]].block
+                    if blk_no == block_0.total_no:
+                        print 'job finished'
+                        tasks_queue.pop(task_id)
+                        concat_block(task)
+            lock.release()
+            gevent.sleep(5)
 
 
 if __name__ == '__main__':
 
-    master_ip       = config.master_ip
-    master_rpc_port = config.master_rpc_port
-    master_rev_port = config.master_rev_port
-    master_snd_port = config.master_snd_port
-
     #start the rpc thread to handle the request
-    server = master_rpc_server((master_ip, int(master_rpc_port)))
+    server = master_rpc_server((master_ip, master_rpc_port))
     server.register_function(add_trans_task, "add_trans_task")
     server.register_function(query_result, "query_result")
     server.register_function(get_blk_num,  "get_blk_num")
 
     #create the thread for splitting video files
     for i in range(3):
-        t = trans_thread(lock, i)
+        t = split_thread(i)
         t.start()
 
     #create the thread for sending data blocks to the worker
@@ -382,7 +404,8 @@ if __name__ == '__main__':
     t = recv_data_thread()
     t.start()
 
-    gevent.spawn(task_status_checker)
+    t = task_status_checker()
+    t.start()
 
     server.serve_forever()
 
