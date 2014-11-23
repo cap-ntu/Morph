@@ -1,7 +1,9 @@
 import os
 import md5
 import struct
+import threading
 import subprocess
+import SocketServer
 from common import *
 from random import Random
 from SocketServer import ThreadingMixIn
@@ -20,6 +22,8 @@ sem = BoundedSemaphore(1)
 class master_rpc_server(ThreadingMixIn, SimpleXMLRPCServer):
     pass
 
+class ThreadedTCPServer(ThreadingMixIn, SocketServer.TCPServer):
+    pass
 
 # This function is used to generate a random string as the key of the task
 def gen_key(randomlength = 8):
@@ -77,77 +81,74 @@ def query_result(task_id):
     pass
 
 
-'''
-This function is used to split the video into segments:
-The video segment command should be:
-ffmpeg -i china.mp4 -f segment -segment_time 10 -c copy -map 0 \
-        -segment_list china.list china%03d.mp4
-'''
+class split_thread(threading.Thread):
 
-def split_video(item):
+    def __init__(self, lock):
+        threading.Thread.__init__(self)
+        self.lock   = lock
 
-    seg_time        = 60 * 30
-    file_path       = item.file_path
-    base_name       = os.path.basename(file_path)
-    dir_name        = os.path.dirname(file_path)
-    (prefix,suffix) = os.path.splitext(base_name)
+    '''
+    This function is used to split the video into segments:
+    The video segment command should be:
+    ffmpeg -i china.mp4 -f segment -segment_time 10 -c copy -map 0 \
+            -segment_list china.list china%03d.mp4
+    '''
 
-    cmd = "ffmpeg -i " + file_path + " -f segment -segment_time " + str(seg_time) + \
-            " -c copy -map 0 -segment_list " + prefix + ".list " + prefix + "%03d" + suffix
-    print cmd
-    #os.system(cmd)
-    p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    #for line in p.stdout.readlines():
-    #    print line,
-    retval = p.wait()
+    def split_video(item):
+        seg_time        = 60 * 30
+        file_path       = item.file_path
+        base_name       = os.path.basename(file_path)
+        dir_name        = os.path.dirname(file_path)
+        (prefix,suffix) = os.path.splitext(base_name)
 
-    f = open(prefix + ".list")
-    lines = f.readlines()
+        cmd = "ffmpeg -i " + file_path + " -f segment -segment_time " + str(seg_time) + \
+                " -c copy -map 0 -segment_list " + prefix + ".list " + prefix + "%03d" + suffix
+        print cmd
+        #os.system(cmd)
+        p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        #for line in p.stdout.readlines():
+        #    print line,
+        retval = p.wait()
 
-    index = 0
-    for line in lines:
-        new_block = block()
-        line = line.strip('\n')
+        f = open(prefix + ".list")
+        lines = f.readlines()
 
-        new_block.task_id       = item.task_id
-        new_block.file_path     = dir_name + '/' + line
-        new_block.path_len      = len(new_block.file_path)
-        new_block.block_no      = index
-        new_block.total_no      = len(lines)
-        new_block.bitrate       = item.bitrate
-        new_block.width         = item.width
-        new_block.height        = item.height
-        new_block.size          = os.path.getsize(new_block.file_path)
+        index = 0
+        for line in lines:
+            new_block = block()
+            line = line.strip('\n')
 
-        print new_block.file_path
-        print new_block.size
-        f       = open(new_block.file_path, 'rb')
-        data    = f.read()
-        f.close()
+            new_block.task_id       = item.task_id
+            new_block.file_path     = dir_name + '/' + line
+            new_block.path_len      = len(new_block.file_path)
+            new_block.block_no      = index
+            new_block.total_no      = len(lines)
+            new_block.bitrate       = item.bitrate
+            new_block.width         = item.width
+            new_block.height        = item.height
+            new_block.size          = os.path.getsize(new_block.file_path)
 
-        key     = md5.new()
-        key.update(data)
-        md5_val = key.hexdigest()
+            print new_block.file_path
+            print new_block.size
+            f       = open(new_block.file_path, 'rb')
+            data    = f.read()
+            f.close()
 
-        new_block.md5_val = md5_val
-        print md5_val
+            key     = md5.new()
+            key.update(data)
+            md5_val = key.hexdigest()
 
-        block_queue.put(new_block)
-        index = index + 1
+            new_block.md5_val = md5_val
+            print md5_val
 
+            block_queue.put(new_block)
+            index = index + 1
 
-def worker(n):
-    while True:
-        item = split_queue.get(True)
-        gevent.sleep(1)
-        #print('Worker %s got task %s' % (n, item.task_id))
-        split_video(item)
-
-
-
-def start_split_workers(num):
-    for i in range(num):
-        gevent.spawn(worker, i)
+    def run(self):
+        while True:
+            task = split_queue.get(True)
+            #print('Worker %s got task %s' % (n, item.task_id))
+            split_video(task)
 
 
 def get_blk_num():
@@ -185,7 +186,7 @@ def send_data(s, sleep):
         print ex
         s.close()
 
-def master_server(port):
+def send_data_server(port):
     s = gevent.socket.socket()
     s.setsockopt(gevent.socket.SOL_SOCKET, gevent.socket.SO_RCVBUF, 1024*1024)
     s.setsockopt(gevent.socket.SOL_SOCKET, gevent.socket.SO_SNDBUF, 1024*1024)
@@ -199,6 +200,18 @@ def master_server(port):
     while True:
         cli, addr = s.accept()
         gevent.spawn(send_data, cli, gevent.sleep)
+
+
+class send_data_thread(threading.Thread):
+
+    def __init__(self, lock, index):
+        threading.Thread.__init__(self)
+        self.lock   = lock
+        self.index  = index
+
+    def run(self):
+        server = ThreadedTCPServer((HOST, PORT), MyTCPHandler)
+        server.serve_forever()
 
 
 def recv_data(s, sleep):
@@ -358,10 +371,16 @@ if __name__ == '__main__':
     server.register_function(get_blk_num,  "get_blk_num")
 
     #create the thread for splitting video files
-    start_split_workers(3)
-    gevent.spawn(master_server, 7777)
+    for i in range(3):
+        t = trans_thread(lock, i)
+        t.start()
 
-    gevent.spawn(receiver, 8888)
+    #create the thread for sending data blocks to the worker
+    t = send_data_thread()
+    t.start()
+
+    t = recv_data_thread()
+    t.start()
 
     gevent.spawn(task_status_checker)
 
