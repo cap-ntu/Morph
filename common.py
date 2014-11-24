@@ -16,7 +16,7 @@ class task_status:
         self.status     = 0
         self.progress   = 0
 
-block_format  = "8si200siiiiii32si"
+block_format  = "8si200siii4s4si32si"
 
 class block:
     def __init__(self):

@@ -11,7 +11,7 @@ if __name__ == "__main__":
 
     #please replace it with the program command line
     file_path = '/home/guanyu/Project/hope/lvjuren.mp4'
-    width     = "400"
-    height    = "400"
+    width     = "%04d" % int("400")
+    height    = "%04d" % int("400")
 
     ret = server.add_trans_task(file_path, 0, width, height)
