@@ -5,8 +5,8 @@ class task:
         self.task_id    = ""
         self.file_path  = ""
         self.bitrate    = 0
-        self.width      = 0
-        self.height     = 0
+        self.width      = ""
+        self.height     = ""
         self.num        = 0
 
 # task status: 0, 1, 2
