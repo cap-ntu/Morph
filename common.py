@@ -26,10 +26,10 @@ class block:
         self.block_no   = 0
         self.total_no   = 0
         self.bitrate    = 0
-        self.width      = 0
-        self.height     = 0
+        self.width      = ""
+        self.height     = ""
         self.size       = 0
-        self.md5_val    = ''
+        self.md5_val    = ""
         self.status     = 0
 
 def pack_block_info(block):
