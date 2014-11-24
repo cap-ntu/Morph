@@ -10,7 +10,7 @@ if __name__ == "__main__":
     server = ServerProxy(rpc_addr)
 
     #please replace it with the program command line
-    file_path = '/home/guanyu/Project/hope/lvjuren.mp4'
+    file_path = '/home/guanyu/Videos/yanjingshe.mp4'
     width     = "%04d" % int("400")
     height    = "%04d" % int("400")
 
