@@ -1,6 +1,7 @@
 import os
 import md5
 import time
+import socket
 import config
 import struct
 import subprocess
@@ -12,6 +13,7 @@ def recv_data_block(master_ip, master_snd_port):
     success     = 0
     block_data  = ''
     block_info  = block()
+    work_path   = config.worker_path
 
     s = socket.socket()         # Create a socket object
     s.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 1024*1024*10)
@@ -57,7 +59,7 @@ def recv_data_block(master_ip, master_snd_port):
             print 'the MD5 checksum is okay'
             path_len    = block_info.path_len
             base_name   = os.path.basename(block_info.file_path[0:path_len])
-            new_path    = working_path + base_name
+            new_path    = work_path + base_name
 
             block_info.file_path = new_path
             block_info.path_len  = len(new_path)
@@ -154,7 +156,7 @@ def send_back_data(block_info, master_ip, master_rev_port):
                 print 'finish sending back data:', sum
                 break
 
-        s.shutdown(gevent.socket.SHUT_WR)
+        s.shutdown(socket.SHUT_WR)
 
         ret_msg = s.recv(10)
         print 'the return msg is:', ret_msg
@@ -169,8 +171,8 @@ if __name__ == '__main__':
 
     master_ip       = config.master_ip
     master_rpc_port = config.master_rpc_port
-    master_rev_port = config.master_rev_port
-    master_snd_port = config.master_snd_port
+    master_rev_port = int(config.master_rev_port)
+    master_snd_port = int(config.master_snd_port)
 
     rpc_addr = "http://" + master_ip + ":" + master_rpc_port
     server = xmlrpclib.ServerProxy(rpc_addr)
@@ -184,8 +186,10 @@ if __name__ == '__main__':
 
         block_info = recv_data_block(master_ip, master_snd_port)
         if block_info is not None:
+            print 'get the data block from the master'
             block_info = transcode_data(block_info)
         else:
+            print 'fail to get data block from the master'
             continue
 
         if block_info.status == 0:

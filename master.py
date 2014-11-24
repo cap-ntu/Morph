@@ -1,17 +1,24 @@
 import os
 import md5
+import time
 import Queue
+import socket
+import config
 import struct
 import threading
 import subprocess
 import SocketServer
 from common import *
 from random import Random
+from SocketServer import TCPServer
 from SocketServer import ThreadingMixIn
 from SimpleXMLRPCServer import SimpleXMLRPCServer, SimpleXMLRPCRequestHandler
 
-
+#used to store the task information
 tasks_queue = {}
+
+#the lock used to access the tasks_queue
+lock = threading.Lock()
 
 #the original videos which needs to be split into blocks
 split_queue = Queue.Queue(maxsize = 100)
@@ -19,19 +26,17 @@ split_queue = Queue.Queue(maxsize = 100)
 #the video blocks after slicing
 block_queue = Queue.Queue(maxsize = 1000)
 
-#the lock used to access the tasks_queue
-lock = threading.Lock()
-
+#the ip and port information of the master server
 master_ip       = config.master_ip
-master_rev_port = config.master_rev_port
-master_snd_port = config.master_snd_port
+master_rev_port = int(config.master_rev_port)
+master_snd_port = int(config.master_snd_port)
 master_rpc_port = int(config.master_rpc_port)
 
 
 class master_rpc_server(ThreadingMixIn, SimpleXMLRPCServer):
     pass
 
-class ThreadedTCPServer(ThreadingMixIn, SocketServer.TCPServer):
+class ThreadedTCPServer(ThreadingMixIn, TCPServer):
     pass
 
 # This function is used to generate a random string as the key of the task
@@ -45,46 +50,27 @@ def gen_key(randomlength = 8):
     return str
 
 
-class task:
-    def __init__(self):
-        self.task_id    = ""
-        self.file_path  = ""
-        self.bitrate    = -1
-        self.width      = -1
-        self.height     = -1
-        self.num        = -1
-
-'''
-task status: 0, 1, 2
-
-'''
-
-class task_status:
-    def __init__(self):
-        self.block      = None
-        self.status     = 0
-
-
-
 def add_trans_task(file_path, bitrate, width, height):
 
     key_val             = gen_key()
-    new_item            = task()
+    new_task            = task()
 
-    new_item.task_id    = key_val
-    new_item.file_path  = file_path
-    new_item.bitrate    = bitrate
-    new_item.width      = width
-    new_item.height     = height
-    new_item.num        = -1
-    split_queue.put_nowait(new_item)
-    print 'put the task into the queue'
+    new_task.task_id    = key_val
+    new_task.file_path  = file_path
+    new_task.bitrate    = bitrate
+    new_task.width      = width
+    new_task.height     = height
+    new_task.num        = -1
 
+    #put the transcoding task into the queue
     lock.acquire()
     tasks_queue[key_val] = {}
     lock.release()
 
-    return 0
+    split_queue.put_nowait(new_task)
+    print 'put the task into the splitting queue'
+    return key_val
+
 
 def query_result(task_id):
     pass
@@ -92,9 +78,9 @@ def query_result(task_id):
 
 class split_thread(threading.Thread):
 
-    def __init__(self, lock):
+    def __init__(self, index):
         threading.Thread.__init__(self)
-        self.lock   = lock
+        self.index = index
 
     '''
     This function is used to split the video into segments:
@@ -102,268 +88,236 @@ class split_thread(threading.Thread):
     ffmpeg -i china.mp4 -f segment -segment_time 10 -c copy -map 0 \
             -segment_list china.list china%03d.mp4
     '''
-
-    def split_video(item):
-        seg_time        = 60 * 30
-        file_path       = item.file_path
+    def split_video(self, task):
+        seg_dur         = 60 * 10
+        file_path       = task.file_path
         base_name       = os.path.basename(file_path)
         dir_name        = os.path.dirname(file_path)
         (prefix,suffix) = os.path.splitext(base_name)
+        work_path       = config.master_path
+        list_file_path  = os.path.join(work_path, prefix + ".list")
+        segm_file_path  = os.path.join(work_path, prefix + "%03d" + suffix)
 
-        cmd = "ffmpeg -i " + file_path + " -f segment -segment_time " + str(seg_time) + \
-                " -c copy -map 0 -segment_list " + prefix + ".list " + prefix + "%03d" + suffix
+        cmd = "ffmpeg -i " + file_path + " -f segment -segment_time " + str(seg_dur) + \
+                " -c copy -map 0 -segment_list " + list_file_path + "  " + segm_file_path
         print cmd
+
         #os.system(cmd)
         p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         #for line in p.stdout.readlines():
         #    print line,
         retval = p.wait()
 
-        f = open(prefix + ".list")
+        f = open(list_file_path)
         lines = f.readlines()
+        f.close()
 
         index = 0
         for line in lines:
-            new_block = block()
+            block_info = block()
             line = line.strip('\n')
 
-            new_block.task_id       = item.task_id
-            new_block.file_path     = dir_name + '/' + line
-            new_block.path_len      = len(new_block.file_path)
-            new_block.block_no      = index
-            new_block.total_no      = len(lines)
-            new_block.bitrate       = item.bitrate
-            new_block.width         = item.width
-            new_block.height        = item.height
-            new_block.size          = os.path.getsize(new_block.file_path)
+            block_info.task_id       = task.task_id
+            block_info.file_path     = os.path.join(work_path, line)
+            block_info.path_len      = len(block_info.file_path)
+            block_info.block_no      = index
+            block_info.total_no      = len(lines)
+            block_info.bitrate       = task.bitrate
+            block_info.width         = task.width
+            block_info.height        = task.height
+            block_info.size          = os.path.getsize(block_info.file_path)
 
-            print new_block.file_path
-            print new_block.size
-            f       = open(new_block.file_path, 'rb')
-            data    = f.read()
+            f    = open(block_info.file_path, 'rb')
+            data = f.read()
             f.close()
 
-            key     = md5.new()
+            key = md5.new()
             key.update(data)
-            md5_val = key.hexdigest()
+            block_info.md5_val = key.hexdigest()
 
-            new_block.md5_val = md5_val
-            print md5_val
-
-            block_queue.put(new_block)
+            block_queue.put(block_info)
             index = index + 1
 
     def run(self):
         while True:
             task = split_queue.get(True)
-            #print('Worker %s got task %s' % (n, item.task_id))
-            split_video(task)
+            print('Worker %s got task %s' % (self.index, task.task_id))
+            self.split_video(task)
 
-
+#get the current number of blocks in queue
 def get_blk_num():
     return block_queue.qsize()
 
+#responsible for sending data blocks to the workers
+class send_data(SocketServer.BaseRequestHandler):
 
-def send_data(s, sleep):
-    try:
-        block   = block_queue.get_nowait()
+    def handle(self):
+        print 'get the sending data request'
+        try:
+            block  = block_queue.get_nowait()
+            f      = open(block.file_path, 'rb')
+            data   = f.read()
+            f.close()
 
-        f       = open(block.file_path, 'rb')
-        data    = f.read()
-        f.close()
+            pack    = pack_block_info(block)
+            data_block = pack + data
+            print 'data_block length:', len(data_block)
 
-        pack    = pack_block_info(block)
-        content = pack + data
-        print 'content length:', len(content)
+            sum = 0
+            while True:
+                cnt = self.request.send(data_block[sum: sum + 1024*400])
+                sum = cnt + sum
+                if cnt == 0:
+                    print 'the number of bytes sent:', sum
+                    self.request.shutdown(socket.SHUT_WR)
+                    break
 
-        sum = 0
-        while True:
-            cnt = s.send(content[sum: sum + 1024*400])
-            # print cnt
-            sum = cnt + sum
-            if cnt == 0:
-                print 'finished:', sum
-                break
+            ret_msg = self.request.recv(10)
+            print 'the return msg is:', ret_msg
+            self.request.close()
 
-        s.shutdown(gevent.socket.SHUT_WR)
-        ret_msg = s.recv(10)
-        print 'the return msg is:', ret_msg
-
-        s.close()
-
-    except Exception, ex:
-        print ex
-        s.close()
-
-def send_data_server(port):
-    s = gevent.socket.socket()
-    s.setsockopt(gevent.socket.SOL_SOCKET, gevent.socket.SO_RCVBUF, 1024*1024)
-    s.setsockopt(gevent.socket.SOL_SOCKET, gevent.socket.SO_SNDBUF, 1024*1024)
-
-    #print s.getsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF)
-    #print s.getsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF)
-
-    s.bind(('0.0.0.0', port))
-    s.listen(500)
-
-    while True:
-        cli, addr = s.accept()
-        gevent.spawn(send_data, cli, gevent.sleep)
+        except Exception, ex:
+            self.request.close()
+            print ex
 
 
 class send_data_thread(threading.Thread):
 
-    def __init__(self, lock, index):
+    def __init__(self):
         threading.Thread.__init__(self)
-        self.lock   = lock
-        self.index  = index
 
     def run(self):
-        server = ThreadedTCPServer((HOST, PORT), MyTCPHandler)
+        print 'start the sending data thread'
+        server = ThreadedTCPServer((master_ip, master_snd_port), send_data)
         server.serve_forever()
+
+
+class recv_data(SocketServer.BaseRequestHandler):
+
+    def handle(self):
+        print 'get the receiving data request'
+        flag        = 0
+        data_block  = ''
+        success     = 0
+        block_info  = block()
+        work_path   = config.master_path
+        print 'begin to receive data from worker'
+
+        try:
+            while True:
+                data = self.request.recv(1024*400)
+                data_block = data_block + data
+                if flag == 0 and len(data_block) >= struct.calcsize(block_format):
+                    flag = 1
+                    (block_info.task_id,  \
+                    block_info.path_len,  \
+                    block_info.file_path, \
+                    block_info.block_no,  \
+                    block_info.total_no,  \
+                    block_info.bitrate,   \
+                    block_info.width,     \
+                    block_info.height,    \
+                    block_info.size,      \
+                    block_info.md5_val,   \
+                    block_info.status)   = struct.unpack(block_format, data_block[0:struct.calcsize(block_format)])
+
+                if not data:
+                    break
+
+            if block_info.size == len(data_block) - struct.calcsize(block_format):
+                print 'received data: length okay'
+            else:
+                print block_info.size
+                print len(data_block) - struct.calcsize(block_format)
+                print 'received data: length error'
+                return None
+
+            key = md5.new()
+            key.update(data_block[struct.calcsize(block_format):])
+            val = key.hexdigest()
+
+            if block_info.md5_val == val:
+                print 'received data: md5 check okay'
+                self.request.sendall('okay')
+
+                path_len    = block_info.path_len
+                base_name   = os.path.basename(block_info.file_path[0:path_len])
+                new_path    = os.path.join(work_path, base_name)
+
+                block_info.file_path = new_path
+                block_info.path_len  = len(new_path)
+
+                new_task = task_status()
+                new_task.block  = block_info
+                new_task.status = 2
+
+                task_id     = block_info.task_id
+                block_id    = block_info.block_no
+
+                lock.acquire()
+                tasks           = tasks_queue[task_id]
+                tasks[block_id] = new_task
+                lock.release()
+
+                f = open(new_path, 'wb')
+                f.write(data_block[struct.calcsize(block_format):])
+                f.close()
+                sucess = 1
+            else:
+                print 'received data: md5 check fail'
+                self.request.sendall('fail')
+                sucess = 0
+
+        except Exception, ex:
+            print ex
+            self.request.sendall('fail')
+            sucess = 0
+        finally:
+            self.request.close()
+            if sucess == 1:
+                return block_info
+            else:
+                return None
+
 
 class recv_data_thread(threading.Thread):
 
-    def __init__(self, lock, index):
+    def __init__(self):
         threading.Thread.__init__(self)
-        self.lock   = lock
-        self.index  = index
 
     def run(self):
-        server = ThreadedTCPServer((HOST, PORT), MyTCPHandler)
+        print 'start the receiving data thread'
+        server = ThreadedTCPServer((master_ip, master_rev_port), recv_data)
         server.serve_forever()
-
-
-def recv_data(s, sleep):
-
-    flag        = 0
-    content     = ''
-    success     = 0
-    new_block   = block()
-    working_path = '/tmp/server/'
-
-    print 'begin to receive data from client'
-
-    try:
-        while True:
-            data = s.recv(1024*400)
-            content = content + data
-            if flag == 0 and len(content) >= struct.calcsize(block_format):
-                flag = 1
-                (new_block.task_id,   \
-                 new_block.path_len,  \
-                 new_block.file_path, \
-                 new_block.block_no,  \
-                 new_block.total_no,  \
-                 new_block.bitrate,   \
-                 new_block.width,     \
-                 new_block.height,    \
-                 new_block.size,      \
-                 new_block.md5_val)   = struct.unpack(block_format, content[0:struct.calcsize(block_format)])
-
-            if not data:
-                break
-
-        if new_block.size == len(content) - struct.calcsize(block_format):
-            print 'received data: length okay'
-        else:
-            print new_block.size
-            print len(content) - struct.calcsize(block_format)
-            print 'received data: length error'
-            return None
-
-        key = md5.new()
-        key.update(content[struct.calcsize(block_format):])
-        val = key.hexdigest()
-
-        if new_block.md5_val == val:
-            print 'received data: md5 check okay'
-            path_len    = new_block.path_len
-            base_name   = os.path.basename(new_block.file_path[0:path_len])
-            new_path    = working_path + base_name
-
-            new_block.file_path = new_path
-            new_block.path_len  = len(new_path)
-
-            new_task = task_status()
-            new_task.block  = new_block
-            new_task.status = 2
-
-            task_id     = new_block.task_id
-            block_id    = new_block.block_no
-
-            lock.acquire()
-            tasks           = tasks_queue[task_id]
-            tasks[block_id] = new_task
-            lock.release()
-
-            f = open(new_path, 'wb')
-            f.write(content[struct.calcsize(block_format):])
-            f.close()
-            s.send('okay')
-            sucess = 1
-        else:
-            print 'received data: md5 check fail'
-            s.send('fail')
-            sucess = 0
-
-
-    except Exception, ex:
-        print ex
-        s.send('fail')
-        sucess = 0
-    finally:
-        s.close()
-        if sucess == 1:
-            return new_block
-        else:
-            return None
-
-
-def receiver(port):
-    s = gevent.socket.socket()
-    s.setsockopt(gevent.socket.SOL_SOCKET, gevent.socket.SO_RCVBUF, 1024*1024)
-    s.setsockopt(gevent.socket.SOL_SOCKET, gevent.socket.SO_SNDBUF, 1024*1024)
-
-    #print s.getsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF)
-    #print s.getsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF)
-
-    s.bind(('0.0.0.0', port))
-    s.listen(500)
-
-    while True:
-        cli, addr = s.accept()
-        gevent.spawn(recv_data, cli, gevent.sleep)
-
-
-def concat_block(task):
-    print 'concatenate the blocks:'
-    total_no    = task[0].block.total_no
-    file_path   = task[0].block.file_path
-
-    dir_name    = os.path.dirname(file_path)
-    task_id     = task[0].block.task_id
-    list_name   = dir_name + '/' + task_id + '.list'
-    new_file    = dir_name + '/' + task_id + '.mp4'
-
-    f = open(list_name, 'w')
-    for key in range(0, total_no):
-        line = 'file ' + '\'' + task[key].block.file_path + '\'' + '\n'
-        print line
-        f.write(line)
-    f.close()
-
-    cmd = 'ffmpeg -f concat -i ' + list_name + ' -c copy ' + new_file
-    os.system(cmd)
-
 
 
 class task_status_checker(threading.Thread):
 
-    def __init__(self, lock, index):
+    def __init__(self):
         threading.Thread.__init__(self)
-        self.lock   = lock
-        self.index  = index
+
+    def concat_block(self, task):
+        print 'concatenate the blocks:'
+        total_no    = task[0].block.total_no
+        file_path   = task[0].block.file_path
+
+        dir_name    = os.path.dirname(file_path)
+        base_name   = os.path.basename(file_path)
+        (pre, suf)  = os.path.splitext(base_name)
+
+        task_id     = task[0].block.task_id
+        list_file   = os.path.join(dir_name, task_id + '.list')
+        new_file    = os.path.join(dir_name, task_id + suf)
+
+        f = open(list_file, 'w')
+        for key in range(0, total_no):
+            line = 'file ' + '\'' + task[key].block.file_path + '\'' + '\n'
+            print line
+            f.write(line)
+        f.close()
+
+        cmd = 'ffmpeg -f concat -i ' + list_file + ' -c copy ' + new_file
+        os.system(cmd)
 
     def run(self):
         while True:
@@ -379,9 +333,9 @@ class task_status_checker(threading.Thread):
                     if blk_no == block_0.total_no:
                         print 'job finished'
                         tasks_queue.pop(task_id)
-                        concat_block(task)
+                        self.concat_block(task)
             lock.release()
-            gevent.sleep(5)
+            time.sleep(2)
 
 
 if __name__ == '__main__':
