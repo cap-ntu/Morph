@@ -43,12 +43,14 @@ def recv_data_block(master_ip, master_snd_port):
             if not data:
                 break
 
+        #check the md5 value of the received data
         key = md5.new()
         key.update(block_data[struct.calcsize(block_format):])
         val = key.hexdigest()
 
         if block_info.md5_val == val:
             s.send('okay')
+            s.shutdown(socket.SHUT_WR)
             print 'the MD5 checking of the received data block is okay'
 
             path_len    = block_info.path_len
@@ -65,6 +67,7 @@ def recv_data_block(master_ip, master_snd_port):
             success = 1
         else:
             s.send('fail')
+            s.shutdown(socket.SHUT_WR)
             print 'md5 check fail'
             success = 0
 
@@ -82,7 +85,7 @@ def recv_data_block(master_ip, master_snd_port):
 
 
 def transcode_data(block_info):
-    print 'transcode the video block into the user requested block_format'
+    print 'transcode the video block into the user requested format'
     #print block_info.task_id
     #print block_info.file_path
 
@@ -166,7 +169,7 @@ if __name__ == '__main__':
     master_snd_port = int(config.master_snd_port)
 
     rpc_addr = "http://" + master_ip + ":" + master_rpc_port
-    server = xmlrpclib.ServerProxy(rpc_addr)
+    server   = xmlrpclib.ServerProxy(rpc_addr)
 
     while True:
         num = server.get_blk_num()

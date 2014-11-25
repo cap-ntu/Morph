@@ -63,8 +63,11 @@ def add_trans_task(file_path, bitrate, width, height):
     new_task.num        = -1
 
     #put the transcoding task into the queue
+    task_stat = task_status()
+    task_stat.start_time = time.time()
+    task_stat.progress   = 1
     lock.acquire()
-    tasks_queue[key_val] = {}
+    tasks_queue[key_val] = task_stat
     lock.release()
 
     split_queue.put_nowait(new_task)
@@ -92,7 +95,7 @@ class split_thread(threading.Thread):
         seg_dur         = 60 * 10
         file_path       = task.file_path
         base_name       = os.path.basename(file_path)
-        dir_name        = os.path.dirname(file_path)
+        #dir_name       = os.path.dirname(file_path)
         (prefix,suffix) = os.path.splitext(base_name)
         work_path       = config.master_path
         list_file_path  = os.path.join(work_path, prefix + ".list")
@@ -137,12 +140,19 @@ class split_thread(threading.Thread):
 
             block_queue.put(block_info)
             index = index + 1
+            #put the video blocks into the splitting queue
+
+        lock.acquire()
+        task_stat = tasks_queue[task.task_id]
+        task_stat.block_num = len(lines)
+        lock.release()
 
     def run(self):
         while True:
             task = split_queue.get(True)
-            print('Worker %s got task %s' % (self.index, task.task_id))
+            print('Worker %s got task %s for splitting' % (self.index, task.task_id))
             self.split_video(task)
+
 
 #get the current number of blocks in queue
 def get_blk_num():
@@ -247,16 +257,16 @@ class recv_data(SocketServer.BaseRequestHandler):
                 block_info.file_path = new_path
                 block_info.path_len  = len(new_path)
 
-                new_task = task_status()
-                new_task.block  = block_info
-                new_task.status = 2
+                #new_task = task_status()
+                #new_task.block  = block_info
 
                 task_id     = block_info.task_id
                 block_id    = block_info.block_no
 
                 lock.acquire()
-                tasks           = tasks_queue[task_id]
-                tasks[block_id] = new_task
+                task_stat           = tasks_queue[task_id]
+                task_stat.fin_num   += 1
+                task_stat.block[block_id] = block_info
                 lock.release()
 
                 f = open(new_path, 'wb')
@@ -298,20 +308,20 @@ class task_status_checker(threading.Thread):
 
     def concat_block(self, task):
         print 'concatenate the blocks:'
-        total_no    = task[0].block.total_no
-        file_path   = task[0].block.file_path
+        total_no    = task.block_num
+        file_path   = task.block[0].file_path
 
         dir_name    = os.path.dirname(file_path)
         base_name   = os.path.basename(file_path)
         (pre, suf)  = os.path.splitext(base_name)
 
-        task_id     = task[0].block.task_id
+        task_id     = task.block[0].task_id
         list_file   = os.path.join(dir_name, task_id + '.list')
         new_file    = os.path.join(dir_name, task_id + suf)
 
         f = open(list_file, 'w')
-        for key in range(0, total_no):
-            line = 'file ' + '\'' + task[key].block.file_path + '\'' + '\n'
+        for i in range(0, total_no):
+            line = 'file ' + '\'' + task.block[i].file_path + '\'' + '\n'
             print line
             f.write(line)
         f.close()
@@ -321,19 +331,20 @@ class task_status_checker(threading.Thread):
 
     def run(self):
         while True:
-            lock.acquire()
-            task = None
             print 'current task number:', len(tasks_queue)
-            for task_id in tasks_queue.keys():
-                task = tasks_queue[task_id]
-                blk_no = len(task.keys())
+            print 'current block number:', len(block_queue)
 
-                if blk_no > 0:
-                    block_0 = task[task.keys()[0]].block
-                    if blk_no == block_0.total_no:
-                        print 'job finished'
-                        tasks_queue.pop(task_id)
-                        self.concat_block(task)
+            lock.acquire()
+            task_stat = None
+            for task_id in tasks_queue.keys():
+                task_stat   = tasks_queue[task_id]
+                fin_blk_no  = task_stat.fin_num
+
+                if fin_blk_no == task_stat.block_num:
+                    print 'job finished'
+                    tasks_queue.pop(task_id)
+                    self.concat_block(task_stat)
+
             lock.release()
             time.sleep(2)
 

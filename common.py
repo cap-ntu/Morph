@@ -4,7 +4,7 @@ class task:
     def __init__(self):
         self.task_id    = ""
         self.file_path  = ""
-        self.bitrate    = 0
+        self.bitrate    = ""
         self.width      = ""
         self.height     = ""
         self.num        = 0
@@ -12,9 +12,11 @@ class task:
 # task status: 0, 1, 2
 class task_status:
     def __init__(self):
-        self.block      = None
-        self.status     = 0
-        self.progress   = 0
+        self.block      = {}    #the status of each block
+        self.fin_num    = 0     #the finished number of transcoding tasks
+        self.progress   = 0     #the current progress of the transcoding task
+        self.start_time = 0     #the time of adding the transcoding task
+        self.block_num  = 0     #the total number of video blocks
 
 block_format  = "8si200siii4s4si32si"
 

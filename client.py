@@ -14,4 +14,4 @@ if __name__ == "__main__":
     width     = "%04d" % int("400")
     height    = "%04d" % int("400")
 
-    ret = server.add_trans_task(file_path, 0, width, height)
+    ret = server.add_trans_task(file_path, "", width, height)
