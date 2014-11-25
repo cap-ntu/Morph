@@ -332,7 +332,7 @@ class task_status_checker(threading.Thread):
     def run(self):
         while True:
             print 'current task number:', len(tasks_queue)
-            print 'current block number:', len(block_queue)
+            #print 'current block number:', block_queue.qsize
 
             lock.acquire()
             task_stat = None

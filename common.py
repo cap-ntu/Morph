@@ -16,9 +16,9 @@ class task_status:
         self.fin_num    = 0     #the finished number of transcoding tasks
         self.progress   = 0     #the current progress of the transcoding task
         self.start_time = 0     #the time of adding the transcoding task
-        self.block_num  = 0     #the total number of video blocks
+        self.block_num  = -1    #the total number of video blocks
 
-block_format  = "8si200siii4s4si32si"
+block_format  = "8si200sii4s4s4si32si"
 
 class block:
     def __init__(self):
@@ -27,7 +27,7 @@ class block:
         self.file_path  = ""
         self.block_no   = 0
         self.total_no   = 0
-        self.bitrate    = 0
+        self.bitrate    = ""
         self.width      = ""
         self.height     = ""
         self.size       = 0
