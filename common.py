@@ -9,7 +9,12 @@ class task:
         self.height     = ""
         self.num        = 0
 
-# task status: 0, 1, 2
+'''
+task progress:
+1, wait for splitting
+2, wait for transcoding
+3, finished
+'''
 class task_status:
     def __init__(self):
         self.block      = {}    #the status of each block

@@ -1,6 +1,7 @@
 import os
 import md5
 import time
+import pickle
 import Queue
 import socket
 import config
@@ -75,8 +76,20 @@ def add_trans_task(file_path, bitrate, width, height):
     return key_val
 
 
-def query_result(task_id):
-    pass
+def get_progress(task_id):
+    work_path = config.master_path
+    f_name = os.path.join(work_path, task_id + '.pkl')
+    if os.path.isfile(f_name) == True:
+        pkl_file = open(f_name, 'rb')
+        task_status = pickle.load(pkl_file)
+        pkl_file.close()
+        return task_status.progress
+    else:
+        lock.acquire()
+        task_stat = tasks_queue[task_id]
+        lock.release()
+        ret = task_stat.progress
+        return ret
 
 
 class split_thread(threading.Thread):
@@ -309,6 +322,13 @@ class task_status_checker(threading.Thread):
     def __init__(self):
         threading.Thread.__init__(self)
 
+    def write_pkl(self, task_id, task):
+        work_path = config.master_path
+        f_name = os.path.join(work_path, task_id + '.pkl')
+        output = open(f_name, 'wb')
+        pickle.dump(task, output)
+        output.close()
+
     def concat_block(self, task):
         print 'concatenate the blocks:'
         total_no    = task.block_num
@@ -348,19 +368,25 @@ class task_status_checker(threading.Thread):
 
                 if fin_blk_no == task_stat.block_num:
                     print 'job finished'
+                    task_stat.progress = 3
                     tasks_queue.pop(task_id)
                     self.concat_block(task_stat)
+                    self.write_pkl(task_id, task_stat)
 
             lock.release()
-            time.sleep(2)
+            time.sleep(1)
+
+class RequestHandler(SimpleXMLRPCRequestHandler):
+    def log_message(self, format, *args):
+        pass
 
 
 if __name__ == '__main__':
 
     #start the rpc thread to handle the request
-    server = master_rpc_server((master_ip, master_rpc_port))
+    server = master_rpc_server((master_ip, master_rpc_port), requestHandler = RequestHandler)
     server.register_function(add_trans_task, "add_trans_task")
-    server.register_function(query_result, "query_result")
+    server.register_function(get_progress, "get_progress")
     server.register_function(get_blk_num,  "get_blk_num")
 
     #create the thread for splitting video files
