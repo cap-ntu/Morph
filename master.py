@@ -95,21 +95,23 @@ class split_thread(threading.Thread):
         seg_dur         = 60 * 10
         file_path       = task.file_path
         base_name       = os.path.basename(file_path)
-        #dir_name       = os.path.dirname(file_path)
         (prefix,suffix) = os.path.splitext(base_name)
         work_path       = config.master_path
-        list_file_path  = os.path.join(work_path, prefix + ".list")
-        segm_file_path  = os.path.join(work_path, prefix + "%03d" + suffix)
+        list_file_path  = os.path.join(work_path, task.task_id + ".list")
+        segm_file_path  = os.path.join(work_path, task.task_id + "_%03d_" + suffix)
 
         cmd = "ffmpeg -i " + file_path + " -f segment -segment_time " + str(seg_dur) + \
                 " -c copy -map 0 -segment_list " + list_file_path + "  " + segm_file_path
         print cmd
 
         #os.system(cmd)
-        p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-        #for line in p.stdout.readlines():
-        #    print line,
-        retval = p.wait()
+        print 'start to split the video into segments'
+        p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+        stdout, stderr = p.communicate()
+        ret = p.returncode
+        print 'the return code is:', ret
+        if ret != 0:
+            return
 
         f = open(list_file_path)
         lines = f.readlines()
@@ -145,6 +147,7 @@ class split_thread(threading.Thread):
         lock.acquire()
         task_stat = tasks_queue[task.task_id]
         task_stat.block_num = len(lines)
+        task_stat.progress  = 2
         lock.release()
 
     def run(self):
@@ -327,12 +330,15 @@ class task_status_checker(threading.Thread):
         f.close()
 
         cmd = 'ffmpeg -f concat -i ' + list_file + ' -c copy ' + new_file
-        os.system(cmd)
+        #os.system(cmd)
+        p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+        stdout, stderr = p.communicate()
+        ret = p.returncode
 
     def run(self):
         while True:
-            print 'current task number:', len(tasks_queue)
-            #print 'current block number:', block_queue.qsize
+            #print 'current number of ongoing tasks:', len(tasks_queue)
+            #print 'current number of blocks in queue:', get_blk_num()
 
             lock.acquire()
             task_stat = None

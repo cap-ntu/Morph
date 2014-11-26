@@ -98,12 +98,12 @@ def transcode_data(block_info):
     cmd = "ffmpeg -y -i " + block_info.file_path + " -s " + resolution + " -strict -2 " + new_path
     print cmd
 
-    os.system(cmd)
-    #p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    #for line in p.stdout.readlines():
-    #    print line,
-    #retval = p.wait()
-    #we still to check the result at here
+    #os.system(cmd)
+    print 'start to encode a video block'
+    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+    stdout, stderr = p.communicate()
+    ret = p.returncode
+    print 'the return code is:', ret
 
     f    = open(new_path, 'rb')
     data = f.read()
