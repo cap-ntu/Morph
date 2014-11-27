@@ -123,7 +123,12 @@ class split_thread(threading.Thread):
         stdout, stderr = p.communicate()
         ret = p.returncode
         print 'the return code is:', ret
+
         if ret != 0:
+            lock.acquire()
+            task_stat = tasks_queue[task.task_id]
+            task_stat.progress = -1
+            lock.release()
             return
 
         f = open(list_file_path)
@@ -345,15 +350,14 @@ class task_status_checker(threading.Thread):
         f = open(list_file, 'w')
         for i in range(0, total_no):
             line = 'file ' + '\'' + task.block[i].file_path + '\'' + '\n'
-            print line
             f.write(line)
         f.close()
 
         cmd = 'ffmpeg -f concat -i ' + list_file + ' -c copy ' + new_file
-        #os.system(cmd)
         p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
         stdout, stderr = p.communicate()
         ret = p.returncode
+        return ret
 
     def run(self):
         while True:
@@ -366,12 +370,21 @@ class task_status_checker(threading.Thread):
                 task_stat   = tasks_queue[task_id]
                 fin_blk_no  = task_stat.fin_num
 
-                if fin_blk_no == task_stat.block_num:
+                if fin_blk_no == task_stat.block_num and task_stat.progress == 2:
                     print 'job finished'
-                    task_stat.progress = 3
                     tasks_queue.pop(task_id)
-                    self.concat_block(task_stat)
+                    ret = self.concat_block(task_stat)
+                    if ret == 0:
+                        task_stat.progress = 3
+                    else:
+                        task_stat.progress = -3
                     self.write_pkl(task_id, task_stat)
+                    continue
+
+                if task_stat.progress < 0:
+                    tasks_queue.pop(task_id)
+                    self.write_pkl(task_id, task_stat)
+                    continue
 
             lock.release()
             time.sleep(1)

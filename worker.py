@@ -98,28 +98,34 @@ def transcode_data(block_info):
     cmd = "ffmpeg -y -i " + block_info.file_path + " -s " + resolution + " -strict -2 " + new_path
     print cmd
 
-    #os.system(cmd)
     print 'start to encode a video block'
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
     stdout, stderr = p.communicate()
     ret = p.returncode
     print 'the return code is:', ret
 
-    f    = open(new_path, 'rb')
-    data = f.read()
-    f.close()
+    block_info.status = ret
+
+    data = ""
+    if ret == 0:
+        f    = open(new_path, 'rb')
+        data = f.read()
+        f.close()
 
     key = md5.new()
     key.update(data)
     md5_val = key.hexdigest()
+    block_info.md5_val = md5_val
 
-    size = os.path.getsize(new_path)
-
-    block_info.file_path = new_path
-    block_info.path_len  = len(new_path)
-    block_info.size      = size
-    block_info.md5_val   = md5_val
-    block_info.status    = 0
+    if ret == 0:
+        size = os.path.getsize(new_path)
+        block_info.file_path = new_path
+        block_info.path_len  = len(new_path)
+        block_info.size      = size
+    else:
+        block_info.file_path = ""
+        block_info.path_len  = 0
+        block_info.size      = 0
 
     return block_info
 
@@ -134,9 +140,11 @@ def send_back_data(block_info, master_ip, master_rev_port):
 
         s.connect((master_ip, master_rev_port))
 
-        f    = open(block_info.file_path, 'rb')
-        data = f.read()
-        f.close()
+        data = ""
+        if block_info.status == 0:
+            f    = open(block_info.file_path, 'rb')
+            data = f.read()
+            f.close()
 
         pack = pack_block_info(block_info)
         block_data = pack + data
@@ -186,8 +194,9 @@ if __name__ == '__main__':
             print 'fail to get data block from the master'
             continue
 
-        if block_info.status == 0:
-            send_back_data(block_info, master_ip, master_rev_port)
+        #send back the transcoded video, the content depends on whether
+        #it has succeed
+        send_back_data(block_info, master_ip, master_rev_port)
 
 
 
