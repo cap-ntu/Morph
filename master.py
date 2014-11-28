@@ -376,6 +376,9 @@ class task_status_checker(threading.Thread):
                     ret = self.concat_block(task_stat)
                     if ret == 0:
                         task_stat.progress = 3
+                        cur_time = time.time()
+                        dur_time = cur_time - task_stat.start_time
+                        print 'transcoding duration:', dur_time
                     else:
                         task_stat.progress = -3
                     self.write_pkl(task_id, task_stat)
