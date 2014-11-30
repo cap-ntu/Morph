@@ -1,4 +1,5 @@
 import struct
+import logging
 
 class task:
     def __init__(self):
@@ -8,6 +9,7 @@ class task:
         self.width      = ""
         self.height     = ""
         self.num        = 0
+        self.priority   = 2
 
 '''
 task progress:
@@ -23,7 +25,7 @@ class task_status:
         self.start_time = 0     #the time of adding the transcoding task
         self.block_num  = 0     #the total number of video blocks
 
-block_format  = "8si200sii4s4s4si32si"
+block_format  = "8si200sii4s4s4si32sii"
 
 class block:
     def __init__(self):
@@ -38,6 +40,7 @@ class block:
         self.size       = 0
         self.md5_val    = ""
         self.status     = 0
+        self.priority   = 1
 
 def pack_block_info(block):
     pack    = struct.pack(block_format, block.task_id, \
@@ -50,7 +53,20 @@ def pack_block_info(block):
                     block.height,
                     block.size,
                     block.md5_val,
-                    block.status)
+                    block.status,
+                    block.priority)
     return pack
+
+
+def init_log_module(logger_name, ip, level):
+    logger = logging.getLogger(logger_name)
+    logger.setLevel(level)
+
+    fh = logging.FileHandler(logger_name + '.' + ip + '.log')
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    fh.setFormatter(formatter)
+    logger.addHandler(fh)
+
+    return logger
 
 

@@ -7,3 +7,7 @@ master_path = "/tmp/master/"
 
 #the configuration of the worker node
 worker_path = "/tmp/worker/"
+
+
+#other configuration
+segment_duration = 60*3

@@ -4,6 +4,7 @@ import time
 import socket
 import config
 import struct
+import logging
 import subprocess
 import xmlrpclib
 from common import *
@@ -37,8 +38,9 @@ def recv_data_block(master_ip, master_snd_port):
                  block_info.width,     \
                  block_info.height,    \
                  block_info.size,      \
-                 block_info.md5_val,
-                 block_info.status)   = struct.unpack(block_format, block_data[0:struct.calcsize(block_format)])
+                 block_info.md5_val,   \
+                 block_info.status,    \
+                 block_info.priority)   = struct.unpack(block_format, block_data[0:struct.calcsize(block_format)])
 
             if not data:
                 break
@@ -170,6 +172,14 @@ def send_back_data(block_info, master_ip, master_rev_port):
 
 
 if __name__ == '__main__':
+
+    host_name = socket.gethostname()
+    host_name = host_name.replace(" ", "").lower()
+    if len(host_name) == 0:
+        host_name = "localhost"
+
+    logger = init_log_module("worker", host_name, logging.DEBUG)
+    logger.debug('start the worker')
 
     master_ip       = config.master_ip
     master_rpc_port = config.master_rpc_port

@@ -3,6 +3,7 @@ import md5
 import time
 import pickle
 import Queue
+import logging
 import socket
 import config
 import struct
@@ -11,9 +12,11 @@ import subprocess
 import SocketServer
 from common import *
 from random import Random
+from Queue import PriorityQueue
 from SocketServer import TCPServer
 from SocketServer import ThreadingMixIn
 from SimpleXMLRPCServer import SimpleXMLRPCServer, SimpleXMLRPCRequestHandler
+
 
 #used to store the task information
 tasks_queue = {}
@@ -22,10 +25,10 @@ tasks_queue = {}
 lock = threading.Lock()
 
 #the original videos which needs to be split into blocks
-split_queue = Queue.Queue(maxsize = 100)
+split_queue = PriorityQueue(100)
 
 #the video blocks after slicing
-block_queue = Queue.Queue(maxsize = 1000)
+block_queue = PriorityQueue(5000)
 
 #the ip and port information of the master server
 master_ip       = config.master_ip
@@ -71,7 +74,7 @@ def add_trans_task(file_path, bitrate, width, height):
     tasks_queue[key_val] = task_stat
     lock.release()
 
-    split_queue.put_nowait(new_task)
+    split_queue.put_nowait((new_task.priority, 1, new_task))
     print 'put the task into the splitting queue'
     return key_val
 
@@ -105,7 +108,7 @@ class split_thread(threading.Thread):
             -segment_list china.list china%03d.mp4
     '''
     def split_video(self, task):
-        seg_dur         = 60 * 10
+        seg_dur         = config.segment_duration
         file_path       = task.file_path
         base_name       = os.path.basename(file_path)
         (prefix,suffix) = os.path.splitext(base_name)
@@ -117,7 +120,6 @@ class split_thread(threading.Thread):
                 " -c copy -map 0 -segment_list " + list_file_path + "  " + segm_file_path
         print cmd
 
-        #os.system(cmd)
         print 'start to split the video into segments'
         p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
         stdout, stderr = p.communicate()
@@ -141,6 +143,7 @@ class split_thread(threading.Thread):
             line = line.strip('\n')
 
             block_info.task_id       = task.task_id
+            block_info.priority      = task.priority
             block_info.file_path     = os.path.join(work_path, line)
             block_info.path_len      = len(block_info.file_path)
             block_info.block_no      = index
@@ -158,7 +161,7 @@ class split_thread(threading.Thread):
             key.update(data)
             block_info.md5_val = key.hexdigest()
 
-            block_queue.put(block_info)
+            block_queue.put((block_info.priority, 1, block_info))
             index = index + 1
             #put the video blocks into the splitting queue
 
@@ -170,8 +173,9 @@ class split_thread(threading.Thread):
 
     def run(self):
         while True:
-            task = split_queue.get(True)
-            print('Worker %s got task %s for splitting' % (self.index, task.task_id))
+            _, _, task = split_queue.get(True)
+            log_msg = 'Worker %s got task %s for splitting' % (self.index, task.task_id)
+            logger.debug(log_msg)
             self.split_video(task)
 
 
@@ -185,7 +189,7 @@ class send_data(SocketServer.BaseRequestHandler):
     def handle(self):
         print 'get the sending data request'
         try:
-            block  = block_queue.get_nowait()
+            _, _, block  = block_queue.get_nowait()
             f      = open(block.file_path, 'rb')
             data   = f.read()
             f.close()
@@ -250,7 +254,8 @@ class recv_data(SocketServer.BaseRequestHandler):
                     block_info.height,    \
                     block_info.size,      \
                     block_info.md5_val,   \
-                    block_info.status)   = struct.unpack(block_format, data_block[0:struct.calcsize(block_format)])
+                    block_info.status,
+                    block_info.priority)   = struct.unpack(block_format, data_block[0:struct.calcsize(block_format)])
 
                 if not data:
                     break
@@ -398,6 +403,9 @@ class RequestHandler(SimpleXMLRPCRequestHandler):
 
 
 if __name__ == '__main__':
+
+    logger = init_log_module("master", master_ip, logging.DEBUG)
+    logger.debug('start the master server')
 
     #start the rpc thread to handle the request
     server = master_rpc_server((master_ip, master_rpc_port), requestHandler = RequestHandler)
