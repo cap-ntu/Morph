@@ -1,4 +1,5 @@
 import os
+import sys
 import md5
 import time
 import pickle
@@ -17,6 +18,8 @@ from SocketServer import TCPServer
 from SocketServer import ThreadingMixIn
 from SimpleXMLRPCServer import SimpleXMLRPCServer, SimpleXMLRPCRequestHandler
 
+#the handler of the log module
+logger = None
 
 #used to store the task information
 tasks_queue = {}
@@ -24,7 +27,7 @@ tasks_queue = {}
 #the lock used to access the tasks_queue
 lock = threading.Lock()
 
-#the original videos which needs to be split into blocks
+#the original videos which need to be split into blocks
 split_queue = PriorityQueue(100)
 
 #the video blocks after slicing
@@ -173,9 +176,10 @@ class split_thread(threading.Thread):
         lock.release()
 
     def run(self):
+        logger.debug('start worker for splitting: %s', self.index)
         while True:
             _, _, task = split_queue.get(True)
-            log_msg = 'Worker %s got task %s for splitting' % (self.index, task.task_id)
+            log_msg = '%s: Worker %s got task for splitting' % (task.task_id, self.index)
             logger.debug(log_msg)
             self.split_video(task)
 
@@ -407,6 +411,11 @@ if __name__ == '__main__':
 
     logger = init_log_module("master", master_ip, logging.DEBUG)
     logger.debug('start the master server')
+
+    work_path = config.master_path
+    if os.path.exists(work_path) == False:
+        logger.critical('work path does not exist:%s', work_path)
+        sys.exit()
 
     #start the rpc thread to handle the request
     server = master_rpc_server((master_ip, master_rpc_port), requestHandler = RequestHandler)
