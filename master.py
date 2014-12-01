@@ -54,7 +54,7 @@ def gen_key(randomlength = 8):
     return str
 
 
-def add_trans_task(file_path, bitrate, width, height):
+def put_trans_task(file_path, bitrate, width, height, priority):
 
     key_val             = gen_key()
     new_task            = task()
@@ -65,6 +65,7 @@ def add_trans_task(file_path, bitrate, width, height):
     new_task.width      = width
     new_task.height     = height
     new_task.num        = -1
+    new_task.priority   = priority
 
     #put the transcoding task into the queue
     task_stat = task_status()
@@ -75,7 +76,7 @@ def add_trans_task(file_path, bitrate, width, height):
     lock.release()
 
     split_queue.put_nowait((new_task.priority, 1, new_task))
-    print 'put the task into the splitting queue'
+    print 'put the task into the splitting queue, priority:', new_task.priority
     return key_val
 
 
@@ -409,7 +410,7 @@ if __name__ == '__main__':
 
     #start the rpc thread to handle the request
     server = master_rpc_server((master_ip, master_rpc_port), requestHandler = RequestHandler)
-    server.register_function(add_trans_task, "add_trans_task")
+    server.register_function(put_trans_task, "put_trans_task")
     server.register_function(get_progress, "get_progress")
     server.register_function(get_blk_num,  "get_blk_num")
 

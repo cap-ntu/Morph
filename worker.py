@@ -191,7 +191,7 @@ if __name__ == '__main__':
 
     while True:
         num = server.get_blk_num()
-        print "The current number of blocks in the master:", num
+        #print "The current number of blocks in the master:", num
         if num == 0:
             time.sleep(1)
             continue
