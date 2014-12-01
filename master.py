@@ -79,7 +79,9 @@ def put_trans_task(file_path, bitrate, width, height, priority):
     lock.release()
 
     split_queue.put_nowait((new_task.priority, 1, new_task))
-    print 'put the task into the splitting queue, priority:', new_task.priority
+    log_msg = 'put the task, task id: %s, priority: %s' % \
+            (new_task.task_id, new_task.priority)
+    logger.info(log_msg)
     return key_val
 
 
@@ -122,13 +124,12 @@ class split_thread(threading.Thread):
 
         cmd = "ffmpeg -i " + file_path + " -f segment -segment_time " + str(seg_dur) + \
                 " -c copy -map 0 -segment_list " + list_file_path + "  " + segm_file_path
-        print cmd
+        logger.debug('%s: %s', task.task_id, cmd)
 
-        print 'start to split the video into segments'
         p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
         stdout, stderr = p.communicate()
         ret = p.returncode
-        print 'the return code is:', ret
+        logger.info('the return code is: %s', ret)
 
         if ret != 0:
             lock.acquire()
@@ -192,33 +193,48 @@ def get_blk_num():
 class send_data(SocketServer.BaseRequestHandler):
 
     def handle(self):
-        print 'get the sending data request'
+        logger.debug('get a request from worker')
+        p_1     = None
+        p_2     = None
+        block   = None
         try:
-            _, _, block  = block_queue.get_nowait()
+            p_1, p_2, block  = block_queue.get_nowait()
             f      = open(block.file_path, 'rb')
             data   = f.read()
             f.close()
 
             pack    = pack_block_info(block)
             data_block = pack + data
-            print 'data_block length:', len(data_block)
+            logger.debug('data block length: %s', len(data_block))
 
             sum = 0
             while True:
                 cnt = self.request.send(data_block[sum: sum + 1024*400])
                 sum = cnt + sum
                 if cnt == 0:
-                    print 'the number of bytes sent:', sum
+                    logger.debug('the number of bytes sent: %s', sum)
                     self.request.shutdown(socket.SHUT_WR)
                     break
 
             ret_msg = self.request.recv(10)
-            print 'the return msg is:', ret_msg
             self.request.close()
 
+            logger.debug('the return msg is: %s', ret_msg)
+
+            if ret_msg == 'okay':
+                logger.debug('send data to the worker successfully')
+            else:
+                block_queue.put((p_1, p_2, block))
+                logger.error('fail to send the data to the worker, put back the task')
+
+        except Queue.Empty:
+            self.request.close()
+            logger.error('no task in Queue')
         except Exception, ex:
             self.request.close()
-            print ex
+            if block != None:
+                block_queue.put((p_1, p_2, block))
+            logger.error('fail to send data')
 
 
 class send_data_thread(threading.Thread):
@@ -227,7 +243,7 @@ class send_data_thread(threading.Thread):
         threading.Thread.__init__(self)
 
     def run(self):
-        print 'start the sending data thread'
+        logger.debug('start the sending data thread')
         server = ThreadedTCPServer((master_ip, master_snd_port), send_data)
         server.serve_forever()
 
@@ -235,13 +251,13 @@ class send_data_thread(threading.Thread):
 class recv_data(SocketServer.BaseRequestHandler):
 
     def handle(self):
-        print 'get the receiving data request'
+        logger.debug('get the receiving data request')
         flag        = 0
         data_block  = ''
         success     = 0
         block_info  = block()
         work_path   = config.master_path
-        print 'begin to receive data from worker'
+        logger.debug('begin to receive data from worker')
 
         try:
             while True:
@@ -266,19 +282,18 @@ class recv_data(SocketServer.BaseRequestHandler):
                     break
 
             if block_info.size == len(data_block) - struct.calcsize(block_format):
-                print 'received data: length okay'
+                logger.debug('received data: length okay')
             else:
-                print block_info.size
-                print len(data_block) - struct.calcsize(block_format)
-                print 'received data: length error'
-                return None
+                logger.debug('received data: length error')
+                sucess = 0
+                return
 
             key = md5.new()
             key.update(data_block[struct.calcsize(block_format):])
             val = key.hexdigest()
 
             if block_info.md5_val == val:
-                print 'received data: md5 check okay'
+                logger.debug('received data: md5 check okay')
                 self.request.sendall('okay')
 
                 path_len    = block_info.path_len
@@ -305,12 +320,11 @@ class recv_data(SocketServer.BaseRequestHandler):
                 f.close()
                 sucess = 1
             else:
-                print 'received data: md5 check fail'
+                logger.error('received data: md5 check fail')
                 self.request.sendall('fail')
                 sucess = 0
 
         except Exception, ex:
-            print ex
             self.request.sendall('fail')
             sucess = 0
         finally:
@@ -327,7 +341,7 @@ class recv_data_thread(threading.Thread):
         threading.Thread.__init__(self)
 
     def run(self):
-        print 'start the receiving data thread'
+        logger.debug('start the receiving data thread')
         server = ThreadedTCPServer((master_ip, master_rev_port), recv_data)
         server.serve_forever()
 
@@ -345,7 +359,7 @@ class task_status_checker(threading.Thread):
         output.close()
 
     def concat_block(self, task):
-        print 'concatenate the blocks:'
+        logger.debug('concatenate the blocks')
         total_no    = task.block_num
         file_path   = task.block[0].file_path
 
@@ -364,9 +378,11 @@ class task_status_checker(threading.Thread):
         f.close()
 
         cmd = 'ffmpeg -f concat -i ' + list_file + ' -c copy ' + new_file
+        logger.debug('%s', cmd)
         p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
         stdout, stderr = p.communicate()
         ret = p.returncode
+        logger.info('return code: %s', ret)
         return ret
 
     def run(self):
@@ -381,14 +397,14 @@ class task_status_checker(threading.Thread):
                 fin_blk_no  = task_stat.fin_num
 
                 if fin_blk_no == task_stat.block_num and task_stat.progress == 2:
-                    print 'job finished'
+                    logger.debug('job finished')
                     tasks_queue.pop(task_id)
                     ret = self.concat_block(task_stat)
                     if ret == 0:
                         task_stat.progress = 3
                         cur_time = time.time()
                         dur_time = cur_time - task_stat.start_time
-                        print 'transcoding duration:', dur_time
+                        logger.info('transcoding duration: %s', dur_time)
                     else:
                         task_stat.progress = -3
                     self.write_pkl(task_id, task_stat)
