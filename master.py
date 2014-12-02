@@ -193,7 +193,8 @@ def get_blk_num():
 class send_data(SocketServer.BaseRequestHandler):
 
     def handle(self):
-        logger.debug('get a request from worker')
+
+        logger.debug('start to send data to the woker')
         p_1     = None
         p_2     = None
         block   = None
@@ -251,10 +252,10 @@ class send_data_thread(threading.Thread):
 class recv_data(SocketServer.BaseRequestHandler):
 
     def handle(self):
-        logger.debug('get the receiving data request')
+
         flag        = 0
         data_block  = ''
-        success     = 0
+        success     = -1
         block_info  = block()
         work_path   = config.master_path
         logger.debug('begin to receive data from worker')
@@ -281,11 +282,16 @@ class recv_data(SocketServer.BaseRequestHandler):
                 if not data:
                     break
 
+            if flag == 0:
+                success = 0
+                logger.debug('cannot decode the header')
+                return
+
             if block_info.size == len(data_block) - struct.calcsize(block_format):
                 logger.debug('received data: length okay')
             else:
                 logger.debug('received data: length error')
-                sucess = 0
+                success = 0
                 return
 
             key = md5.new()
@@ -295,6 +301,7 @@ class recv_data(SocketServer.BaseRequestHandler):
             if block_info.md5_val == val:
                 logger.debug('received data: md5 check okay')
                 self.request.sendall('okay')
+                self.request.shutdown(socket.SHUT_WR)
 
                 path_len    = block_info.path_len
                 base_name   = os.path.basename(block_info.file_path[0:path_len])
@@ -303,33 +310,42 @@ class recv_data(SocketServer.BaseRequestHandler):
                 block_info.file_path = new_path
                 block_info.path_len  = len(new_path)
 
-                #new_task = task_status()
-                #new_task.block  = block_info
-
                 task_id     = block_info.task_id
                 block_id    = block_info.block_no
 
+                #check whehter the transcoding task is successful
                 lock.acquire()
-                task_stat           = tasks_queue[task_id]
-                task_stat.fin_num   += 1
-                task_stat.block[block_id] = block_info
+                task_stat = tasks_queue[task_id]
+                if block_info.status == 0 and task_stat.progress > 0:
+                    if block_id in task_stat.block.keys():
+                        task_stat.block[block_id] = block_info
+                    else:
+                        task_stat.fin_num   += 1
+                        task_stat.block[block_id] = block_info
+                else:
+                    success = 0
+                    task_stat.progress = -2
                 lock.release()
+
+                if success == 0:
+                    return
 
                 f = open(new_path, 'wb')
                 f.write(data_block[struct.calcsize(block_format):])
                 f.close()
-                sucess = 1
+                success = 1
             else:
                 logger.error('received data: md5 check fail')
                 self.request.sendall('fail')
-                sucess = 0
+                self.request.shutdown(socket.SHUT_WR)
+                success = 0
 
         except Exception, ex:
             self.request.sendall('fail')
-            sucess = 0
+            success = 0
         finally:
             self.request.close()
-            if sucess == 1:
+            if success == 1:
                 return block_info
             else:
                 return None
@@ -396,6 +412,7 @@ class task_status_checker(threading.Thread):
                 task_stat   = tasks_queue[task_id]
                 fin_blk_no  = task_stat.fin_num
 
+                #video concatenation
                 if fin_blk_no == task_stat.block_num and task_stat.progress == 2:
                     logger.debug('job finished')
                     tasks_queue.pop(task_id)
@@ -410,13 +427,16 @@ class task_status_checker(threading.Thread):
                     self.write_pkl(task_id, task_stat)
                     continue
 
+                #cancel a task
                 if task_stat.progress < 0:
                     tasks_queue.pop(task_id)
                     self.write_pkl(task_id, task_stat)
                     continue
 
+                #others, i.e., time out
+
             lock.release()
-            time.sleep(1)
+            time.sleep(2)
 
 class RequestHandler(SimpleXMLRPCRequestHandler):
     def log_message(self, format, *args):
@@ -440,7 +460,7 @@ if __name__ == '__main__':
     server.register_function(get_blk_num,  "get_blk_num")
 
     #create the thread for splitting video files
-    for i in range(3):
+    for i in range(config.split_thread_num):
         t = split_thread(i)
         t.start()
 
@@ -448,12 +468,15 @@ if __name__ == '__main__':
     t = send_data_thread()
     t.start()
 
+    #create the thread for receiving the data blocks from the workers
     t = recv_data_thread()
     t.start()
 
+    #create the thread for checking tasks
     t = task_status_checker()
     t.start()
 
+    #never stop
     server.serve_forever()
 
 
