@@ -252,7 +252,6 @@ class send_data_thread(threading.Thread):
 class recv_data(SocketServer.BaseRequestHandler):
 
     def write_file(self, block_info, data_block):
-        print 'get here'
         cur = 0
         num = 0
         fs  = [0, 0, 0, 0, 0, 0]
@@ -272,7 +271,6 @@ class recv_data(SocketServer.BaseRequestHandler):
         for i in range(len(width)):
             resolution = width[i] + 'x' + height[i]
             new_path   = os.path.join(config.master_path, prefix + resolution + suffix)
-            print new_path
             f = open(new_path, 'wb')
             f.write(data_block[cur:cur + fs[i]])
             f.close()
@@ -366,7 +364,7 @@ class recv_data(SocketServer.BaseRequestHandler):
                 success = 0
 
         except Exception, ex:
-            print ex
+            #print ex
             self.request.sendall('fail')
             success = 0
         finally:
@@ -403,29 +401,44 @@ class task_status_checker(threading.Thread):
     def concat_block(self, task):
         logger.debug('concatenate the blocks')
         total_no    = task.block_num
-        file_path   = task.block[0].file_path
 
-        dir_name    = os.path.dirname(file_path)
-        base_name   = os.path.basename(file_path)
-        (pre, suf)  = os.path.splitext(base_name)
+        width   = task.block[0].width.replace(' ', '').split('%')
+        width   = filter(lambda a: a != '', width)
+        height  = task.block[0].height.replace(' ', '').split('%')
+        height  = filter(lambda a: a != '', height)
 
-        task_id     = task.block[0].task_id
-        list_file   = os.path.join(dir_name, task_id + '.list')
-        new_file    = os.path.join(dir_name, task_id + suf)
+        suf     = ''
+        task_id = task.block[0].task_id
 
-        f = open(list_file, 'w')
-        for i in range(0, total_no):
-            line = 'file ' + '\'' + task.block[i].file_path + '\'' + '\n'
-            f.write(line)
-        f.close()
+        for i in range(len(width)):
+            resolution = width[i] + 'x' + height[i]
+            list_path  = os.path.join(config.master_path, \
+                    task_id + '_' + resolution + '.list')
+            f = open(list_path, 'w')
+            for i in range(0, total_no):
+                path        = task.block[i].file_path
+                dir_name    = os.path.dirname(path)
+                base_name   = os.path.basename(path)
+                base_name   = base_name.replace('_package', '')
+                (pre, suf)  = os.path.splitext(base_name)
+                file_name   = os.path.join(dir_name, \
+                                 pre + resolution + suf)
+                line = 'file ' + '\'' + file_name + '\'' + '\n'
+                f.write(line)
+            f.close()
 
-        cmd = 'ffmpeg -f concat -i ' + list_file + ' -c copy ' + new_file
-        logger.debug('%s', cmd)
-        p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-        stdout, stderr = p.communicate()
-        ret = p.returncode
-        logger.info('return code: %s', ret)
-        return ret
+            new_file = os.path.join(config.master_path, \
+                    task_id + '_' + resolution + suf)
+            cmd = 'ffmpeg -f concat -i ' + list_path + ' -c copy ' + new_file
+            logger.debug('%s', cmd)
+            p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+            stdout, stderr = p.communicate()
+            ret = p.returncode
+            logger.info('return code: %s', ret)
+            if ret != 0:
+                return ret
+
+        return 0
 
     def run(self):
         while True:
