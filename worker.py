@@ -82,7 +82,7 @@ def recv_data_block(master_ip, master_snd_port):
             success = 0
 
     except Exception, ex:
-        #print ex
+        print ex
         s.send('fail')
         logger.error('fail to receive data from the master')
         success = 0
@@ -101,10 +101,18 @@ def transcode_data(block_info):
     dir_name        = os.path.dirname(block_info.file_path)
     base_name       = os.path.basename(block_info.file_path)
     (prefix,suffix) = os.path.splitext(base_name)
-    new_path        = os.path.join(dir_name, prefix + '_new' + suffix)
-    resolution      = block_info.width + 'x' + block_info.height
 
-    cmd = "ffmpeg -y -i " + block_info.file_path + " -s " + resolution + " -strict -2 " + new_path
+    width   = block_info.width.replace(' ', '').split('%')
+    width   = filter(lambda a: a != '', width)
+    height  = block_info.height.replace(' ', '').split('%')
+    height  = filter(lambda a: a != '', height)
+
+    cmd = "ffmpeg -y -i " + block_info.file_path
+    for i in range(len(width)):
+        resolution = width[i] + 'x' + height[i]
+        new_path   = os.path.join(dir_name, prefix + resolution + suffix)
+        sub_cmd    = " -s " + resolution + " -strict -2 " + new_path
+        cmd        += sub_cmd
     logger.debug('%s: %s', block_info.task_id, cmd)
 
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
@@ -114,16 +122,33 @@ def transcode_data(block_info):
     log_msg = 'the return code is: %s' % ret
     logger.info('%s: %s', block_info.task_id, log_msg)
 
-    data = ""
+    head = ''
+    data = ''
+    fs   = [0, 0, 0, 0, 0, 0]
     if ret == 0:
-        f    = open(new_path, 'rb')
-        data = f.read()
-        f.close()
+        for i in range(len(width)):
+            resolution = width[i] + 'x' + height[i]
+            path = os.path.join(dir_name, prefix + resolution + suffix)
+            size = os.path.getsize(path)
+            fs[i] = size
+            f    = open(path, 'rb')
+            data += f.read()
+            f.close()
+
+        head = struct.pack(format_length, len(width), \
+                fs[0], fs[1], fs[2], fs[3], fs[4], fs[5])
+        data = head + data
 
     key = md5.new()
     key.update(data)
     md5_val = key.hexdigest()
     block_info.md5_val = md5_val
+
+    new_path = os.path.join(dir_name, base_name + "_package")
+    f = open(new_path, 'wb')
+    f.write(data)
+    f.close()
+    data = ''
 
     if ret == 0:
         size = os.path.getsize(new_path)

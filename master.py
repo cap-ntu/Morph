@@ -251,6 +251,33 @@ class send_data_thread(threading.Thread):
 
 class recv_data(SocketServer.BaseRequestHandler):
 
+    def write_file(self, block_info, data_block):
+        print 'get here'
+        cur = 0
+        num = 0
+        fs  = [0, 0, 0, 0, 0, 0]
+        (num, fs[0], fs[1], fs[2], fs[3], fs[4], fs[5]) = \
+                struct.unpack(format_length, data_block[0:struct.calcsize(format_length)])
+        cur = cur + struct.calcsize(format_length)
+
+        base_name   = os.path.basename(block_info.file_path)
+        base_name   = base_name.replace('_package', '')
+        (prefix,suffix) = os.path.splitext(base_name)
+
+        width   = block_info.width.replace(' ', '').split('%')
+        width   = filter(lambda a: a != '', width)
+        height  = block_info.height.replace(' ', '').split('%')
+        height  = filter(lambda a: a != '', height)
+
+        for i in range(len(width)):
+            resolution = width[i] + 'x' + height[i]
+            new_path   = os.path.join(config.master_path, prefix + resolution + suffix)
+            print new_path
+            f = open(new_path, 'wb')
+            f.write(data_block[cur:cur + fs[i]])
+            f.close()
+            cur = cur + fs[i]
+
     def handle(self):
 
         flag        = 0
@@ -330,9 +357,7 @@ class recv_data(SocketServer.BaseRequestHandler):
                 if success == 0:
                     return
 
-                f = open(new_path, 'wb')
-                f.write(data_block[struct.calcsize(block_format):])
-                f.close()
+                self.write_file(block_info, data_block[struct.calcsize(block_format):])
                 success = 1
             else:
                 logger.error('received data: md5 check fail')
@@ -341,6 +366,7 @@ class recv_data(SocketServer.BaseRequestHandler):
                 success = 0
 
         except Exception, ex:
+            print ex
             self.request.sendall('fail')
             success = 0
         finally:

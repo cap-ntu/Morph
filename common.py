@@ -25,7 +25,7 @@ class task_status:
         self.start_time = 0     #the time of adding the transcoding task
         self.block_num  = 0     #the total number of video blocks
 
-block_format  = "8si200sii4s4s4si32sii"
+block_format  = "8si200sii4s30s30si32sii"
 
 class block:
     def __init__(self):
@@ -57,6 +57,7 @@ def pack_block_info(block):
                     block.priority)
     return pack
 
+format_length = "iqqqqqq"
 
 def init_log_module(logger_name, ip, level):
     logger = logging.getLogger(logger_name)
