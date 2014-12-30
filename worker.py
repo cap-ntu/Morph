@@ -232,7 +232,13 @@ if __name__ == '__main__':
     server   = xmlrpclib.ServerProxy(rpc_addr)
 
     while True:
-        num = server.get_blk_num()
+        try:
+            num = server.get_blk_num()
+        except:
+            logger.error('cannot connect to the master server')
+            time.sleep(1)
+            continue
+
         logger.debug('The current number of blocks in the master: %s', num)
         if num == 0:
             time.sleep(1)
