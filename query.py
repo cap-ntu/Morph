@@ -18,12 +18,12 @@ if __name__ == "__main__":
     if task_key == None and task_num == False:
         print 'please input at one query parameter'
         parser.print_help()
-        sys.exit()
+        sys.exit(-100)
 
     if task_key != None and task_num != False:
         print 'only one query parameter is allowed'
         parser.print_help()
-        sys.exit()
+        sys.exit(-100)
 
     master_ip       = config.master_ip
     master_rpc_port = config.master_rpc_port
@@ -32,14 +32,16 @@ if __name__ == "__main__":
 
     if task_key != None and len(task_key) != 8:
         print "key format error"
-        sys.exit()
+        sys.exit(-100)
     elif task_key != None and len(task_key) == 8:
         ret = server.get_progress(task_key)
         print ret
+        sys.exit(ret)
 
     if task_num == True:
         ret = server.get_blk_num()
         print ret
+        sys.exit(ret)
 
 
 
