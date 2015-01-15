@@ -23,6 +23,8 @@ for line in lines:
     line = line.replace('\n', '')
     video_list.append(line)
 
+f = open('keys','w')
+
 while flag:
     cmd = 'python /home/guanyu/Project/distributed_transcoding/query.py -n'
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
@@ -37,13 +39,20 @@ while flag:
         cmd = 'python /home/guanyu/Project/distributed_transcoding/client.py -i ' + \
                 video + ' ' + '-s 640x360  426x240'
         print cmd
+        f.write(cmd + '\n')
         p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
         stdout, stderr = p.communicate()
         ret = p.returncode
         if ret == 0:
             key = stdout.replace('\n', '')
             print key
+            f.write(key + '\n')
             time.sleep(120)
+
+    f.flush()
+    if flag == False:
+        f.close()
+
 
 
 
