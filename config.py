@@ -1,13 +1,13 @@
 #the configuration of the master node
-master_ip       = "155.69.149.12"
+master_ip       = "155.69.149.68"
 master_rpc_port = "8091"
 master_rev_port = "9001"
 master_snd_port = "9011"
-master_path = "/tmp/master/"
-split_thread_num = 3
+master_path = "/data/master/"
+split_thread_num = 5
 
 #the configuration of the worker node
-worker_path = "/tmp/worker/"
+worker_path = "/data/worker/"
 
 
 #other configuration

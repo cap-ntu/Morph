@@ -98,6 +98,9 @@ def put_trans_task(URI, bitrate, width, height, priority, task_id):
         return -1
 
 
+    log_msg = 'the generated key: %s' % key_val
+    logger.debug(log_msg)
+
     new_task.task_id    = key_val
     new_task.file_path  = file_path
     new_task.bitrate    = bitrate
@@ -110,9 +113,12 @@ def put_trans_task(URI, bitrate, width, height, priority, task_id):
     task_stat = task_status()
     task_stat.start_time = time.time()
     task_stat.progress   = 1
+
     lock.acquire()
-    tasks_queue[key_val] = task_stat
-    lock.release()
+    try:
+        tasks_queue[key_val] = task_stat
+    finally:
+        lock.release()
 
     split_queue.put_nowait((new_task.priority, 1, new_task))
     log_msg = 'put the task, task id: %s, priority: %s' % \
@@ -130,11 +136,17 @@ def get_progress(task_id):
         pkl_file.close()
         return task_status.progress
     else:
-        lock.acquire()
-        task_stat = tasks_queue[task_id]
-        lock.release()
-        ret = task_stat.progress
-        return ret
+        if task_id in tasks_queue.keys():
+            lock.acquire()
+            try:
+                task_stat = tasks_queue[task_id]
+            finally:
+                lock.release()
+
+            ret = task_stat.progress
+            return ret
+        else:
+            return -100
 
 
 class split_thread(threading.Thread):
@@ -169,9 +181,11 @@ class split_thread(threading.Thread):
 
         if ret != 0:
             lock.acquire()
-            task_stat = tasks_queue[task.task_id]
-            task_stat.progress = -1
-            lock.release()
+            try:
+                task_stat = tasks_queue[task.task_id]
+                task_stat.progress = -1
+            finally:
+                lock.release()
             return
 
         f = open(list_file_path)
@@ -207,10 +221,12 @@ class split_thread(threading.Thread):
             #put the video blocks into the splitting queue
 
         lock.acquire()
-        task_stat = tasks_queue[task.task_id]
-        task_stat.block_num = len(lines)
-        task_stat.progress  = 2
-        lock.release()
+        try:
+            task_stat = tasks_queue[task.task_id]
+            task_stat.block_num = len(lines)
+            task_stat.progress  = 2
+        finally:
+            lock.release()
 
     def run(self):
         logger.debug('start worker for splitting: %s', self.index)
@@ -376,17 +392,19 @@ class recv_data(SocketServer.BaseRequestHandler):
 
                 #check whehter the transcoding task is successful
                 lock.acquire()
-                task_stat = tasks_queue[task_id]
-                if block_info.status == 0 and task_stat.progress > 0:
-                    if block_id in task_stat.block.keys():
-                        task_stat.block[block_id] = block_info
+                try:
+                    task_stat = tasks_queue[task_id]
+                    if block_info.status == 0 and task_stat.progress > 0:
+                        if block_id in task_stat.block.keys():
+                            task_stat.block[block_id] = block_info
+                        else:
+                            task_stat.fin_num   += 1
+                            task_stat.block[block_id] = block_info
                     else:
-                        task_stat.fin_num   += 1
-                        task_stat.block[block_id] = block_info
-                else:
-                    success = 0
-                    task_stat.progress = -2
-                lock.release()
+                        success = 0
+                        task_stat.progress = -2
+                finally:
+                    lock.release()
 
                 if success == 0:
                     return
@@ -482,35 +500,37 @@ class task_status_checker(threading.Thread):
             #print 'current number of blocks in queue:', get_blk_num()
 
             lock.acquire()
-            task_stat = None
-            for task_id in tasks_queue.keys():
-                task_stat   = tasks_queue[task_id]
-                fin_blk_no  = task_stat.fin_num
+            try:
+                task_stat = None
+                for task_id in tasks_queue.keys():
+                    task_stat   = tasks_queue[task_id]
+                    fin_blk_no  = task_stat.fin_num
 
-                #video concatenation
-                if fin_blk_no == task_stat.block_num and task_stat.progress == 2:
-                    logger.debug('job finished')
-                    tasks_queue.pop(task_id)
-                    ret = self.concat_block(task_stat)
-                    if ret == 0:
-                        task_stat.progress = 3
-                        cur_time = time.time()
-                        dur_time = cur_time - task_stat.start_time
-                        logger.info('transcoding duration: %s', dur_time)
-                    else:
-                        task_stat.progress = -3
-                    self.write_pkl(task_id, task_stat)
-                    continue
+                    #video concatenation
+                    if fin_blk_no == task_stat.block_num and task_stat.progress == 2:
+                        logger.debug('job finished')
+                        tasks_queue.pop(task_id)
+                        ret = self.concat_block(task_stat)
+                        if ret == 0:
+                            task_stat.progress = 3
+                            cur_time = time.time()
+                            dur_time = cur_time - task_stat.start_time
+                            logger.info('transcoding duration: %s', dur_time)
+                        else:
+                            task_stat.progress = -3
+                        self.write_pkl(task_id, task_stat)
+                        continue
 
-                #cancel a task
-                if task_stat.progress < 0:
-                    tasks_queue.pop(task_id)
-                    self.write_pkl(task_id, task_stat)
-                    continue
+                    #cancel a task
+                    if task_stat.progress < 0:
+                        tasks_queue.pop(task_id)
+                        self.write_pkl(task_id, task_stat)
+                        continue
 
-                #others, i.e., time out
+                    #others, i.e., time out
+            finally:
+                lock.release()
 
-            lock.release()
             time.sleep(2)
 
 class RequestHandler(SimpleXMLRPCRequestHandler):
