@@ -82,21 +82,7 @@ def put_trans_task(URI, bitrate, width, height, priority, task_id):
     #key_val            = gen_key()
     key_val             = task_id
     new_task            = task()
-    file_path           = ''
-
-    if URI[0] == 'L':
-        file_path = URI[1:]
-    elif URI[0] == 'U':
-        url  = URI[1:]
-        path = download_video(url, task_id)
-        if path == '':
-            return -1
-        else:
-            file_path = path
-
-    if URI[0] != 'L' and URI[0] != 'U':
-        return -1
-
+    file_path           = URI
 
     log_msg = 'the generated key: %s' % key_val
     logger.debug(log_msg)
@@ -124,6 +110,7 @@ def put_trans_task(URI, bitrate, width, height, priority, task_id):
     log_msg = 'put the task, task id: %s, priority: %s' % \
             (new_task.task_id, new_task.priority)
     logger.info(log_msg)
+    print dump_msg(TASKID = task_id, PROGRESS = 10)
     return key_val
 
 
@@ -162,8 +149,23 @@ class split_thread(threading.Thread):
             -segment_list china.list china%03d.mp4
     '''
     def split_video(self, task):
+
+        file_path = ''
+
+        if task.file_path[0] != 'L' and task.file_path[0] != 'U':
+            return -1
+
+        if task.file_path[0] == 'L':
+            file_path = task.file_path[1:]
+        elif task.file_path[0] == 'U':
+            url  = task.file_path[1:]
+            file_path = download_video(url, task.task_id)
+            if file_path == '':
+                return -1
+
+        task.file_path  = file_path
+
         seg_dur         = config.segment_duration
-        file_path       = task.file_path
         base_name       = os.path.basename(file_path)
         (prefix,suffix) = os.path.splitext(base_name)
         work_path       = config.master_path
@@ -225,6 +227,7 @@ class split_thread(threading.Thread):
             task_stat = tasks_queue[task.task_id]
             task_stat.block_num = len(lines)
             task_stat.progress  = 2
+            print dump_msg(TASKID = task.task_id, PROGRESS = 20)
         finally:
             lock.release()
 
@@ -513,6 +516,7 @@ class task_status_checker(threading.Thread):
                         ret = self.concat_block(task_stat)
                         if ret == 0:
                             task_stat.progress = 3
+                            print dump_msg(TASKID = task_id, PROGRESS = 100)
                             cur_time = time.time()
                             dur_time = cur_time - task_stat.start_time
                             logger.info('transcoding duration: %s', dur_time)

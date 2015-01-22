@@ -1,3 +1,4 @@
+import json
 import struct
 import logging
 
@@ -69,5 +70,12 @@ def init_log_module(logger_name, ip, level):
     logger.addHandler(fh)
 
     return logger
+
+class dump_msg(object):
+    def __init__(self, **kwargs):
+        self.kwargs = kwargs
+
+    def __str__(self):
+        return '%s' % json.dumps(self.kwargs)
 
 
