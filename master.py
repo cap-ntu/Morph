@@ -2,9 +2,11 @@ import os
 import sys
 import md5
 import time
+import pycurl
 import pickle
 import Queue
 import logging
+import urlparse
 import socket
 import config
 import struct
@@ -56,11 +58,45 @@ def gen_key(randomlength = 8):
         str += chars[random.randint(0, length)]
     return str
 
+def download_video(url, task_id):
+    file_name = url.split('/')[-1]
+    name, ext = os.path.splitext(file_name)
+    file_name = task_id + ext
+    file_name = os.path.join(config.master_path, file_name)
 
-def put_trans_task(file_path, bitrate, width, height, priority):
+    try:
+        with open(file_name, 'wb') as f:
+            c = pycurl.Curl()
+            c.setopt(c.URL, url)
+            c.setopt(c.WRITEDATA, f)
+            c.perform()
+            c.close()
+    except:
+        file_name = ''
+    finally:
+        return file_name
 
-    key_val             = gen_key()
+
+def put_trans_task(URI, bitrate, width, height, priority, task_id):
+
+    #key_val            = gen_key()
+    key_val             = task_id
     new_task            = task()
+    file_path           = ''
+
+    if URI[0] == 'L':
+        file_path = URI[1:]
+    elif URI[0] == 'U':
+        url  = URI[1:]
+        path = download_video(url, task_id)
+        if path == '':
+            return -1
+        else:
+            file_path = path
+
+    if URI[0] != 'L' and URI[0] != 'U':
+        return -1
+
 
     new_task.task_id    = key_val
     new_task.file_path  = file_path
