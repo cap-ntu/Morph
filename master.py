@@ -98,7 +98,7 @@ def put_trans_task(URI, bitrate, width, height, priority, task_id):
     #put the transcoding task into the queue
     task_stat = task_status()
     task_stat.start_time = time.time()
-    task_stat.progress   = 1
+    task_stat.progress   = 10
 
     lock.acquire()
     try:
@@ -226,7 +226,7 @@ class split_thread(threading.Thread):
         try:
             task_stat = tasks_queue[task.task_id]
             task_stat.block_num = len(lines)
-            task_stat.progress  = 2
+            task_stat.progress  = 20
             print dump_msg(TASKID = task.task_id, PROGRESS = 20)
         finally:
             lock.release()
@@ -402,6 +402,9 @@ class recv_data(SocketServer.BaseRequestHandler):
                             task_stat.block[block_id] = block_info
                         else:
                             task_stat.fin_num   += 1
+                            task_stat.progress  += 70.0/task_stat.block_num
+                            #print task_stat.block_num
+                            print dump_msg(TASKID = task_id, PROGRESS = task_stat.progress)
                             task_stat.block[block_id] = block_info
                     else:
                         success = 0
@@ -510,12 +513,12 @@ class task_status_checker(threading.Thread):
                     fin_blk_no  = task_stat.fin_num
 
                     #video concatenation
-                    if fin_blk_no == task_stat.block_num and task_stat.progress == 2:
+                    if fin_blk_no == task_stat.block_num and task_stat.progress >= 20:
                         logger.debug('job finished')
                         tasks_queue.pop(task_id)
                         ret = self.concat_block(task_stat)
                         if ret == 0:
-                            task_stat.progress = 3
+                            task_stat.progress = 100
                             print dump_msg(TASKID = task_id, PROGRESS = 100)
                             cur_time = time.time()
                             dur_time = cur_time - task_stat.start_time
