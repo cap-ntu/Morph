@@ -111,6 +111,7 @@ def put_trans_task(URI, bitrate, width, height, priority, task_id):
             (new_task.task_id, new_task.priority)
     logger.info(log_msg)
     print dump_msg(TASKID = task_id, PROGRESS = 10)
+    sys.stdout.flush()
     return key_val
 
 
@@ -228,6 +229,7 @@ class split_thread(threading.Thread):
             task_stat.block_num = len(lines)
             task_stat.progress  = 20
             print dump_msg(TASKID = task.task_id, PROGRESS = 20)
+            sys.stdout.flush()
         finally:
             lock.release()
 
@@ -407,6 +409,7 @@ class recv_data(SocketServer.BaseRequestHandler):
                             task_stat.progress  += 70.0/task_stat.block_num
                             #print task_stat.block_num
                             print dump_msg(TASKID = task_id, PROGRESS = task_stat.progress)
+                            sys.stdout.flush()
                             task_stat.block[block_id] = block_info
                     else:
                         success = 0
@@ -522,6 +525,7 @@ class task_status_checker(threading.Thread):
                         if ret == 0:
                             task_stat.progress = 100
                             print dump_msg(TASKID = task_id, PROGRESS = 100)
+                            sys.stdout.flush()
                             cur_time = time.time()
                             dur_time = cur_time - task_stat.start_time
                             logger.info('transcoding duration: %s', dur_time)

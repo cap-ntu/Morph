@@ -1,3 +1,4 @@
+import sys
 import json
 import struct
 import logging
@@ -78,5 +79,4 @@ class dump_msg(object):
 
     def __str__(self):
         return '%s' % json.dumps(self.kwargs)
-
 
