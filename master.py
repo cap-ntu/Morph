@@ -359,6 +359,8 @@ class recv_data(SocketServer.BaseRequestHandler):
                     block_info.status,
                     block_info.priority)   = struct.unpack(block_format, data_block[0:struct.calcsize(block_format)])
 
+                    block_info.task_id = block_info.task_id.strip()
+
                 if not data:
                     break
 

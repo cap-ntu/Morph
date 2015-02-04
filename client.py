@@ -43,6 +43,10 @@ if __name__ == "__main__":
     if input_url != None:
         file_path = "U" + input_url
 
+    if len(task_id) > 50:
+        print 'error: the length of the task id cannot exceed 50'
+        sys.exit(-1)
+
 
     width   = ''
     height  = ''
@@ -63,6 +67,7 @@ if __name__ == "__main__":
     width  = width.ljust(30)
     height = height.ljust(30)
 
+
     if priority == None:
         priority = 5
     else:
@@ -74,7 +79,7 @@ if __name__ == "__main__":
     server = ServerProxy(rpc_addr)
 
     key = server.put_trans_task(file_path, "", width, height, priority, task_id)
-    print key
+    #print key
 
 
 

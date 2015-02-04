@@ -44,7 +44,8 @@ class block:
         self.priority   = 1
 
 def pack_block_info(block):
-    pack    = struct.pack(block_format, block.task_id, \
+    block.task_id = block.task_id.ljust(50)
+    pack = struct.pack(block_format, block.task_id, \
                     block.path_len,
                     block.file_path,
                     block.block_no,
