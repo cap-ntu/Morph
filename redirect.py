@@ -6,7 +6,8 @@ from random import Random
 urls = (
     '/', 'home',
     '/get_progress', 'get_progress',
-    '/submit', 'submit'
+    '/submit_file', 'submit_file',
+    '/submit_url', 'submit_url'
     )
 
 
@@ -20,7 +21,7 @@ def gen_key(randomlength = 8):
     return str
 
 
-class submit:
+class submit_file:
     def GET(self):
         return """<html><head></head><body>
             <form method="POST" enctype="multipart/form-data" action="">
@@ -45,6 +46,26 @@ class submit:
 
         ret = json.dumps({"key": key, "ret": 0})
         return res
+
+
+class submit_url:
+    def GET(self):
+        return """<html><head></head><body>
+            <form method="POST" enctype="multipart/form-data" action="">
+            <input type="file" name="video_file" />
+            <br/>
+            <input type="submit" />
+            </form>
+            </body></html>"""
+
+    def POST(self):
+        new_task = web.input(url = {}, target_resolution = None)
+        url = new_task['url']
+        res = new_task['target_resolution']
+
+        #ret = json.dumps({"key": key, "ret": 0})
+        return res
+
 
 
 class get_progress:
