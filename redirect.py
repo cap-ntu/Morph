@@ -22,16 +22,9 @@ def gen_key(randomlength = 8):
 
 
 class submit_file:
-    def GET(self):
-        return """<html><head></head><body>
-            <form method="POST" enctype="multipart/form-data" action="">
-            <input type="file" name="video_file" />
-            <br/>
-            <input type="submit" />
-            </form>
-            </body></html>"""
 
     def POST(self):
+
         upload_file = web.input(video_file = {}, target_resolution = None)
         file_name = upload_file['video_file'].filename
         _, ext = os.path.splitext(file_name)
@@ -49,14 +42,6 @@ class submit_file:
 
 
 class submit_url:
-    def GET(self):
-        return """<html><head></head><body>
-            <form method="POST" enctype="multipart/form-data" action="">
-            <input type="file" name="video_file" />
-            <br/>
-            <input type="submit" />
-            </form>
-            </body></html>"""
 
     def POST(self):
         new_task = web.input(url = {}, target_resolution = None)
@@ -67,13 +52,9 @@ class submit_url:
         return res
 
 
-
 class get_progress:
-    def POST(self):
-        s = web.input(key = None)
-        return s.key
 
-    def GET(self):
+    def POST(self):
         s = web.input(key = None)
         return s.key
 
