@@ -29,7 +29,7 @@ class submit_file:
 
     def POST(self):
 
-        upload_file = web.input(video_file = {}, target_resolution = None)
+        upload_file = web.input(video_file = {}, target_resolution = None, priority = None)
         file_name = upload_file['video_file'].filename
         _, ext = os.path.splitext(file_name)
 
@@ -53,7 +53,7 @@ class submit_file:
 class submit_url:
 
     def POST(self):
-        new_task = web.input(url = None, target_resolution = None)
+        new_task = web.input(url = None, target_resolution = None, priority = None)
         url = new_task['url']
         res = new_task['target_resolution']
 
