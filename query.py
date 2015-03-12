@@ -36,6 +36,7 @@ if __name__ == "__main__":
     elif task_key != None and len(task_key) == 8:
         ret = server.get_progress(task_key)
         print ret
+        ret = int(ret)
         sys.exit(ret)
 
     if task_num == True:

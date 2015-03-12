@@ -1,6 +1,7 @@
 import os
 import web
 import json
+import subprocess
 from random import Random
 
 urls = (
@@ -10,6 +11,9 @@ urls = (
     '/submit_url', 'submit_url'
     )
 
+work_path = '/tmp'
+cln_path  = '/home/guanyu/Project/distributed_transcoding/client.py'
+qry_path  = '/home/guanyu/Project/distributed_transcoding/query.py'
 
 def gen_key(randomlength = 8):
     str     = ''
@@ -30,34 +34,52 @@ class submit_file:
         _, ext = os.path.splitext(file_name)
 
         key = gen_key()
-        file_name = os.path.join('/tmp', key + ext)
+        file_name = os.path.join(work_path, key + ext)
         f = open(file_name, "wb")
         f.write(upload_file['video_file'].value)
         f.close()
 
         res = upload_file['target_resolution']
 
+        cmd = "python " + cln_path + " -l " + file_name + " -t " + key + " -s " + res
+        p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+        stdout, stderr = p.communicate()
+        ret = p.returncode
+
         ret = json.dumps({"key": key, "ret": 0})
-        return res
+        return ret
 
 
 class submit_url:
 
     def POST(self):
-        new_task = web.input(url = {}, target_resolution = None)
+        new_task = web.input(url = None, target_resolution = None)
         url = new_task['url']
         res = new_task['target_resolution']
 
-        #ret = json.dumps({"key": key, "ret": 0})
-        return res
+        key = gen_key()
+        cmd = "python " + cln_path + " -u " + url + " -t " + key + " -s " + res
+        p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+        stdout, stderr = p.communicate()
+        ret = p.returncode
+        ret = json.dumps({"key": key, "ret": 0})
+
+        return ret
 
 
 class get_progress:
 
     def POST(self):
         s = web.input(key = None)
-        return s.key
 
+        cmd = "python " + qry_path + " -k " + str(s.key)
+        web.debug(cmd)
+        p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+        stdout, stderr = p.communicate()
+        prg = p.returncode
+
+        ret = json.dumps({"key": str(s.key), "ret": str(prg)})
+        return ret
 
 class home:
     def GET(self):
