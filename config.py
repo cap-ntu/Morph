@@ -4,11 +4,15 @@ master_rpc_port = "8091"
 master_rev_port = "9001"
 master_snd_port = "9011"
 master_path = "/data/master/"
-split_thread_num = 5
 
 #the configuration of the worker node
 worker_path = "/data/worker/"
 
-
 #other configuration
-segment_duration = 60*3
+min_seg_dur = 60*3
+max_seg_dur = 60*100
+
+#the number of threads for preprocessing
+preproc_thread_num = 10
+
+blk_retry_times = 3

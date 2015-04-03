@@ -6,7 +6,6 @@ from common import *
 from xmlrpclib import ServerProxy
 
 if __name__ == "__main__":
-
     parser = argparse.ArgumentParser()
     parser.add_argument('-k', '--key', help='task key', required=False)
     parser.add_argument('-n', '--num', action='store_true', help='task number', required=False)
