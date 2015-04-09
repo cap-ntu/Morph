@@ -65,7 +65,7 @@ if __name__=='__main__':
     passwd = ""
     thread_num = 2
 
-    cmds = ['ps -ef |grep python']
+    cmds = ['sudo /etc/init.d/ganglia-monitor restart']
 
     f = open("ip.info")
     lines = f.readlines()
