@@ -14,7 +14,10 @@ class home_page:
 
             _, ext = os.path.splitext(path)
             if ext == '.pkl':
-                info = c.probe(path)
+                pkl_file = open(path, 'rb')
+                task = pickle.load(pkl_file)
+                pkl_file.close()
+                return str(task.progress)
 
 
 application = web.application(urls, globals()).wsgifunc()
