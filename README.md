@@ -1,2 +1,2 @@
-# Akilos
+# akilos
 A distributed transcoding system
