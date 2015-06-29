@@ -6,6 +6,7 @@ import logging, urlparse, socket
 import struct, threading
 import subprocess, SocketServer
 from common import *
+sys.path.append("algorithms")
 from scheduling import *
 from Queue import PriorityQueue
 from SocketServer import TCPServer
