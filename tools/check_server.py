@@ -33,14 +33,6 @@ def execute_multi_cmd(ip, username, passwd, cmds):
             out = stdout.readlines()
             for o in out:
                 str += o
-                '''
-                if cmd == cmds[0]:
-                    if uboot_ver.haskey(o) == False:
-                        uboot_ver[o] = []
-                        uboot_ver[o].append(ip)
-                    else:
-                        uboot_ver[o].append(ip)
-                '''
 
 
         ssh.close()
@@ -65,7 +57,7 @@ if __name__=='__main__':
     passwd = ""
     thread_num = 2
 
-    cmds = ['sudo /etc/init.d/ganglia-monitor restart']
+    cmds = ['ls /data/']
 
     f = open("ip.info")
     lines = f.readlines()
