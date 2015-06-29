@@ -1,10 +1,28 @@
 
+'''
+FIFO: first in first out
+'''
+def fifo(queue):
+    f = lambda a, b: a.start_time - b.start_time
+    queue.sort(f)
 
-def fifo():
-    pass
+'''
+EDF: earliest deadline first
+'''
+def edf(queue):
+    f = lambda a, b: a.deadline - b.deadline
+    queue.sort(f)
 
-def edf():
-    pass
+'''
+HPF: highest priority first
+'''
+def hpf(queue):
+    f = lambda a, b: a.priority - b.priority
+    queue.sort(f)
 
-def hpf():
-    pass
+schedule_task = {
+    'fifo': fifo,
+    'edf':  edf,
+    'hpf':  hpf,}
+
+
