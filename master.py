@@ -6,6 +6,7 @@ import logging, urlparse, socket
 import struct, threading
 import subprocess, SocketServer
 from common import *
+from scheduling import *
 from Queue import PriorityQueue
 from SocketServer import TCPServer
 from SocketServer import ThreadingMixIn
@@ -138,6 +139,7 @@ class task_scheduling(threading.Thread):
         block.height       = task.height
 
     def scheduling(self):
+        schedule_task[config.sch_alg](sched_queue)
         if get_blk_num() < 1 and len(sched_queue) > 0:
             task = sched_queue.pop(0)
             msg = "%s: pop task for partition" % task.task_id

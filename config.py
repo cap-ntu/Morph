@@ -16,3 +16,6 @@ max_seg_dur = 60*100
 preproc_thread_num = 10
 
 blk_retry_times = 3
+
+#select the algorithm for task scheduling
+sch_alg = 'fifo'
