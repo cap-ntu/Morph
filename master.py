@@ -204,6 +204,7 @@ class task_scheduling(threading.Thread):
             #put the video blocks into the queue for dispatching
             disb_queue.put(block_info)
             index = index + 1
+            logger.info('all blocks have been put into the dispatching queue')
 
 
     def run(self):
