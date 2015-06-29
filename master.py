@@ -178,6 +178,10 @@ class task_scheduling(threading.Thread):
         lines = ""
         with open(list_file_path) as f:
             lines = f.readlines()
+            task.block_num = len(lines)
+            task.progress  = 20
+            print dump_msg(TASKID = task.task_id, PROGRESS = 20)
+            sys.stdout.flush()
 
         index = 0
         for line in lines:
@@ -201,10 +205,6 @@ class task_scheduling(threading.Thread):
             disb_queue.put(block_info)
             index = index + 1
 
-        task.block_num = len(lines)
-        task.progress  = 20
-        print dump_msg(TASKID = task.task_id, PROGRESS = 20)
-        sys.stdout.flush()
 
     def run(self):
         logger.debug('start worker for task scheduling')
