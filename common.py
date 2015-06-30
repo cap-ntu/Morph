@@ -30,6 +30,7 @@ class task:
         self.end_time   = 0     #the finish time of the task
         self.est_time   = 0     #estimated transcoding time for this task
         self.deadline   = 0     #the deadline for this task
+        self.value      = 0     #the estimated value for scheduling
 
 block_format  = "50si200sii4s30s30si32siii"
 
