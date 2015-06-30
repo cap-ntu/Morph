@@ -20,4 +20,12 @@ blk_retry_times = 3
 #select the algorithm for task scheduling
 sch_alg = 'fifo'
 
+#database name
 db_name = 'system_info.db'
+
+#initial marginal price for different types of tasks
+price_per_type = [10, 9, 8, 7]
+
+#price decaying factor
+price_decaying = 0.95
+
