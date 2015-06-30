@@ -12,7 +12,7 @@ f.close()
 
 for line in lines:
     line = line.replace('\n', '')
-    cmd = 'python /root/distributed_transcoding/query.py -k ' + line
+    cmd = 'python /root/akilos/get_progress.py -k ' + line
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
     stdout, stderr = p.communicate()
     ret = p.returncode
