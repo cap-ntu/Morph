@@ -1,2 +1,3 @@
 # akilos
-A distributed transcoding system
+A new system
+

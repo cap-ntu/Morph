@@ -8,13 +8,14 @@ import subprocess, SocketServer
 from common import *
 sys.path.append("algorithms")
 from scheduling import *
+from sys_info import *
 from Queue import PriorityQueue
 from SocketServer import TCPServer
 from SocketServer import ThreadingMixIn
 from SimpleXMLRPCServer import SimpleXMLRPCServer
 from SimpleXMLRPCServer import SimpleXMLRPCRequestHandler
 
-#the handler of the log module
+#the handler of the log and database module
 logger = None
 
 #store the task information
@@ -76,6 +77,9 @@ def put_trans_task(URI, bitrate, width, height, priority, task_id = None):
 
     log_msg = 'new task: %s' % task_id
     logger.debug(log_msg)
+
+    #insert the task information into database
+    db_insert_task_info(task_id, priority)
 
     new_task            = task()
     new_task.task_id    = task_id
@@ -204,7 +208,7 @@ class task_scheduling(threading.Thread):
             #put the video blocks into the queue for dispatching
             disb_queue.put(block_info)
             index = index + 1
-            logger.info('all blocks have been put into the dispatching queue')
+        logger.info('all blocks have been put into the dispatching queue')
 
 
     def run(self):
@@ -553,6 +557,12 @@ if __name__ == '__main__':
     work_path = config.master_path
     if os.path.exists(work_path) == False:
         logger.critical('work path does not exist:%s', work_path)
+        sys.exit()
+
+    #create database and init the tables
+    (db_con, db_cur) = init_db()
+    if db_con == -1 or db_cur == -1:
+        logger.critical('cannot initialize the database')
         sys.exit()
 
     #start the rpc thread to handle the request

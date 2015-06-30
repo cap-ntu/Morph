@@ -1,5 +1,5 @@
 #the configuration of the master node
-master_ip       = "10.0.143.229"
+master_ip       = "155.69.52.158"
 master_rpc_port = "8091"
 master_rev_port = "9001"
 master_snd_port = "9011"
@@ -19,3 +19,5 @@ blk_retry_times = 3
 
 #select the algorithm for task scheduling
 sch_alg = 'fifo'
+
+db_name = 'system_info.db'
