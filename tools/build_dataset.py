@@ -10,6 +10,8 @@ from converter import Converter
 basepath = '/data/video_dataset/'
 c = Converter()
 
+f = open('trans_res.dat','w')
+
 y_w = [1280, 854, 640, 426]
 y_h = [720,  480, 360, 240]
 
@@ -38,7 +40,7 @@ for fname in os.listdir(basepath):
         o_c = info.video.codec
         o_d = info.format.duration
 
-        if o_d > 60*5:
+        if o_d > 60*3:
             continue
 
         for i in range(4):
@@ -57,16 +59,13 @@ for fname in os.listdir(basepath):
                 ret = p.returncode
                 elapsed_time = time.time() - start_time
 
-                print fname, ' ', o_d, ' ', o_w, ' ', o_h, ' ', o_f, ' ', o_b, ' ', o_c, ' ', resolution, ' ', elapsed_time
+                res = fname + ' '+ str(o_d) + ' ' + str(o_w) + ' ' + str(o_h) + ' ' + str(o_f) + \
+                        ' ' + str(o_b) + ' '+ o_c + ' ' + resolution + ' ' + str(elapsed_time) + '\n'
+                print res,
+                f.write(res)
+                f.flush()
 
-                '''
-                print '------------------'
-                print 'file name:', trans
-                print 'bitrate (b/s):', info.video.bitrate
-                print 'transcoding time:', elapsed_time
-                print 'speed:', duration / elapsed_time
-                print '------------------'
-                '''
+f.close()
 
 
 
