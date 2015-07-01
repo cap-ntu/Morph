@@ -493,7 +493,9 @@ class task_tracker(threading.Thread):
             ret = p.returncode
             logger.info('return code: %s', ret)
             if ret != 0:
+                db_update_finish_time(task_id, ret)
                 return ret
+        db_update_finish_time(task_id, 0)
         return 0
 
     def run(self):
@@ -560,8 +562,8 @@ if __name__ == '__main__':
         sys.exit()
 
     #create database and init the tables
-    (db_con, db_cur) = init_db()
-    if db_con == -1 or db_cur == -1:
+    ret = init_db()
+    if ret == -1:
         logger.critical('cannot initialize the database')
         sys.exit()
 
