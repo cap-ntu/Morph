@@ -5,7 +5,6 @@ import sqlite3 as lite
 import sys
 
 
-
 def period_revenue(start_time, end_time):
     con = None
     try:

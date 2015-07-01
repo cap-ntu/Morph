@@ -24,7 +24,8 @@ def hpf(queue):
 VBS: value-based task scheduling
 '''
 def vbs(queue):
-    pass
+    f = lambda a, b: a.priority - b.priority
+    queue.sort(f)
 
 schedule_task = {
     'fifo': fifo,
