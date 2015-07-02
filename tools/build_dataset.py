@@ -40,14 +40,13 @@ for fname in os.listdir(basepath):
         o_c = info.video.codec
         o_d = info.format.duration
 
-        if o_d > 60*3:
-            continue
+        #if o_d > 60*3:
+        #    continue
 
         for i in range(4):
             if o_w > y_w[i] and o_h > y_h[i]:
 
                 resolution = str(y_w[i]) + 'x' + str(y_h[i])
-
                 trans = name + '_' + resolution + ext
 
                 cmd = "ffmpeg -y -i " + path + " -s " + resolution + " -strict -2 " + trans
@@ -57,10 +56,12 @@ for fname in os.listdir(basepath):
                 p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
                 stdout, stderr = p.communicate()
                 ret = p.returncode
+                if ret != 0:
+                    continue
                 elapsed_time = time.time() - start_time
 
-                res = fname + ' '+ str(o_d) + ' ' + str(o_w) + ' ' + str(o_h) + ' ' + str(o_f) + \
-                        ' ' + str(o_b) + ' '+ o_c + ' ' + resolution + ' ' + str(elapsed_time) + '\n'
+                res = fname + ' ' + str(o_d) + ' ' + str(o_w) + ' ' + str(o_h) + ' ' + str(o_f) + \
+                        ' ' + str(o_b) + ' ' + o_c + ' ' + resolution + ' ' + str(elapsed_time) + '\n'
                 print res,
                 f.write(res)
                 f.flush()
