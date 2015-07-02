@@ -4,7 +4,7 @@ import random
 import pickle
 
 t = 0
-duration = 10
+duration = 100
 rate = 1
 arrive_time = []
 
