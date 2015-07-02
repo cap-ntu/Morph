@@ -1,3 +1,4 @@
+import os
 import math
 import time
 import random
@@ -22,9 +23,9 @@ def submit_task():
         o_h = info.video.video_height
 
         service_type = choice(service_set)
-        t_w = -1, t_h = -1, i = 0
+        t_w = -1; t_h = -1; i = 0;
         while i < 4:
-            if y_w[i] < o_w and y_h[i] < o_h
+            if y_w[i] < o_w and y_h[i] < o_h:
                 break
             else:
                 i = i + 1
@@ -35,7 +36,7 @@ def submit_task():
         i = random.randint(i, 3)
         resolution = str(y_w[i]) + 'x' + str(y_h[i])
 
-        cmd = 'python ../submit_task.py -l ' + path + ' -s ' + resolution + ' -p ' + str(service_type) + '>> task_id'
+        cmd = 'python ../submit_task.py -l ' + path + ' -s ' + resolution + ' -p ' + str(service_type) + ' >> task_id '
         os.system(cmd)
         return
 
@@ -43,7 +44,7 @@ def submit_task():
 f = open('arrive_time.pkl', 'r')
 arrive_time = pickle.load(f)
 
-duration = 100
+duration = 10*60*60
 start_time = time.time()
 
 while True:
@@ -60,5 +61,5 @@ while True:
         print x, ' ', cur_time - start_time
         submit_task()
     else:
-        time.sleep(1)
+        time.sleep(5)
 
