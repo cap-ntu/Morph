@@ -493,9 +493,7 @@ class task_tracker(threading.Thread):
             ret = p.returncode
             logger.info('return code: %s', ret)
             if ret != 0:
-                db_update_finish_time(task_id, ret)
                 return ret
-        db_update_finish_time(task_id, 0)
         return 0
 
     def run(self):
@@ -519,14 +517,17 @@ class task_tracker(threading.Thread):
                         cur_time = time.time()
                         dur_time = cur_time - task.start_time
                         logger.info('transcoding duration: %s', dur_time)
+        		db_update_finish_time(task_id, 0)
                     else:
                         task.progress = -3
+        		db_update_finish_time(task_id, -3)
 
                     self.write_pkl(task_id, task)
                     continue
                 if task.progress < 0:
                     task_status.pop(task_id)
                     self.write_pkl(task_id, task)
+                    db_update_finish_time(task_id, task.progress)
                     continue
 
 #check whether the task has been time out
