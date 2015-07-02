@@ -5,8 +5,7 @@ import pickle
 from random import choice
 from converter import Converter
 
-base_path = '/data/video_dataset/'
-
+base_path = '/root/Video/'
 video_set = os.listdir(base_path)
 service_set = [1, 2, 3]
 
@@ -23,10 +22,8 @@ def submit_task():
         o_h = info.video.video_height
 
         service_type = choice(service_set)
-        t_w = -1
-        t_h = -1
-        i = 0
-        for i < 4:
+        t_w = -1, t_h = -1, i = 0
+        while i < 4:
             if y_w[i] < o_w and y_h[i] < o_h
                 break
             else:
@@ -38,10 +35,9 @@ def submit_task():
         i = random.randint(i, 3)
         resolution = str(y_w[i]) + 'x' + str(y_h[i])
 
-        cmd = 'python submit_task.py -l ' + path + ' -s ' + resolution + ' -p ' + str(service_type) + '>> task_id'
+        cmd = 'python ../submit_task.py -l ' + path + ' -s ' + resolution + ' -p ' + str(service_type) + '>> task_id'
         os.system(cmd)
-        break
-
+        return
 
 
 f = open('arrive_time.pkl', 'r')
@@ -64,5 +60,5 @@ while True:
         print x, ' ', cur_time - start_time
         submit_task()
     else:
-        time.sleep(0.5)
+        time.sleep(1)
 
