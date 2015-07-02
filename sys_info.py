@@ -13,11 +13,14 @@ def init_db():
         cur.execute("create table if not exists task_info(id TEXT, submit_time REAL, \
                 finish_time REAL, service_type INTEGER, trans_time REAL, task_ongoing INTEGER)")
         con.commit()
-        con.close()
 
-        con = lite.connect(':memory:')
-        cur = con.cursor()
-        cur.execute("create table if not exists server_info(server_num INTEGER, server_list TEXT)")
+        cur.execute("create table if not exists server_info(server_num INTEGER, server_list TEXT, id TEXT)")
+        con.commit()
+        sql_cmd = "DELETE FROM server_info WHERE id = 'current'"
+        cur.execute(sql_cmd)
+        con.commit()
+        sql_cmd = "INSERT INTO server_info VALUES(-1, '', 'current')"
+        cur.execute(sql_cmd)
         con.commit()
         con.close()
         return 0
@@ -57,5 +60,32 @@ def db_update_finish_time(task_id, result):
 
 def get_task_progress():
     pass
+
+def set_server_num(num, serv_list):
+    try:
+        con = lite.connect(config.db_name)
+        cur = con.cursor()
+        sql_cmd = "UPDATE server_info SET server_num = %d, server_list = '%s' WHERE id = 'current'" \
+                    % (num, serv_list)
+        cur.execute(sql_cmd)
+        con.commit()
+        con.close()
+        return 0
+    except lite.Error, e:
+        print e
+        return -1
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
