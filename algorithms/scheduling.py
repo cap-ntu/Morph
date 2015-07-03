@@ -27,6 +27,13 @@ def vbs(queue):
     f = lambda a, b: a.priority - b.priority
     queue.sort(f)
 
+'''
+lifo: last in first out
+'''
+def lifo(queue):
+    f = lambda a, b: b.start_time - a.start_time
+    queue.sort(f)
+
 schedule_task = {
     'fifo': fifo,
     'edf':  edf,

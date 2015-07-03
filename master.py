@@ -522,10 +522,10 @@ class task_tracker(threading.Thread):
                         cur_time = time.time()
                         dur_time = cur_time - task.start_time
                         logger.info('transcoding duration: %s', dur_time)
-        		        db_update_finish_time(task_id, 0)
+                        db_update_finish_time(task_id, 0)
                     else:
                         task.progress = -3
-        		        db_update_finish_time(task_id, -3)
+                        db_update_finish_time(task_id, -3)
 
                     self.write_pkl(task_id, task)
                     continue
