@@ -1,15 +1,19 @@
+import os
+import sys
 import math
 import time
 import random
+sys.path.append("../algorithms")
+import scheduling
 
 t = 0
 all_task = []
-pending_taks = []
+pending_task = []
 finished_tasks = []
 machine_num = 10
-duration = 100
-arrive_rate = 1
-
+duration = 60 * 100
+arrive_rate = 1.0 / (60.0 * 3.0)
+seg_trans_time = 60.0
 decay_factor = 0.99
 
 class task:
@@ -21,31 +25,46 @@ class task:
         self.deadline   = 0     #the deadline for this task
         self.value      = 0     #the estimated value for scheduling
 
-def sched_algo(pending_task):
-
 
 #generate the tasks
 while t < duration:
     t = t + random.expovariate(arrive_rate)
     x = task()
     x.priority = random.randint(1, 3)
-    x.start_time = t
+    x.start_time = int(t)
     x.block_num = random.randint(5, 20)
     all_task.append(x)
 
+print len(all_task)
+sys.exit()
 
 t = 0
-next_a_t = 0
+a_t = 0
 
 while t < duration:
-    pending_task = [x for x in all_task if x.start_time <= t]
 
-    print 'current time:', t, ' ',
+    for x in all_task:
+        if x.start_time <= t:
+            task = x
+            all_task.remove(x)
+            pending_task.append(task)
+
+    scheduling.fifo(pending_task)
+
+    print 'current time:', t, ':',
     for x in pending_task:
         print x.start_time, ' ',
     print ' '
 
+    if a_t <= t:
+        if len(pending_task) == 0:
+            a_t = t
+            break
+        else:
+            task = pending_task.pop(0)
+            a_t = task.block_num * seg_trans_time / machine_num + t
+
     t = t + 1
-    time.sleep(2)
+    #time.sleep(1)
 
 
