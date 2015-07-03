@@ -509,7 +509,12 @@ class task_tracker(threading.Thread):
                     msg = "%s: task has been finished" % task_id
                     logger.debug(msg)
                     task_status.pop(task_id)
-                    ret = self.concat_block(task)
+                    ret = 0
+                    try:
+                        ret = self.concat_block(task)
+                    except:
+                        ret = -1
+
                     if ret == 0:
                         task.progress = 100
                         print dump_msg(TASKID = task_id, PROGRESS = 100)
@@ -517,10 +522,10 @@ class task_tracker(threading.Thread):
                         cur_time = time.time()
                         dur_time = cur_time - task.start_time
                         logger.info('transcoding duration: %s', dur_time)
-        		db_update_finish_time(task_id, 0)
+        		        db_update_finish_time(task_id, 0)
                     else:
                         task.progress = -3
-        		db_update_finish_time(task_id, -3)
+        		        db_update_finish_time(task_id, -3)
 
                     self.write_pkl(task_id, task)
                     continue
