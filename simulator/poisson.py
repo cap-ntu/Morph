@@ -10,8 +10,14 @@ import scheduling
 
 flag = False
 
-if len(sys.argv) > 1:
+if len(sys.argv) != 3:
+    print 'argument error'
+    sys.exit()
+
+if sys.argv[1] == '1':
     flag = True
+
+algo = sys.argv[2]
 
 
 t = 0
@@ -19,7 +25,7 @@ all_task = []
 pending_task = []
 finished_tasks = []
 machine_num = 10
-duration = 60 * 100
+duration = 60 * 500
 arrive_rate = 1 / (60.0*4)
 seg_trans_time = 60.0
 decay_factor = 0.999
@@ -71,23 +77,16 @@ while t < duration:
         else:
             break
 
-    scheduling.hpf(pending_task)
+    #scheduling.hpf(pending_task)
     #scheduling.fifo(pending_task)
     #scheduling.edf(pending_task)
     #scheduling.vbs(pending_task, t)
 
+    if algo == 'vbs':
+        scheduling.schedule_task[algo](pending_task, t)
+    else:
+        scheduling.schedule_task[algo](pending_task)
 
-    if t % 1000 == 0:
-        for x in pending_task:
-            print x.task_id, ' ',
-        print ' '
-
-    '''
-    print 'current time:', t, ':',
-    for x in pending_task:
-        print x.start_time, ' ',
-    print ' '
-    '''
 
     if a_t <= t:
         if len(pending_task) == 0:
