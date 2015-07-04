@@ -68,7 +68,7 @@ def hvs(queue, t):
 edf_2: earliest deadline first
 '''
 def edf_2(queue):
-
+    pass
 
 
 schedule_task = {
