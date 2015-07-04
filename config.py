@@ -27,5 +27,5 @@ db_name = 'system_info.db'
 price_per_type = [10, 9, 8, 7]
 
 #price decaying factor
-price_decaying = 0.95
+price_decaying = 0.99
 
