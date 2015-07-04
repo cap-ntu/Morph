@@ -50,21 +50,25 @@ def lifo(queue):
     queue.sort(f)
 
 '''
-hvs: highest value
+hvs: highest value first
 '''
 def h_fun(task, t):
     price_decaying = 0.999
     seg_trans_time = 60.0
     machine_num = 10
-    v = (pow(price_decaying, task.block_num * seg_trans_time * 1.0 / (machine_num) ) * \
-            pow(price_decaying, (t - task.start_time)) * \
-            task.priority * task.block_num) / (1 - pow(price_decaying, task.block_num * seg_trans_time * 1.0 / (machine_num)))
-    v = int(v)
-    return v
+    h = pow(price_decaying, (t - task.start_time)) * task.priority * task.block_num
+    h = int(h)
+    return h
 
 def hvs(queue, t):
     f = lambda a, b: h_fun(b, t) - h_fun(a, t)
     queue.sort(f)
+
+'''
+edf_2: earliest deadline first
+'''
+def edf_2(queue):
+
 
 
 schedule_task = {

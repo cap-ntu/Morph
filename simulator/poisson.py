@@ -19,16 +19,17 @@ if sys.argv[1] == '1':
 
 algo = sys.argv[2]
 
-
 t = 0
 all_task = []
 pending_task = []
-finished_tasks = []
-machine_num = 10
+
+machine_num = 5
 duration = 60 * 500
-arrive_rate = 1 / (60.0*4)
+
+arrive_rate = 0.5 / (60.0*4)
 seg_trans_time = 60.0
 decay_factor = 0.999
+
 
 class task:
     def __init__(self):
@@ -39,6 +40,19 @@ class task:
         self.end_time   = 0     #the finish time of the task
         self.deadline   = 0     #the deadline for this task
         self.value      = 0     #the estimated value for scheduling
+
+latency = {}
+priority = {1, 2, 3}
+latency[1] = 0
+latency[2] = 0
+latency[3] = 0
+
+req_num = {}
+req_num[1] = 0
+req_num[2] = 0
+req_num[3] = 0
+
+
 
 id = 0
 if flag == True:
@@ -68,7 +82,7 @@ sum_revenue = 0
 t = 0
 a_t = 0
 
-while t < duration:
+while t < duration + 60*60*3:
     while len(all_task) > 0:
         if all_task[0].start_time <= t:
             task = all_task[0]
@@ -82,7 +96,7 @@ while t < duration:
     #scheduling.edf(pending_task)
     #scheduling.vbs(pending_task, t)
 
-    if algo == 'vbs':
+    if algo == 'vbs' or algo == 'hvs':
         scheduling.schedule_task[algo](pending_task, t)
     else:
         scheduling.schedule_task[algo](pending_task)
@@ -98,7 +112,15 @@ while t < duration:
             a_t = task.block_num * seg_trans_time * 1.0 / machine_num + t
             sum_revenue = sum_revenue + task.priority * task.block_num * 1.0 * math.pow(decay_factor, (a_t - task.start_time))
             #print 'estimated time:', a_t
+            latency[task.priority] += (t - task.start_time)
+            req_num[task.priority] += 1
 
     t = t + 1
 
-print sum_revenue
+print 'pending task number', len(pending_task)
+print 'total revenue:', sum_revenue
+for key in latency.keys():
+    print key, '  ' ,latency[key] / req_num[key]
+
+
+
