@@ -55,9 +55,14 @@ if __name__=='__main__':
 
     username = "root"
     passwd = ""
-    thread_num = 2
+    thread_num = 10
 
-    cmds = ['ls /data/']
+    cmds = ['pkill python']
+    cmds = ['rm -f /data/worker/*']
+    cmds = ['du -sh']
+    cmds = ['ps -ef | grep python']
+    cmds = ['ps -ef | grep python']
+    #cmds = ['nohup  python /root/akilos/worker.py & ']
 
     f = open("ip.info")
     lines = f.readlines()
