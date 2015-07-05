@@ -1,5 +1,5 @@
 #the configuration of the master node
-master_ip       = "localhost"
+master_ip       = "10.0.143.229"
 master_rpc_port = "8091"
 master_rev_port = "9001"
 master_snd_port = "9011"
@@ -27,5 +27,5 @@ db_name = 'system_info.db'
 price_per_type = [10, 9, 8, 7]
 
 #price decaying factor
-price_decaying = 0.99
+price_decaying = 0.999
 
