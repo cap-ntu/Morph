@@ -5,6 +5,8 @@ import time
 import math
 import random
 import pickle
+sys.path.append("../.")
+import config
 sys.path.append("../algorithms")
 import scheduling
 
@@ -28,7 +30,7 @@ duration = 60 * 500
 
 arrive_rate = 0.5 / (60.0*4)
 seg_trans_time = 60.0
-decay_factor = 0.999
+decay_factor = config.price_decaying
 
 
 class task:
@@ -53,15 +55,14 @@ req_num[2] = 0
 req_num[3] = 0
 
 
-
-id = 0
+task_id = 0
 if flag == True:
     #generate the tasks
     while t < duration:
         t = t + random.expovariate(arrive_rate)
         x = task()
-        x.task_id = id
-        id = id + 1
+        x.task_id = task_id
+        task_id = task_id + 1
         x.priority = random.randint(1, 3)
         x.start_time = int(t)
         x.block_num = random.randint(4, 90)
@@ -77,7 +78,6 @@ all_task = pickle.load(f)
 
 sum_revenue = 0
 
-#print len(all_task)
 
 t = 0
 a_t = 0
