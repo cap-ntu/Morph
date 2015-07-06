@@ -59,9 +59,9 @@ if __name__=='__main__':
 
     cmds = ['pkill python']
     cmds = ['rm -f /data/worker/*']
-    cmds = ['du -sh']
-    cmds = ['ps -ef | grep python']
-    cmds = ['ps -ef | grep python']
+    cmds = ['du -sh /data/worker/']
+    #cmds = ['ps -ef | grep python']
+    #cmds = ['ps -ef | grep python']
     #cmds = ['nohup  python /root/akilos/worker.py & ']
 
     f = open("ip.info")
