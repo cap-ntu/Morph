@@ -4,8 +4,8 @@ import random
 import pickle
 
 t = 0
-duration = 60*60
-rate = 1.0 / 10
+duration = 60*120
+rate = 1.0 / 180.0
 arrive_time = []
 
 while t < duration:

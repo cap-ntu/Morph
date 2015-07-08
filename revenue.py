@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import sys
+import time
 import config
 import sqlite3 as lite
 from math import pow
@@ -13,7 +14,16 @@ def period_revenue(start_time, end_time):
     con = None
     revenue  = 0
     task_num = 0
-    latency  = 0
+    latency  = {}
+    latency[1] = 0
+    latency[2] = 0
+    latency[3] = 0
+
+    task_type = {}
+    task_type[1] = 0
+    task_type[2] = 0
+    task_type[3] = 0
+
     try:
         con = lite.connect(config.db_name)
         cur = con.cursor()
@@ -32,10 +42,15 @@ def period_revenue(start_time, end_time):
                 revenue += task_revenue
                 task_num += 1
                 #print task_revenue
-                latency += (row[2] - row[1])
+                latency[row[4]] += (row[2] - row[1])
+                task_type[row[4]] += 1
 
         print 'task num:', task_num
-        return (revenue, latency/task_num, task_num)
+        print 'type 1 latency:', latency[1] / task_type[1]
+        print 'type 2 latency:', latency[2] / task_type[2]
+        print 'type 3 latency:', latency[3] / task_type[3]
+
+        return (revenue, task_num)
 
     except lite.Error, e:
         print "Error %s:" % e.args[0]
@@ -45,5 +60,13 @@ def period_revenue(start_time, end_time):
         if con:
             con.close()
 
-r = period_revenue(1436356584.9515, 1436357729.02912)
+
+s = 1436356584.9515
+t = time.time()
+r = period_revenue(s, t)
 print r
+
+print 'duration:', (t - s) /60.0
+
+
+
