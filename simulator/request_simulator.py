@@ -44,7 +44,7 @@ def submit_task():
 f = open('arrive_time.pkl', 'r')
 arrive_time = pickle.load(f)
 
-duration = 10*60*60
+duration = 60*60
 start_time = time.time()
 
 while True:

@@ -11,7 +11,9 @@ price_per_type = config.price_per_type
 
 def period_revenue(start_time, end_time):
     con = None
-    revenue = 0
+    revenue  = 0
+    task_num = 0
+    latency  = 0
     try:
         con = lite.connect(config.db_name)
         cur = con.cursor()
@@ -26,9 +28,14 @@ def period_revenue(start_time, end_time):
         for row in rows:
             if row[6] == 0:
                 #print "%s %s %s" % (row[0], row[1], row[2])
-                task_revenue = pow(decay_factor, row[3] - row[1]) * (row[5] / 60.0) * price_per_type(row[4])
+                task_revenue = pow(decay_factor, row[3] - row[1]) * (row[5] / 60.0) * price_per_type[row[4]]
                 revenue += task_revenue
-        return revenue
+                task_num += 1
+                #print task_revenue
+                latency += (row[2] - row[1])
+
+        print 'task num:', task_num
+        return (revenue, latency/task_num, task_num)
 
     except lite.Error, e:
         print "Error %s:" % e.args[0]
