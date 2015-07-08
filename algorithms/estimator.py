@@ -5,11 +5,11 @@ import numpy as np
 import neurolab as nl
 
 
-input   = scipy.io.loadmat('transcoding1to5.mat')
-target  = scipy.io.loadmat('transcoding6.mat')
+input   = scipy.io.loadmat('t3_input.mat')
+target  = scipy.io.loadmat('t3_output.mat')
 #i = input['transcoding1to5'].transpose()
-i = input['transcoding1to5']
-t = target['transcodingdata']
+i = input['t3_input']
+t = target['t3_output']
 
 #print target
 #print i.shape
@@ -20,12 +20,12 @@ norm_t = nl.tool.Norm(t)
 t = norm_t(t)
 
 '''
-net = nl.net.newff(nl.tool.minmax(i), [20, 1])
+net = nl.net.newff(nl.tool.minmax(i), [10, 1])
 err = net.train(i, t, epochs=1000, show=1)
-net.save('estimator.net')
+net.save('t3_estimator.net')
 '''
 
-net = nl.load('estimator.net')
+net = nl.load('t3_estimator.net')
 out = net.sim(i)
 
 out = norm_t.renorm(out)

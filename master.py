@@ -1,4 +1,6 @@
 import config
+import scipy.io
+import numpy as np
 import os, sys, md5
 import time, pycurl
 import pickle, Queue
@@ -7,8 +9,10 @@ import struct, threading
 import subprocess, SocketServer
 from common import *
 sys.path.append("algorithms")
+import neurolab as nl
 from scheduling import *
 from sys_info import *
+from converter import Converter
 from Queue import PriorityQueue
 from SocketServer import TCPServer
 from SocketServer import ThreadingMixIn
@@ -148,6 +152,7 @@ class task_scheduling(threading.Thread):
         if get_blk_num() < 1 and len(sched_queue) > 0:
             task = sched_queue.pop(0)
             msg = "%s: pop task for partition" % task.task_id
+            db_update_start_time(task.task_id)
             self.dispatch(task)
 
     def det_seg_dur(self, task):
@@ -225,9 +230,38 @@ class preproc_thread(threading.Thread):
     def __init__(self, index):
         threading.Thread.__init__(self)
         self.index = index
+        self.c = Converter()
+        target   = scipy.io.loadmat('./algorithms/t3_output.mat')
+        self.net = nl.load('./algorithms/t3_estimator.net')
+        t = target['t3_output']
+        self.norm_t = nl.tool.Norm(t)
 
     def trans_time_est(self, task):
-        return 0
+        path = task.file_path
+        info = self.c.probe(path)
+        o_w = info.video.video_width
+        o_h = info.video.video_height
+        r_1 = int(o_w) * int(o_h)
+        o_f = info.video.video_fps
+        o_b = info.video.bitrate
+        o_d = info.format.duration
+
+        width   = task.width
+        height  = task.height
+        width   = width.replace(' ', '').split('%')
+        width   = filter(lambda a: a != '', width)
+        height  = height.replace(' ', '').split('%')
+        height  = filter(lambda a: a != '', height)
+        r_2     = int(width[0]) * int(height[0])
+
+        f   = [[o_d, r_1, o_f, o_b, r_2]]
+        out = self.net.sim(f)
+        out = self.norm_t.renorm(out)
+        out = out[0][0]
+        log_msg = '%s: estimated time %f, %d, %f, %f, %d, %f' \
+                % (task.task_id, o_d, r_1, o_f, o_b, r_2, out)
+        logger.info(log_msg)
+        return out
 
     def preprocess(self, task):
         file_path = ''
@@ -246,6 +280,7 @@ class preproc_thread(threading.Thread):
 
         task.file_path = file_path
         est_time = self.trans_time_est(task)
+        db_update_trans_time(task.task_id, est_time)
         task.est_time = est_time
         return 0
 

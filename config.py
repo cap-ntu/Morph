@@ -34,12 +34,9 @@ service_type = [1, 2, 3]
 #-> 1280x720, 854x480, 640x360, 426x240
 #-> price per unite video duration
 price_per_type = {}
-s_1 = 0.08
-s_2 = 0.05
-s_3 = 0.02
-price_per_type[1] = [s_1, s_1*0.66, s_1*0.33]
-price_per_type[2] = [s_2, s_2*0.66, s_2*0.33]
-price_per_type[3] = [s_3, s_3*0.66, s_3*0.33]
+price_per_type[1] = 0.08
+price_per_type[2] = 0.05
+price_per_type[3] = 0.02
 
 #amazon ec2 instance
 vm_cost_per_hour = 0.252

@@ -35,7 +35,8 @@ def v_fun(task, t, machine_num):
 
     v = (pow(price_decaying, task.block_num * seg_trans_time * 1.0 / (machine_num) ) * \
             pow(price_decaying, (t - task.start_time)) * \
-            price_per_type[task.priority][0] * task.block_num) / (1 - pow(price_decaying, task.block_num * seg_trans_time * 1.0 / (machine_num)))
+            price_per_type[task.priority] * (task.block_num * seg_trans_time / 60.0)) \
+                / (1 - pow(price_decaying, task.block_num * seg_trans_time * 1.0 / (machine_num)))
     v = int(v)
     return v
 
@@ -61,7 +62,8 @@ def h_fun(task, t):
     seg_trans_time = config.equal_trans_dur
     price_per_type = config.price_per_type
 
-    h = pow(price_decaying, (t - task.start_time)) * price_per_type[task.priority][0] * task.block_num
+    h = pow(price_decaying, (t - task.start_time)) * price_per_type[task.priority] \
+            * (task.block_num * seg_trans_time / 60.0)
     h = int(h)
     return h
 

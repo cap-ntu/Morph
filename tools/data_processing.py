@@ -1,5 +1,5 @@
 
-fname = 'trans_res.dat'
+fname = 't3_trans_res.dat'
 f = open(fname, 'r')
 lines = f.readlines()
 f.close()

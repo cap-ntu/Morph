@@ -79,7 +79,7 @@ if flag == True:
         x.priority = gen_p()
         x.start_time = int(t)
         x.block_num  = random.randint(1, 10)
-        x.deadline   = int(x.start_time + x.block_num * equal_trans_dur * 3.0 / machine_num)
+        x.deadline   = int(x.start_time + x.block_num * equal_trans_dur * 3.0)
         all_task.append(x)
         task_id = task_id + 1
 
@@ -97,7 +97,7 @@ t = 0
 a_t = 0
 
 #while t < sim_dur + 60*60*3:
-while t < sim_dur:
+while t < sim_dur + 60*60*2:
     while len(all_task) > 0:
         if all_task[0].start_time <= t:
             task = all_task[0]
@@ -122,7 +122,8 @@ while t < sim_dur:
             #print 'execute a task:', t
             #print len(pending_task)
             a_t = task.block_num * equal_trans_dur * 1.0 / machine_num + t
-            sum_revenue = sum_revenue + price_per_type[task.priority][0] * task.block_num * 3.0 * math.pow(decay_factor, (a_t - task.start_time))
+            sum_revenue = sum_revenue + price_per_type[task.priority] * task.block_num * (equal_trans_dur / 60.0) \
+                                * math.pow(decay_factor, (a_t - task.start_time))
             #print 'estimated time:', a_t
             latency[task.priority] += (t - task.start_time)
             req_num[task.priority] += 1
