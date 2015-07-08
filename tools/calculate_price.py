@@ -13,6 +13,8 @@ tra_3 = 0
 
 f = open('transcoding_data')
 lines = f.readlines()
+f.close()
+
 for line in lines:
     line  = line.strip('\n')
     items = line.split(' ')
