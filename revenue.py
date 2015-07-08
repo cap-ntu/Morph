@@ -6,7 +6,8 @@ import config
 import sqlite3 as lite
 from math import pow
 
-decay_factor = config.price_decaying
+decay_factor   = config.price_decaying
+price_per_type = config.price_per_type
 
 def period_revenue(start_time, end_time):
     con = None
@@ -19,13 +20,13 @@ def period_revenue(start_time, end_time):
         cur.execute(sql_cmd)
         rows = cur.fetchall()
         '''
-        id TEXT, submit_time REAL, finish_time REAL, service_type INTEGER,\
-                trans_time REAL, task_ongoing INTEGER
+        0: id TEXT, 1: submit_time REAL, 2: start_time, 3: finish_time REAL, 4: service_type INTEGER,\
+                5: trans_time REAL, 6: task_ongoing INTEGER
         '''
         for row in rows:
-            if row[5] == 0:
+            if row[6] == 0:
                 #print "%s %s %s" % (row[0], row[1], row[2])
-                task_revenue = pow(decay_factor, row[2] - row[1]) * row[3] * row[4]
+                task_revenue = pow(decay_factor, row[3] - row[1]) * (row[5] / 60.0) * price_per_type(row[4])
                 revenue += task_revenue
         return revenue
 
@@ -37,5 +38,5 @@ def period_revenue(start_time, end_time):
         if con:
             con.close()
 
-r = period_revenue(1435938011.92517, 1436076176.82975)
+r = period_revenue(1436356584.9515, 1436357729.02912)
 print r
