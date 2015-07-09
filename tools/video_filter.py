@@ -17,4 +17,4 @@ for line in lines:
     #v.append(w*h)
     dur = float(items[8])
     if dur > 180:
-        print items[0]
+        print items[8]
