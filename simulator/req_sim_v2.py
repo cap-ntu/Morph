@@ -2,6 +2,14 @@ import os
 import time
 import pickle
 
+class task:
+    def __init__(self):
+        self.priority   = 0     #task priority
+        self.start_time = 0     #the time of adding the transcoding task
+        self.tgt_res    = 0     #resolution
+        self.video_name = ''    #video name
+
+
 def submit_task(task):
     cmd = 'python ../submit_task.py -l ' + task.video_name + ' -s ' + \
             task.tgt_res + ' -p ' + str(task.priority) + ' >> task_id '
@@ -11,11 +19,11 @@ def submit_task(task):
     return
 
 
-f = open('sim_v2.pkl', 'r')
+f = open('sim_v3.pkl', 'r')
 all_task = pickle.load(f)
 f.close()
 
-duration = 60*60
+duration = 60*180
 start_time = time.time()
 
 while True:
