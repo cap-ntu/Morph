@@ -232,7 +232,7 @@ class task_scheduling(threading.Thread):
         logger.debug('start worker for task scheduling')
         while True:
             self.scheduling()
-            time.sleep(2)
+            time.sleep(3)
 
 '''
 preprocess the task, download the video file
