@@ -67,7 +67,7 @@ def h_fun(task, t):
     h = int(h*10000)
     return h
 
-def hvs(queue, t): #N, N-1, N-2, ...
+def hvs(queue, t, machine_num): #N, N-1, N-2, ...
     f = lambda a, b: h_fun(b, t) - h_fun(a, t)
     queue.sort(f)
 

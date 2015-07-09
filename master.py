@@ -148,8 +148,14 @@ class task_scheduling(threading.Thread):
         block.height       = task.height
 
     def scheduling(self):
-        schedule_task[config.sch_alg](sched_queue)
-        if get_blk_num() < 1 and len(sched_queue) > 0:
+        if config.sch_alg == 'vbs' or config.sch_alg == 'hvs':
+            t = time.time()
+            machine_num = 10
+            schedule_task[config.sch_alg](sched_queue, t, machine_num)
+        else:
+            schedule_task[config.sch_alg](sched_queue)
+
+        if get_blk_num() < 2 and len(sched_queue) > 0:
             task = sched_queue.pop(0)
             msg = "%s: pop task for partition" % task.task_id
             db_update_start_time(task.task_id)
@@ -226,7 +232,7 @@ class task_scheduling(threading.Thread):
         logger.debug('start worker for task scheduling')
         while True:
             self.scheduling()
-            time.sleep(1)
+            time.sleep(2)
 
 '''
 preprocess the task, download the video file
