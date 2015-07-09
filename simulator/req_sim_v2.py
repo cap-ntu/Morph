@@ -1,10 +1,12 @@
 import os
 import time
-
+import pickle
 
 def submit_task(task):
     cmd = 'python ../submit_task.py -l ' + task.video_name + ' -s ' + \
             task.tgt_res + ' -p ' + str(task.priority) + ' >> task_id '
+    print cmd
+    print 'start time:', task.start_time
     os.system(cmd)
     return
 
@@ -24,7 +26,7 @@ while True:
     if len(all_task) == 0:
         break
 
-    if all_task[0].start_time <= cur_time - start_time:
+    if all_task[0].start_time <= (cur_time - start_time):
         task = all_task[0]
         all_task.pop(0)
         submit_task(task)
