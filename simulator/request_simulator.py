@@ -61,5 +61,5 @@ while True:
         print x, ' ', cur_time - start_time
         submit_task()
     else:
-        time.sleep(5)
+        time.sleep(3)
 
