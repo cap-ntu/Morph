@@ -69,3 +69,5 @@ f = open('sim_v2.pkl','wb')
 pickle.dump(all_task, f)
 f.close()
 
+
+
