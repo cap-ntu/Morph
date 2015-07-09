@@ -28,7 +28,8 @@ class task:
         self.start_time = 0     #the time of adding the transcoding task
         self.block_num  = -1    #the total number of video blocks
         self.end_time   = 0     #the finish time of the task
-        self.est_time   = 0     #estimated transcoding time for this task
+        self.est_time   = 0.0   #estimated transcoding time for this task
+        self.v_duration = 0.0   #the video duration of the original file
         self.deadline   = 0     #the deadline for this task
         self.value      = 0     #the estimated value for scheduling
 

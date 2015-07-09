@@ -156,7 +156,13 @@ class task_scheduling(threading.Thread):
             self.dispatch(task)
 
     def det_seg_dur(self, task):
-        return config.min_seg_dur
+        if task.est_time <= 0:
+            return config.equal_trans_dur
+
+        blk_dur = (config.equal_trans_dur * task.v_duration) / task.est_time
+        logger.info('duration: %f, estimated time: %f, block duration: %f', \
+                task.v_duration, task.est_time, blk_dur)
+        return blk_dur
 
     def dispatch(self, task):
         '''
@@ -245,6 +251,7 @@ class preproc_thread(threading.Thread):
         o_f = info.video.video_fps
         o_b = info.video.bitrate
         o_d = info.format.duration
+        task.v_duration = o_d
 
         width   = task.width
         height  = task.height
