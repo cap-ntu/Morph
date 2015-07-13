@@ -41,7 +41,7 @@ def period_revenue(start_time, end_time):
                 task_revenue = pow(decay_factor, row[3] - row[1]) * (row[5] / 60.0) * price_per_type[row[4]]
                 revenue += task_revenue
                 task_num += 1
-                #print task_revenue
+                print row[4]
                 latency[row[4]] += (row[2] - row[1])
                 task_type[row[4]] += 1
 
@@ -49,6 +49,10 @@ def period_revenue(start_time, end_time):
         print 'type 1 latency:', latency[1] / task_type[1]
         print 'type 2 latency:', latency[2] / task_type[2]
         print 'type 3 latency:', latency[3] / task_type[3]
+
+        print 'type 1 num:', task_type[1]
+        print 'type 2 num:', task_type[2]
+        print 'type 3 num:', task_type[3]
 
         return (revenue, task_num)
 
@@ -61,7 +65,7 @@ def period_revenue(start_time, end_time):
             con.close()
 
 
-s = 1436356584.9515
+s = 1436444221.13204
 t = time.time()
 r = period_revenue(s, t)
 print r

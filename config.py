@@ -19,10 +19,10 @@ preproc_thread_num = 10
 blk_retry_times = 3
 
 #select the algorithm for task scheduling
-sch_alg = 'fifo'
+sch_alg = 'vbs'
 
 #database name
-db_name = 'system_info.db'
+db_name = 'system_info_vbs.db'
 
 #price decaying factor
 price_decaying = 0.999

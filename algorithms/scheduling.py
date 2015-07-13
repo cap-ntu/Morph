@@ -12,10 +12,17 @@ def fifo(queue): #0,1,2,...
     queue.sort(f)
 
 '''
+Get the deadline of a transcoding task
+'''
+def get_deadline(task):
+    d = int(task.start_time + task.est_time * 3.0)
+    return d
+
+'''
 EDF: earliest deadline first
 '''
 def edf(queue): #0,1,2,...
-    f = lambda a, b: a.deadline - b.deadline
+    f = lambda a, b: get_deadline(a) - get_deadline(b)
     queue.sort(f)
 
 '''

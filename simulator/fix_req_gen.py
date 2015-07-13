@@ -1,8 +1,9 @@
+import random
 import pickle
 
 n = 0
 max_num = 50
-arrive_rate = 5 / 60.0
+arrive_rate = 3.0 / 60.0
 
 class task:
     def __init__(self):
