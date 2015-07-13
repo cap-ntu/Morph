@@ -8,8 +8,8 @@ from converter import Converter
 
 base_path = '/data/video_dataset/'
 video_set = os.listdir(base_path)
-sim_dur = 60 * 60
-arrive_rate = 5 / (60.0*3.0)
+sim_dur = 60 * 180
+arrive_rate = 1.0 / 60.0
 
 y_w = [854, 640, 426]
 y_h = [480, 360, 240]

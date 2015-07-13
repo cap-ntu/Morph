@@ -150,8 +150,7 @@ class task_scheduling(threading.Thread):
     def scheduling(self):
         if config.sch_alg == 'vbs' or config.sch_alg == 'hvs':
             t = time.time()
-            machine_num = 10
-            schedule_task[config.sch_alg](sched_queue, t, machine_num)
+            schedule_task[config.sch_alg](sched_queue, t, config.machine_num)
         else:
             schedule_task[config.sch_alg](sched_queue)
 
@@ -539,8 +538,10 @@ class task_tracker(threading.Thread):
             p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
             stdout, stderr = p.communicate()
             ret = p.returncode
-            logger.info('return code: %s', ret)
+            logger.info('ffmpeg concat return code: %s', ret)
             if ret != 0:
+                print stderr
+                print stdout
                 return ret
         return 0
 
