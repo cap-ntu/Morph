@@ -11,8 +11,6 @@ import scheduling
 import trans_time
 
 
-t = 0
-task_id = 0
 all_task = []
 pending_task = []
 sim_dur = 60 * 60
@@ -25,9 +23,8 @@ vm_cost_per_hour = config.vm_cost_per_hour
 def gen_p():
     return random.randint(1, 3)
 
-class task:
+class trans_task:
     def __init__(self):
-        self.task_id    = 0     #task id
         self.priority   = 0     #task priority
         self.start_time = 0     #the time of adding the transcoding task
         self.est_time   = -1    #the total number of video blocks
@@ -35,30 +32,28 @@ class task:
         self.deadline   = 0     #the deadline for this task
         self.value      = 0     #the estimated value for scheduling
 
+
+t = 0
+a_t = 0
 while True:
 
-    rate = float(sys.argv[1])
-    machine_num = int(sys.argv[2])
+    cur_time = t
+    rate = random.uniform(0, 3)
+    machine_num = random.randint(10, 30)
     arrive_rate = rate / 60.0
 
-    #generate the tasks
-    while t < sim_dur:
+    sum_revenue = 0
+    while t < cur_time + sim_dur:
         t = t + random.expovariate(arrive_rate)
-        x = task()
-        x.task_id    = task_id
+        x = trans_task()
         x.priority   = gen_p()
         x.start_time = int(t)
-        #x.est_time   = random.randint(180, 1800) * 1.0
+        #x.est_time  = random.randint(180, 1800) * 1.0
         x.est_time   = random.choice(trans_time.a)
-        x.deadline   = int(x.start_time + x.est_time * 3.0)
         all_task.append(x)
-        task_id = task_id + 1
 
-
-    t = 0
-    a_t = 0
-
-    while t < sim_dur:
+    t = cur_time
+    while t - cur_time < sim_dur:
         while len(all_task) > 0:
             if all_task[0].start_time <= t:
                 task = all_task[0]
@@ -66,7 +61,6 @@ while True:
                 pending_task.append(task)
             else:
                 break
-
 
         scheduling.schedule_task['vbs'](pending_task, t, machine_num)
 
@@ -81,12 +75,11 @@ while True:
                 sum_revenue = sum_revenue + price_per_type[task.priority] * (task.est_time / 60.0) \
                                 * math.pow(decay_factor, (a_t - task.start_time))
                 #print 'estimated time:', a_t
-                latency[task.priority] += (t - task.start_time)
-                req_num[task.priority] += 1
 
         t = t + 1
 
     print '-----------'
+    print 'arrival rate:', arrive_rate
     print 'pending task number', len(pending_task)
     print 'total revenue:', sum_revenue
     print 'total cost:', vm_cost_per_hour * machine_num
