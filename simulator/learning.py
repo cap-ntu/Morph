@@ -38,7 +38,7 @@ a_t = 0
 while True:
 
     cur_time = t
-    rate = random.uniform(0, 3)
+    rate = random.uniform(0, 2)
     machine_num = random.randint(10, 30)
     arrive_rate = rate / 60.0
 
