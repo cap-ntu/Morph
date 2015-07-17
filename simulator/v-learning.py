@@ -59,7 +59,7 @@ policy = {}
 for i in range(0, max_pending_val + 1):
     policy[i] = {}
     for j in range(min_machine_num, max_machine_num + 1):
-        policy[i][j] = 0.0001 * random.random()
+        policy[i][j] = 0.001 * random.random()
 
 def select_best_action(policy, state_rate):
     action = 0
@@ -79,10 +79,8 @@ def select_best_action(policy, state_rate):
 profit = 0
 state_rate  = 0
 state_num   = max_machine_num
-sum_revenue = 0
-
-#dis_f = 0.01
-dis_b = 0.0
+revenue = 0
+dis_b = 0.3
 
 t   = 0
 a_t = 0
@@ -91,7 +89,7 @@ w   = 0
 
 while True:
     times += 1
-    if times > 80000:
+    if times > 500000:
         break
 
     cur_time = t
@@ -115,7 +113,7 @@ while True:
     state_num   = m_a
     machine_num = m_a
 
-    sum_revenue = 0
+    revenue = 0
     while True:
         t = t + random.expovariate(arrive_rate)
         if t >= cur_time + sim_dur:
@@ -149,7 +147,7 @@ while True:
                 #print 'execute a task:', t
                 #print len(pending_task)
                 a_t = task.est_time * 1.0 / machine_num + t
-                sum_revenue = sum_revenue + factor * price_per_type[task.priority] * (task.est_time / 60.0) \
+                revenue = revenue + factor * price_per_type[task.priority] * (task.est_time / 60.0) \
                                 * math.pow(decay_factor, (a_t - task.start_time))
                 #print 'estimated time:', a_t
 
@@ -160,15 +158,15 @@ while True:
     print 'arrival rate:', rate
     print 'machine number:', machine_num
     print 'pending task number', len(pending_task)
-    print 'total revenue:', sum_revenue
+    print 'total revenue:', revenue
     print 'total cost:', vm_cost_per_hour * machine_num
-    print 'total profit:', sum_revenue - vm_cost_per_hour * machine_num
+    print 'total profit:', revenue - vm_cost_per_hour * machine_num
     '''
     #print len(pending_task)
-    #print rate, '\t', machine_num, '\t', v, '\t', w, '\t', len(pending_task), '\t', sum_revenue - vm_cost_per_hour * machine_num
-    #print machine_num, '\t', round(10*v), '\t', sum_revenue - vm_cost_per_hour * machine_num
-    overall_revenue += (sum_revenue - vm_cost_per_hour * machine_num)
-    profit = sum_revenue - vm_cost_per_hour * machine_num
+    #print rate, '\t', machine_num, '\t', v, '\t', w, '\t', len(pending_task), '\t', revenue - vm_cost_per_hour * machine_num
+    #print machine_num, '\t', round(10*v), '\t', revenue - vm_cost_per_hour * machine_num
+    overall_revenue += (revenue - vm_cost_per_hour * machine_num)
+    profit = revenue - vm_cost_per_hour * machine_num
     #print len(pending_task)
 
 #print 'overall revenue:', overall_revenue
@@ -177,4 +175,4 @@ for j in range(min_machine_num, max_machine_num + 1):
     for i in range(0, max_pending_val + 1):
         print j, ' ', i, ' ', policy[i][j]
 
-
+print times
