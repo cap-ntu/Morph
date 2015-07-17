@@ -18,17 +18,17 @@ price_per_type   = config.price_per_type
 priority         = config.service_type
 decay_factor     = config.price_decaying
 vm_cost_per_hour = config.vm_cost_per_hour * sim_dur / (60.0 * 60.0)
-factor = 10
+factor = 1
 overall_revenue  = 0
 times = 0
 
-max_machine_num = 25
+max_machine_num = 30
 min_machine_num = 10
 
 max_pending_task_num = 500
 
 def gen_p():
-    return random.randint(1, 3)
+    return random.randint(1, 1)
 
 class trans_task:
     def __init__(self):
@@ -43,7 +43,7 @@ def feature_extraction(task_list, t):
     value = 0
     workload = 0
     for task in task_list:
-        value = value + math.pow(decay_factor, t - task.start_time) * \
+        value = value + factor * math.pow(decay_factor, t - task.start_time) * \
                 price_per_type[task.priority] * (task.est_time / 60.0)
         workload += task.est_time
 
@@ -79,21 +79,25 @@ sum_revenue = 0
 dis_f = 0.2
 dis_b = 0.1
 
-t = 0
+t   = 0
 a_t = 0
-v = 0
-w = 0
+v   = 0
+w   = 0
 
 while True:
     times += 1
-    if times > 100000:
+    if times > 1000000:
         break
 
     cur_time = t
-    rate = 1.2
-    #machine_num = random.randint(25, 25)
+    rate = 1
+    machine_num = random.randint(10, 35)
     arrive_rate = rate / 60.0
 
+    #all_task       = []
+    #pending_task   = []
+
+    '''
     (v, w, pending_task_num) = feature_extraction(pending_task, t)
     new_state_rate = pending_task_num / 10
     (m_a, m_v)     = select_best_action(policy, new_state_rate)
@@ -105,7 +109,7 @@ while True:
     state_rate  = new_state_rate
     state_num   = m_a
     machine_num = m_a
-
+    '''
 
     sum_revenue = 0
     while True:
@@ -130,8 +134,8 @@ while True:
             else:
                 break
 
-        #scheduling.schedule_task['vbs'](pending_task, t, machine_num)
-        scheduling.schedule_task['hpf'](pending_task)
+        scheduling.schedule_task['vbs'](pending_task, t, machine_num)
+        #scheduling.schedule_task['hpf'](pending_task)
 
         if a_t <= t:
             if len(pending_task) == 0:
@@ -158,7 +162,7 @@ while True:
     '''
     #print len(pending_task)
     #print rate, '\t', machine_num, '\t', v, '\t', w, '\t', len(pending_task), '\t', sum_revenue - vm_cost_per_hour * machine_num
-    print machine_num, '\t', v, '\t', sum_revenue - vm_cost_per_hour * machine_num
+    print machine_num, '\t', len(pending_task), '\t', sum_revenue - vm_cost_per_hour * machine_num
     overall_revenue += (sum_revenue - vm_cost_per_hour * machine_num)
     #print len(pending_task)
 
