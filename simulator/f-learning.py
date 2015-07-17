@@ -33,7 +33,7 @@ state_v  = 0
 state_n  = max_machine_num
 state_r  = 1
 revenue = 0
-dis_b = 0.3
+dis_b = 0.1
 
 
 def gen_p():
@@ -88,7 +88,7 @@ def select_best_action(grad_w, state_v):
             action = k
 
     a = random.random()
-    if a < 1:
+    if a < 0.2:
         action = random.randint(min_machine_num, max_machine_num)
     return (action, max_v)
 
@@ -118,6 +118,7 @@ while True:
     #print sum(sto_grad(state_n, state_v, state_r) * grad_w)
     grad_w = grad_w + dis_f * det * sto_grad(state_n, state_v, state_r)
     print grad_w
+    print det
 
     state_v  = new_state_v
     state_n   = m_a
@@ -180,9 +181,4 @@ while True:
     #print len(pending_task)
 
 #print 'overall revenue:', overall_revenue
-
-for j in range(min_machine_num, max_machine_num + 1):
-    for i in range(0, max_pending_val + 1):
-        print j, ' ', i, ' ', policy[i][j]
-
 print times
