@@ -33,7 +33,7 @@ state_v  = 0
 state_n  = max_machine_num
 state_r  = 1
 revenue = 0
-dis_b = 0.1
+dis_b = 0.3
 
 
 def gen_p():
@@ -72,8 +72,8 @@ def sto_grad(num, v, rate):
     w7 = num*v
     w8 = num*rate
     w9 = v*rate
-    tmp = np.array([w0, w1, w2, w3, w4, w5, w6, w7, w8, w9]) / 1000
-    return tmp
+    tmp = np.array([w0, w1, w2, w3, w4, w5, w6, w7, w8, w9])
+    return tmp /1000
 
 
 def select_best_action(grad_w, state_v):
@@ -88,7 +88,7 @@ def select_best_action(grad_w, state_v):
             action = k
 
     a = random.random()
-    if a < 0.2:
+    if a < 0.9:
         action = random.randint(min_machine_num, max_machine_num)
     return (action, max_v)
 
