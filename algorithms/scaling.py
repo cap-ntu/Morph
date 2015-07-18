@@ -1,4 +1,5 @@
 import sys
+import math
 import time
 import redis
 sys.path.append("../.")
@@ -6,25 +7,24 @@ import config
 import numpy as np
 import sqlite3 as lite
 
-
 list_name        = 'vm.list'
-dur              = 60 * 30
+dur              = 60 * 1
 price_per_type   = config.price_per_type
 priority         = config.service_type
 decay_factor     = config.price_decaying
-vm_cost_per_hour = config.vm_cost_per_hour * sim_dur / (60.0 * 60.0)
+vm_cost_per_hour = config.vm_cost_per_hour * dur / (60.0 * 60.0)
 factor           = 1
 redis_ip         = config.master_ip
 redis_ip         = 'localhost'
 
-
 def get_pending_task():
-    con = None
+    con  = None
+    rows = None
     try:
         path = '../' + config.db_name
         con = lite.connect(path)
         cur = con.cursor()
-        sql_cmd = 'SELECT * FROM task_info WHERE task_ongoing = 0'
+        sql_cmd = 'SELECT * FROM task_info WHERE task_ongoing = 1'
         cur.execute(sql_cmd)
         rows = cur.fetchall()
         #for row in rows:
@@ -61,7 +61,6 @@ vm_list = r.lrange(list_name, 0, -1)
 for vm in vm_list:
     r.set(vm, 0)
 
-
 times = 0
 while True:
     times += 1
@@ -73,8 +72,8 @@ while True:
     if value > len(policy) - 1:
         print 'out of scale'
         sys.exit()
-
     opt_num = policy[value]
+    opt_num = int(opt_num)
 
     up_set   = []
     up_num   = 0
