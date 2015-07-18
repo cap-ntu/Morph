@@ -6,7 +6,7 @@ import pickle
 from random import choice
 from converter import Converter
 
-base_path = '/data/video_dataset/'
+base_path = '/data/video_dataset_v2'
 video_set = os.listdir(base_path)
 sim_dur = 60 * 180
 arrive_rate = 1.0 / 60.0

@@ -36,7 +36,7 @@ def period_revenue(start_time, end_time):
                 5: trans_time REAL, 6: task_ongoing INTEGER
         '''
         for row in rows:
-            if row[6] == 0:
+            if row[6] == 0 or row[6] == -3:
                 #print "%s %s %s" % (row[0], row[1], row[2])
                 task_revenue = pow(decay_factor, row[3] - row[1]) * (row[5] / 60.0) * price_per_type[row[4]]
                 revenue += task_revenue
@@ -65,7 +65,7 @@ def period_revenue(start_time, end_time):
             con.close()
 
 
-s = 1436444221.13204
+s = 0
 t = time.time()
 r = period_revenue(s, t)
 print r
