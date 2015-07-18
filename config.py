@@ -9,9 +9,9 @@ master_path = "/data/master/"
 worker_path = "/data/worker/"
 
 #other configuration
-min_seg_dur = 60*3
+min_seg_dur = 60*2
 max_seg_dur = 60*100
-equal_trans_dur = 60*3
+equal_trans_dur = 60*2
 
 #the number of threads for preprocessing
 preproc_thread_num = 10
@@ -19,10 +19,10 @@ preproc_thread_num = 10
 blk_retry_times = 3
 
 #select the algorithm for task scheduling
-sch_alg = 'vbs'
+sch_alg = 'fifo'
 
 #database name
-db_name = 'system_info_vbs.db'
+db_name = 'system_info_fifo.db'
 
 #price decaying factor
 price_decaying = 0.999
@@ -40,5 +40,5 @@ price_per_type[3] = 0.02
 
 #amazon ec2 instance
 vm_cost_per_hour = 0.252
-
+machine_num = 12
 
