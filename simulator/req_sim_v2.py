@@ -12,7 +12,7 @@ class task:
 
 def submit_task(task):
     cmd = 'python ../submit_task.py -l ' + task.video_name + ' -s ' + \
-            task.tgt_res + ' -p ' + str(task.priority) + ' >> task_id '
+            task.tgt_res + ' -p ' + str(task.priority)
     print cmd
     print 'start time:', task.start_time
     os.system(cmd)

@@ -57,11 +57,12 @@ if __name__=='__main__':
     passwd = ""
     thread_num = 10
 
-    cmds = ['pkill python']
-    cmds = ['rm -f /data/worker/*']
-    cmds = ['du -sh /data/worker/']
-    #cmds = ['ps -ef | grep python']
-    #cmds = ['ps -ef | grep python']
+    #cmds = ['df']
+    #cmds = ['pkill python']
+    #cmds = ['rm -f /data/worker/*']
+    #cmds = ['du -sh /data/worker/']
+    #cmds = ['ls /data/worker/ | wc -l']
+    cmds = ['ps -ef | grep python']
     #cmds = ['nohup  python /root/akilos/worker.py & ']
 
     f = open("ip.info")
