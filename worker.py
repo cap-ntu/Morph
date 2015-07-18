@@ -237,6 +237,8 @@ if __name__ == '__main__':
             time.sleep(5)
             continue
 
+        r.set(host_name + '_time', time.time())
+
         try:
             num = server.get_blk_num()
         except:
