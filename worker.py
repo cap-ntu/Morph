@@ -2,6 +2,7 @@ import os
 import sys
 import md5
 import time
+import redis
 import socket
 import config
 import struct
@@ -218,8 +219,24 @@ if __name__ == '__main__':
     rpc_addr = "http://" + master_ip + ":" + master_rpc_port
     server   = xmlrpclib.ServerProxy(rpc_addr)
 
+    host_name = socket.gethostname()
+    r = redis.StrictRedis(host=master_ip, port=6379, db=0)
+
     #get video block from master continuously
     while True:
+        try:
+            ret = r.get(host_name)
+            if ret == None:
+                time.sleep(10)
+                continue
+            elif int(ret) == 0:
+                time.sleep(10)
+                continue
+        except:
+            logger.error('cannot connect to the redis server')
+            time.sleep(5)
+            continue
+
         try:
             num = server.get_blk_num()
         except:

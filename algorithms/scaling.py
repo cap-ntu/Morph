@@ -44,12 +44,14 @@ def feature_extraction(task_list):
         value = value + factor * math.pow(decay_factor, cur_time - task[1]) * \
                 price_per_type[task[4]] * (task[5] / 60.0)
     value = round(10*value)
+    value = int(value)
     return value
 
 
 r = redis.StrictRedis(host=redis_ip, port=6379, db=0)
 r.delete(list_name)
-policy = np.loadtxt('policy.dat')
+#policy = np.loadtxt('policy.dat')
+policy = [1, 2, 3, 4, 5, 7, 8, 9, 10, 11]
 
 f = open(list_name, 'r')
 lines = f.readlines()
