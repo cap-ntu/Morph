@@ -54,7 +54,19 @@ def period_revenue(start_time, end_time):
         print 'type 2 num:', task_type[2]
         print 'type 3 num:', task_type[3]
 
-        return (revenue, task_num)
+        sql_cmd = 'select min(submit_time) from task_info'
+        cur.execute(sql_cmd)
+        rows = cur.fetchall()
+        start_time = rows[0][0]
+
+        sql_cmd = 'select max(finish_time) from task_info'
+        cur.execute(sql_cmd)
+        rows = cur.fetchall()
+        fin_time = rows[0][0]
+
+        dur = (fin_time - start_time) / 60.0
+
+        return (revenue, task_num, dur)
 
     except lite.Error, e:
         print "Error %s:" % e.args[0]
@@ -70,7 +82,7 @@ t = time.time()
 r = period_revenue(s, t)
 print r
 
-print 'duration:', (t - s) /60.0
+#print 'duration:', (t - s) /60.0
 
 
 

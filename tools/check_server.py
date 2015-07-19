@@ -57,6 +57,7 @@ if __name__=='__main__':
     passwd = ""
     thread_num = 10
 
+    #cmds = ['mkdir -p /data/worker/']
     #cmds = ['df']
     #cmds = ['pkill python']
     #cmds = ['rm -f /data/worker/*']
@@ -67,6 +68,8 @@ if __name__=='__main__':
     cmds =  ['python /tmp/get_host_name.py']
     #cmds  = ['sudo apt-get install python-setuptools -y']
     #cmds = ['sudo easy_install redis -y']
+    #cmds = ['rm -rf /root/akilos']
+    #cmds = ['ls /root/']
 
     f = open("ip.info")
     lines = f.readlines()

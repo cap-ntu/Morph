@@ -8,7 +8,7 @@ import numpy as np
 import sqlite3 as lite
 
 list_name        = 'vm.list'
-dur              = 60 * 1
+dur              = 60 * 30
 price_per_type   = config.price_per_type
 priority         = config.service_type
 decay_factor     = config.price_decaying
@@ -43,15 +43,16 @@ def feature_extraction(task_list):
     for task in task_list:
         value = value + factor * math.pow(decay_factor, cur_time - task[1]) * \
                 price_per_type[task[4]] * (task[5] / 60.0)
-    value = round(10*value)
+    value = round(value)
     value = int(value)
+    print value
     return value
 
 
 r = redis.StrictRedis(host=redis_ip, port=6379, db=0)
 r.delete(list_name)
 #policy = np.loadtxt('policy.dat')
-policy = [1, 2, 3, 4, 5, 7, 8, 9, 10, 11]
+policy = [10, 10, 10, 10, 10, 10, 10, 10, 10, 10]
 
 f = open(list_name, 'r')
 lines = f.readlines()
@@ -60,8 +61,8 @@ for line in lines:
     r.rpush(list_name, line)
 
 vm_list = r.lrange(list_name, 0, -1)
-for vm in vm_list:
-    r.set(vm, 0)
+#for vm in vm_list:
+#    r.set(vm, 0)
 
 times = 0
 while True:
@@ -76,6 +77,7 @@ while True:
         sys.exit()
     opt_num = policy[value]
     opt_num = int(opt_num)
+    print 'optimal num:', opt_num
 
     up_set   = []
     up_num   = 0
