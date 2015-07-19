@@ -23,7 +23,7 @@ overall_revenue  = 0
 times = 0
 
 max_machine_num = 25
-min_machine_num = 10
+min_machine_num = 5
 max_pending_val = 50
 max_req_rate    = 10
 #(0, 0.1 0.2, ...)
@@ -77,7 +77,7 @@ def select_best_action(policy, state_r, state_v):
             action = k
 
     a = random.random()
-    if a < 1:
+    if a < 0.3:
         action = random.randint(min_machine_num, max_machine_num)
     return (action, max_v)
 
@@ -86,8 +86,8 @@ profit   = 0
 state_r  = 0
 state_v  = 0
 state_n  = max_machine_num
-revenue = 0
-dis_b = 0.3
+revenue  = 0
+dis_b    = 0.2
 
 t   = 0
 a_t = 0
@@ -119,6 +119,7 @@ while True:
 
     state_r     = new_state_r
     state_n     = m_a
+    state_v     = new_state_v
     machine_num = m_a
 
     revenue = 0
@@ -176,6 +177,7 @@ while True:
     overall_revenue += (revenue - vm_cost_per_hour * machine_num)
     profit = revenue - vm_cost_per_hour * machine_num
     #print len(pending_task)
+    #print profit
 
 #print 'overall revenue:', overall_revenue
 
