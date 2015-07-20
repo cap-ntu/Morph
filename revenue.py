@@ -10,6 +10,8 @@ from math import pow
 decay_factor   = config.price_decaying
 price_per_type = config.price_per_type
 
+db_name = sys.argv[1]
+
 def period_revenue(start_time, end_time):
     con = None
     revenue  = 0
@@ -25,7 +27,7 @@ def period_revenue(start_time, end_time):
     task_type[3] = 0
 
     try:
-        con = lite.connect(config.db_name)
+        con = lite.connect(db_name)
         cur = con.cursor()
         sql_cmd = 'SELECT * FROM task_info WHERE finish_time BETWEEN %f AND %f' % \
                 (start_time, end_time)
@@ -45,6 +47,7 @@ def period_revenue(start_time, end_time):
                 latency[row[4]] += (row[2] - row[1])
                 task_type[row[4]] += 1
 
+        '''
         print 'task num:', task_num
         print 'type 1 latency:', latency[1] / task_type[1]
         print 'type 2 latency:', latency[2] / task_type[2]
@@ -53,6 +56,7 @@ def period_revenue(start_time, end_time):
         print 'type 1 num:', task_type[1]
         print 'type 2 num:', task_type[2]
         print 'type 3 num:', task_type[3]
+        '''
 
         sql_cmd = 'select min(submit_time) from task_info'
         cur.execute(sql_cmd)
