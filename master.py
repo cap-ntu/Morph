@@ -1,3 +1,4 @@
+import redis
 import config
 import scipy.io
 import numpy as np
@@ -43,6 +44,8 @@ master_rev_port = int(config.master_rev_port)
 master_snd_port = int(config.master_snd_port)
 master_rpc_port = int(config.master_rpc_port)
 
+redis_ip = 'localhost'
+red_con  = redis.StrictRedis(host=redis_ip, port=6379, db=0)
 
 class master_rpc_server(ThreadingMixIn, SimpleXMLRPCServer):
     pass
@@ -140,6 +143,9 @@ task scheduling and block dispatching:
 class task_scheduling(threading.Thread):
     def __init__(self):
         threading.Thread.__init__(self)
+        self.times = 0
+        #the number of VM instances
+        self.machine_num = config.machine_num
 
     def task_to_block(self, task, block):
         block.task_id      = task.task_id
@@ -149,8 +155,20 @@ class task_scheduling(threading.Thread):
 
     def scheduling(self):
         if config.sch_alg == 'vbs' or config.sch_alg == 'hvs':
+            self.times = self.times + 1
+            if self.times % 10 == 0:
+                try:
+                    ret = red_con.get('server_num')
+                    if ret == None:
+                        self.machine_num = config.machine_num
+                    else:
+                        self.machine_num = int(ret)
+                except:
+                    self.machine_num = config.machine_num
+
             t = time.time()
-            schedule_task[config.sch_alg](sched_queue, t, config.machine_num)
+            print 'machine num:', self.machine_num
+            schedule_task[config.sch_alg](sched_queue, t, self.machine_num)
         else:
             schedule_task[config.sch_alg](sched_queue)
 
