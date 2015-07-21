@@ -1,4 +1,5 @@
 import sys
+import h5py
 import math
 import time
 import redis
@@ -13,9 +14,11 @@ price_per_type   = config.price_per_type
 priority         = config.service_type
 decay_factor     = config.price_decaying
 vm_cost_per_hour = config.vm_cost_per_hour * dur / (60.0 * 60.0)
-factor           = 1
+factor           = 0.1 * 1.5
 redis_ip         = config.master_ip
 redis_ip         = 'localhost'
+
+rate_set = [4, 2, 4, 2, 1, 2, 3, 5, 3, 4, 2, 5, 6, 5, 3, 1, 5, 3, 7, 6, 2, 6, 2, 3]
 
 def get_pending_task():
     con  = None
@@ -27,10 +30,6 @@ def get_pending_task():
         sql_cmd = 'SELECT * FROM task_info WHERE task_ongoing = 1'
         cur.execute(sql_cmd)
         rows = cur.fetchall()
-        #for row in rows:
-        #    if row != None:
-        #        print row
-
     except lite.Error, e:
         print "Error %s:" % e.args[0]
     finally:
@@ -43,16 +42,21 @@ def feature_extraction(task_list):
     for task in task_list:
         value = value + factor * math.pow(decay_factor, cur_time - task[1]) * \
                 price_per_type[task[4]] * (task[5] / 60.0)
-    value = round(value)
+    value = round(value * 10)
     value = int(value)
-    print value
     return value
 
 
 r = redis.StrictRedis(host=redis_ip, port=6379, db=0)
 r.delete(list_name)
-#policy = np.loadtxt('policy.dat')
-policy = [10, 10, 10, 10, 10, 10, 10, 10, 10, 10]
+
+f = h5py.File('policy.mat','r')
+data = f.get('policy')
+data = np.array(data)
+policy = np.transpose(data)
+rate_num = 7
+val_num  = 15
+
 
 f = open(list_name, 'r')
 lines = f.readlines()
@@ -61,22 +65,28 @@ for line in lines:
     r.rpush(list_name, line)
 
 vm_list = r.lrange(list_name, 0, -1)
-#for vm in vm_list:
-#    r.set(vm, 0)
 
-times = 0
+k = 0
 while True:
-    times += 1
-    if times > 10:
+    if k >= 24:
         break
 
     task_list = get_pending_task()
     value = feature_extraction(task_list)
-    if value > len(policy) - 1:
-        print 'out of scale'
-        sys.exit()
-    opt_num = policy[value]
+    if value > 15:
+        value = 15
+
+    cur_rate = rate_set[k]
+    index = (cur_rate - 1) * (val_num + 1) + value
+    opt_num = policy[index][2]
     opt_num = int(opt_num)
+    if opt_num > 23:
+        opt_num = 23
+    r.set('server_num', opt_num)
+
+    print time.time()
+    print 'cur rate :',   cur_rate
+    print 'cur value:',   value
     print 'optimal num:', opt_num
 
     up_set   = []
@@ -106,8 +116,10 @@ while True:
         for i in range(0, up_num - opt_num):
             vm = up_set.pop(0)
             r.set(vm, 0)
+    print up_set
 
     time.sleep(dur)
+    k += 1
 
 
 
