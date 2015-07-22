@@ -84,10 +84,16 @@ while True:
         opt_num = 23
     r.set('server_num', opt_num)
 
-    print time.time()
-    print 'cur rate :',   cur_rate
-    print 'cur value:',   value
-    print 'optimal num:', opt_num
+    msg = ''
+    msg = msg + str(time.time()) + '\n'
+    msg = msg + 'cur rate :' + str(cur_rate) + '\n'
+    msg = msg + 'cur value:' + str(value) + '\n'
+    msg = msg + 'optimal num:' + str(opt_num) + '\n'
+
+    f = open('real_res','a')
+    f.write(msg)
+    f.close()
+    print msg
 
     up_set   = []
     up_num   = 0
@@ -116,7 +122,13 @@ while True:
         for i in range(0, up_num - opt_num):
             vm = up_set.pop(0)
             r.set(vm, 0)
-    print up_set
+
+    msg = ''
+    msg = msg + str(up_set)
+    f = open('real_res','a')
+    f.write(msg)
+    f.close()
+    print msg
 
     time.sleep(dur)
     k += 1
