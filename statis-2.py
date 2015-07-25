@@ -13,7 +13,7 @@ factor = 0.1 * 1.5
 vm_cost = config.vm_cost_per_hour
 
 db_name = sys.argv[1]
-rate_set = [4, 2, 4, 2, 1, 2, 3, 5, 3, 4, 2, 5, 6, 5, 3, 1, 5, 3, 7, 6, 2, 6, 2, 3]
+m_num = [11, 6, 13, 8, 5, 6, 10, 17, 11, 13, 8, 16, 20, 15, 13, 3, 16, 9, 20, 20, 8, 17, 8, 9];
 
 def period_revenue(start_time, end_time):
     con = None
@@ -31,7 +31,9 @@ def period_revenue(start_time, end_time):
         start_time = rows[0][0]
 
         for k in range(0, 24):
-            cost = 15 * (k+1) * vm_cost / 2.0
+            #cost = 15 * (k+1) * vm_cost / 2.0
+            cost = 10 * (k+1) * vm_cost / 2.0
+            #cost = sum(m_num[0:k+1]) * vm_cost / 2.0
             revenue = 0
             epch_start = start_time
             epch_end   = start_time + (k + 1) * 1800
