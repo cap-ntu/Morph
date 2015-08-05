@@ -12,6 +12,10 @@ price_per_type = config.price_per_type
 
 db_name = sys.argv[1]
 
+print price_per_type[1]
+print price_per_type[2]
+print price_per_type[3]
+
 def period_revenue(start_time, end_time):
     con = None
     revenue  = 0
@@ -43,7 +47,7 @@ def period_revenue(start_time, end_time):
                 task_revenue = pow(decay_factor, row[3] - row[1]) * (row[5] / 60.0) * price_per_type[row[4]]
                 revenue += task_revenue
                 task_num += 1
-                print row[4]
+                #print row[4]
                 latency[row[4]] += (row[2] - row[1])
                 task_type[row[4]] += 1
 
