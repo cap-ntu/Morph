@@ -18,6 +18,7 @@ f = open(list_name, 'r')
 lines = f.readlines()
 for line in lines:
     line = line.strip('\n')
+    #print line
     last_time = r.get(line + '_time')
     cur_time  = time.time()
     print (cur_time - float(last_time)) / 60.0
