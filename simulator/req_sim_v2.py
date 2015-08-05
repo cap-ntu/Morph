@@ -23,13 +23,13 @@ f = open('sim_v3.pkl', 'r')
 all_task = pickle.load(f)
 f.close()
 
-duration = 60*180
+#duration = 60*180
 start_time = time.time()
 
 while True:
     cur_time = time.time()
-    if cur_time - start_time > duration:
-        break
+    #if cur_time - start_time > duration:
+    #    break
 
     if len(all_task) == 0:
         break
