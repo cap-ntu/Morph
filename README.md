@@ -1,3 +1,3 @@
 # akilos
-A new system
+A cloud video transcoding system
 
