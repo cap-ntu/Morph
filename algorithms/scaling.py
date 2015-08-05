@@ -19,6 +19,7 @@ redis_ip         = config.master_ip
 redis_ip         = 'localhost'
 
 rate_set = [4, 2, 4, 2, 1, 2, 3, 5, 3, 4, 2, 5, 6, 5, 3, 1, 5, 3, 7, 6, 2, 6, 2, 3]
+#k_2 = [x*3 for x in rate_set]
 
 def get_pending_task():
     con  = None
@@ -50,7 +51,7 @@ def feature_extraction(task_list):
 r = redis.StrictRedis(host=redis_ip, port=6379, db=0)
 r.delete(list_name)
 
-f = h5py.File('policy.mat','r')
+f = h5py.File('policy-2.mat','r')
 data = f.get('policy')
 data = np.array(data)
 policy = np.transpose(data)
@@ -73,13 +74,15 @@ while True:
 
     task_list = get_pending_task()
     value = feature_extraction(task_list)
-    if value > 15:
-        value = 15
+    if value > 2:
+        value = 2
 
     cur_rate = rate_set[k]
     index = (cur_rate - 1) * (val_num + 1) + value
     opt_num = policy[index][2]
+    #opt_num = k_2[k]
     opt_num = int(opt_num)
+
     if opt_num > 23:
         opt_num = 23
     r.set('server_num', opt_num)
