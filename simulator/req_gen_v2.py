@@ -8,7 +8,7 @@ from converter import Converter
 
 base_path = '/data/video_dataset_v2'
 video_set = os.listdir(base_path)
-sim_dur = 60 * 180
+sim_dur = 60 * 60 * 24
 arrive_rate = 1.0 / 60.0
 
 y_w = [854, 640, 426]
@@ -23,7 +23,7 @@ class task:
 
 def gen_p():
     #d1
-    return random.randint(1, 3)
+    return random.randint(1, 1)
     #d2
     p = random.randint(1, 100)
     if p <= 10:

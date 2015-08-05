@@ -19,10 +19,10 @@ preproc_thread_num = 10
 blk_retry_times = 3
 
 #select the algorithm for task scheduling
-sch_alg = 'fifo'
+sch_alg = 'vbs'
 
 #database name
-db_name = 'system_info_fifo.db'
+db_name = 'system_info_vbs.db'
 
 #price decaying factor
 price_decaying = 0.999
@@ -38,7 +38,13 @@ price_per_type[1] = 0.08
 price_per_type[2] = 0.05
 price_per_type[3] = 0.02
 
+#price_per_type[1] = 0.018
+#price_per_type[2] = 0.012
+#price_per_type[3] = 0.006
+
+
+
 #amazon ec2 instance
 vm_cost_per_hour = 0.252
-machine_num = 12
+machine_num = 15
 

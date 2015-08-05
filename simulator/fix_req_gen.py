@@ -3,7 +3,7 @@ import pickle
 
 n = 0
 max_num = 50
-arrive_rate = 3 / 60.0
+arrive_rate = 0.7 / 60.0
 
 class task:
     def __init__(self):
