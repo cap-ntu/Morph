@@ -39,9 +39,9 @@ price_per_type = {}
 #price_per_type[2] = 0.05
 #price_per_type[3] = 0.02
 
-#price_per_type[1] = 0.018
-#price_per_type[2] = 0.012
-#price_per_type[3] = 0.006
+price_per_type[1] = 0.018
+price_per_type[2] = 0.012
+price_per_type[3] = 0.006
 
 
 
