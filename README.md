@@ -17,6 +17,12 @@ Clone the code from Github
 
 `https://github.com/springlake/akilos`
 
+System Configuration
+
+Revise the config.py according to system requirements.
+
+
+
 2. System Interface
 -------------------
 
