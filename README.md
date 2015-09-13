@@ -5,8 +5,7 @@ Cloud Video Transcoding System
 1. Installation
 -----------
 
-1.1 System Requirement
----------------------
+System Requirement
 
 * [NeuroLab](https://pythonhosted.org/neurolab/)
 * [Redis](http://redis.io/)
@@ -14,18 +13,16 @@ Cloud Video Transcoding System
 * [ffmpeg](https://www.ffmpeg.org/)
 * [SQLite](https://www.sqlite.org/)
 
-1.2 Clone the code from Github
-------
+Clone the code from Github
 
 `https://github.com/springlake/akilos`
 
-1.3 System Configuration
--------
+System Configuration
 
 Revise the config.py according to system requirements.
 
-1.4 Start up the Master node
---------
+Start up the Master node
+
 
 `nohup python master.py &`
 
