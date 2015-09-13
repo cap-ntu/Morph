@@ -1,5 +1,7 @@
 # akilos
-A cloud video transcoding system
+
+Cloud Video Transcoding System
+====
 
 
 I like [Google](https://www.google.com/)
