@@ -26,8 +26,7 @@ Start up the Master node
 
 `nohup python master.py &`
 
-1.5 Start up the Worker node
----------
+Start up the Worker node
 
 `nohup python worker.py &`
 
