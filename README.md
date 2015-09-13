@@ -8,7 +8,6 @@ Cloud Video Transcoding System
 System Requirement
 
 [NeuroLab](https://pythonhosted.org/neurolab/)
-
 [Redis](http://redis.io/)
 
 [Video Converter](https://github.com/senko/python-video-converter)
