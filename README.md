@@ -19,3 +19,16 @@ The parameters of HTTP POST method for submitting a new task. The video location
      'priority': 5
      
 </html>
+
+The parameters of HTTP POST method for submitting a new task. The video location is specified with a local path. The video file will be uploaded to the server for video transcoding. 
+
+<html>
+
+ 'video_file': open('/home/guanyu/Public/guanyu.mp4','rb'),
+ 'target_resolution': '100x100 200x200',
+ 'priority': 5
+ 
+</html>
+
+
+
