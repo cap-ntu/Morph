@@ -9,10 +9,8 @@ System Requirement
 
 * [NeuroLab](https://pythonhosted.org/neurolab/)
 * [Redis](http://redis.io/)
-
-[Video Converter](https://github.com/senko/python-video-converter)
-
-[Ffmpeg](https://www.ffmpeg.org/)
+* [Video Converter](https://github.com/senko/python-video-converter)
+* [Ffmpeg](https://www.ffmpeg.org/)
 
 
 2. System Interface
