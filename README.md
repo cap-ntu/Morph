@@ -24,9 +24,9 @@ The parameters of HTTP POST method for submitting a new task. The video location
 
 <html>
 
- 'video_file': open('/home/guanyu/Public/guanyu.mp4','rb'),
- 'target_resolution': '100x100 200x200',
- 'priority': 5
+     'video_file': open('/home/guanyu/Public/guanyu.mp4','rb'),
+     'target_resolution': '100x100 200x200',
+     'priority': 5
  
 </html>
 
