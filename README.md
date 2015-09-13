@@ -53,9 +53,7 @@ Parameters for the command line:
 </html>
 
 Submit a new transcoding task by CLI.
-
 `python submit_task.py -l /home/Videos/lvjuren/lvjuren.mp4 -s 640x360 426x240`
-
 Query task status
 
 `python query.py –k taskid`
