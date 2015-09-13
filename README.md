@@ -13,10 +13,7 @@ The system provides three kinds of interface for providing video transcoding ser
 The parameters of HTTP POST method for submitting a new task. The video location is specified with URL. 
 
 <html>
-    <title>Markdown</title>
-    
      'url': 'http://155.69.52.158/guanyu.mp4',
      'target_resolution': '100x100 200x200',
      'priority': 5
-
 </html>
