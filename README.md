@@ -41,5 +41,13 @@ The parameter of HTTP Post method for querying the task status.
 
 ###1.2 Command Line Interface
 
+Parameters for the command line:
+-l: local video file
+-u: url of the video file
+-t: task id (optional)
+-p: priority (optional)
+-s: resolution
+
+
 
 
