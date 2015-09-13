@@ -1,4 +1,3 @@
-# akilos
 
 Cloud Video Transcoding System
 ====
