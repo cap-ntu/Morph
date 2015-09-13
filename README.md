@@ -21,7 +21,13 @@ System Configuration
 
 Revise the config.py according to system requirements.
 
+Start up the Master node
 
+`nohup python master.py &`
+
+Start up the Worker node
+
+`nohup python worker.py &`
 
 2. System Interface
 -------------------
