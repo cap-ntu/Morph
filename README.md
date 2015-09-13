@@ -52,13 +52,30 @@ Parameters for the command line:
 
 </html>
 
-Submit a new transcoding task by CLI.
+Submit a new transcoding task by CLI
 
 `python submit_task.py -l /home/Videos/lvjuren/lvjuren.mp4 -s 640x360 426x240`
 
 Query task status
 
 `python query.py –k taskid`
+
+###1.3 RPC Interface
+
+We adopt the SimpleXML as the RPC library, the APIs for submitting transcoding task and querying task status are as follows:
+
+Submit a new transcoding task (URI can be a URL or local file path)
+
+`put_trans_task(URI, bitrate, width, height, priority, task_id = None)`
+
+Query the task status
+
+`get_progress(task_id)`
+
+
+
+
+
 
 
 
