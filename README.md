@@ -30,5 +30,14 @@ The parameters of HTTP POST method for submitting a new task. The video location
  
 </html>
 
+The parameter of HTTP Post method for querying the task status. 
+
+<html>
+
+     url = 'http://155.69.52.158/transcoder/get_progress'
+     key = {'key' : 'G8QKmGXX'}
+     
+</html>
+
 
 
