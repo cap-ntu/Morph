@@ -12,7 +12,6 @@ System Requirement
 * [Video Converter](https://github.com/senko/python-video-converter)
 * [ffmpeg](https://www.ffmpeg.org/)
 
-
 2. System Interface
 -------------------
 
