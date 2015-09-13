@@ -42,12 +42,17 @@ The parameter of HTTP Post method for querying the task status.
 ###1.2 Command Line Interface
 
 Parameters for the command line:
--l: local video file
--u: url of the video file
--t: task id (optional)
--p: priority (optional)
--s: resolution
+<html>
 
+     -l: local video file
+     -u: url of the video file
+     -t: task id (optional)
+     -p: priority (optional)
+     -s: resolution
+
+</html>
+
+Submit a new transcoding task by CLI without task Key.
 
 
 
