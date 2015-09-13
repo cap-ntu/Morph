@@ -7,7 +7,7 @@ Cloud Video Transcoding System
 
 System Requirement
 
-[NeuroLab](https://pythonhosted.org/neurolab/)
+* [NeuroLab](https://pythonhosted.org/neurolab/)
 
 [Redis](http://redis.io/)
 
