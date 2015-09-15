@@ -2,7 +2,7 @@
 Cloud Video Transcoding System
 ==============================
 
-![GitHub](https://github.com/springlake/akilos/blob/master/DOC/system.png "GitHub,Social Coding")
+![GitHub](https://github.com/springlake/akilos/blob/master/DOC/system.png title="system" width="50" height="50")
 
 1. Installation
 -----------
