@@ -43,7 +43,7 @@ The parameters of HTTP POST method for submitting a new task. The video location
 
 <html>
 
-     'url': 'http://155.69.52.158/guanyu.mp4',
+     'url': 'http://155.69.52.158/test.mp4',
      'target_resolution': '100x100 200x200',
      'priority': 5
      
@@ -53,7 +53,7 @@ The parameters of HTTP POST method for submitting a new task. The video location
 
 <html>
 
-     'video_file': open('/home/guanyu/Public/guanyu.mp4','rb'),
+     'video_file': open('/home/guanyu/Public/test.mp4','rb'),
      'target_resolution': '100x100 200x200',
      'priority': 5
  
@@ -83,7 +83,7 @@ Parameters for the command line:
 
 Submit a new transcoding task by CLI
 
-`python submit_task.py -l /home/Videos/lvjuren/lvjuren.mp4 -s 640x360 426x240`
+`python submit_task.py -l /home/Videos/test.mp4 -s 640x360 426x240`
 
 Query task status
 
