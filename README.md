@@ -1,6 +1,20 @@
 
 Cloud Video Transcoding System
 ==============================
+Our system provides cost-efficient and QoS-guaranteed cloud-based video transcoding service. It consists of three layers, including the Service Interface Layer, Task Scheduling Layer, and Resource Management Layer. The functionalities of each layer are detailed as follows: 
+
+Service Interface Layer
+
+It handles the user requests for submitting new transcoding tasks, querying task status and obtaining the transcoded video files. It provides two kinds of interfaces for the video transcoding service, including Restful API and Command Line Interface (CLI). With the Restful API interface, users can submit the request through HTTP POST/GET method; with CLI, users can submit the request by executing command line on the system background.
+
+Task Scheduling Layer
+
+It manages a queue of the pending tasks, and determines the execution sequence of the tasks. When there is idle computing resource in the computing cluster, the task scheduler will pick the head-of-queue task to execute. It first partitions the video file into segments, and then distributes the video segments to many workers for transcoding. After transcoding the video segments into the target resolution or bitrate, the transcoding workers will send back the transcoded video segments to the task scheduler. Finally, the task scheduler will concentrate the transcoded video segments into one video file. 
+
+Resource Management Layer
+
+It manages many virtual machines, on each of which runs a transcoding worker. Since the transcoding request rate is changing over time, the resource manager layer is responsible for dynamically adjusting the number of running VMs to minimize the operational cost, according to the current workload.
+
 
 ![GitHub](https://github.com/springlake/akilos/blob/master/DOC/system.png "system")
 
