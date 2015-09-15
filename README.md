@@ -2,6 +2,8 @@
 Cloud Video Transcoding System
 ==============================
 
+![GitHub](https://github.com/springlake/akilos/blob/master/DOC/system.png "system")
+
 1. Installation
 -----------
 
