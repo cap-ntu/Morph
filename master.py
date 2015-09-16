@@ -20,6 +20,7 @@ from SocketServer import ThreadingMixIn
 from SimpleXMLRPCServer import SimpleXMLRPCServer
 from SimpleXMLRPCServer import SimpleXMLRPCRequestHandler
 
+
 #the handler of the log and database module
 logger = None
 
