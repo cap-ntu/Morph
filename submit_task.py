@@ -52,6 +52,7 @@ if __name__ == "__main__":
             sys.exit(-1)
         width   += (r[0] + '%')
         height  += (r[1] + '%')
+        
     width  = width.ljust(30)
     height = height.ljust(30)
     if priority == None:
