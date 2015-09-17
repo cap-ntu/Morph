@@ -79,7 +79,7 @@ def hvs(queue, t, machine_num): #N, N-1, N-2, ...
     queue.sort(f)
 
 
-
+#select the task scheduling algorithm by configuring the config.py
 schedule_task = {
     'fifo':   fifo,
     'edf':    edf,
