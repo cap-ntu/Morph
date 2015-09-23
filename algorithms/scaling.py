@@ -9,7 +9,7 @@ import numpy as np
 import sqlite3 as lite
 
 list_name        = 'vm.list'
-dur              = 60 * 30
+dur              = 60 * 60
 price_per_type   = config.price_per_type
 priority         = config.service_type
 decay_factor     = config.price_decaying
@@ -19,7 +19,6 @@ redis_ip         = config.master_ip
 redis_ip         = 'localhost'
 
 rate_set = [4, 2, 4, 2, 1, 2, 3, 5, 3, 4, 2, 5, 6, 5, 3, 1, 5, 3, 7, 6, 2, 6, 2, 3]
-#k_2 = [x*3 for x in rate_set]
 
 def get_pending_task():
     con  = None
@@ -47,7 +46,7 @@ def feature_extraction(task_list):
     value = int(value)
     return value
 
-
+#connect to the redis database
 r = redis.StrictRedis(host=redis_ip, port=6379, db=0)
 r.delete(list_name)
 
