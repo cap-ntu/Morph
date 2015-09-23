@@ -4,6 +4,7 @@ import time
 import config
 import sqlite3 as lite
 
+#feature extraction for system control
 
 def get_vm_info():
     try:
