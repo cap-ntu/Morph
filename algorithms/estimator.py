@@ -19,15 +19,18 @@ t = target['t3_output']
 norm_t = nl.tool.Norm(t)
 t = norm_t(t)
 
+#train and save the neural network
 '''
 net = nl.net.newff(nl.tool.minmax(i), [10, 1])
 err = net.train(i, t, epochs=1000, show=1)
 net.save('t3_estimator.net')
 '''
 
+#load the neural network for transcoding time estimation
 net = nl.load('t3_estimator.net')
-out = net.sim(i)
 
+#test the input using the neural network
+out = net.sim(i)
 out = norm_t.renorm(out)
 t = norm_t.renorm(t)
 
