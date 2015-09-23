@@ -50,6 +50,7 @@ def feature_extraction(task_list):
 r = redis.StrictRedis(host=redis_ip, port=6379, db=0)
 r.delete(list_name)
 
+#load the policy
 f = h5py.File('policy-2.mat','r')
 data = f.get('policy')
 data = np.array(data)
@@ -71,6 +72,7 @@ while True:
     if k >= 24:
         break
 
+    #get the pending tasks
     task_list = get_pending_task()
     value = feature_extraction(task_list)
     if value > 2:
