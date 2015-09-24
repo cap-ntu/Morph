@@ -1,5 +1,5 @@
 '''
-Tran the neural network and evaluate the performance of the transcoding time estimation
+Train the neural network and evaluate the performance of the transcoding time estimation
 '''
 
 #!/usr/bin/python
