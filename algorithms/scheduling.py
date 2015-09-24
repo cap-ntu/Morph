@@ -1,3 +1,7 @@
+'''
+The implemented task scheduling algorithms
+'''
+
 from math import pow
 import sys
 import time
