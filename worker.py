@@ -1,3 +1,7 @@
+'''
+The main program for the transcoding worker.
+'''
+
 import os
 import sys
 import md5
