@@ -1,3 +1,8 @@
+'''
+The main file for the master node, which is responsible for task
+scheduling, block dispatching, video splitting and concentration.
+'''
+
 import redis
 import config
 import scipy.io
