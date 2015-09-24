@@ -35,7 +35,7 @@ Clone the code from Github
 
 System Configuration
 
-Revise the config.py according to system requirements.
+`Set the values of the items in config.py according to system information and requirements.`
 
 Start up the Master node
 
