@@ -1,3 +1,7 @@
+'''
+Resource management for controlling the transcoding workers
+'''
+
 import sys
 import h5py
 import math
