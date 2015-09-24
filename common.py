@@ -1,10 +1,14 @@
+'''
+Library for common data structure and protocol
+'''
+
 import sys
 import json
 import struct
 import logging
 from random import Random
 
-# This function is used to generate a random string as the key of the task
+#This function is used to generate a random string as the key of the task
 def gen_key(randomlength = 8):
     str     = ''
     chars   = 'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz0123456789'
@@ -14,6 +18,7 @@ def gen_key(randomlength = 8):
         str += chars[random.randint(0, length)]
     return str
 
+#The data structure for storing the task information
 class task:
     def __init__(self):
         self.task_id    = ""    #the id of the task
@@ -33,8 +38,11 @@ class task:
         self.deadline   = 0     #the deadline for this task
         self.value      = 0     #the estimated value for scheduling
 
+#The protocol for packing the task information
 block_format  = "50si200sii4s30s30si32siii"
 
+#The data structure for storing the video block information
+#Note that each video file can be divide into multiple blocks
 class block:
     def __init__(self):
         self.task_id    = ""
@@ -51,6 +59,7 @@ class block:
         self.st_time    = 0
         self.retry      = 0
 
+#The function for packing the video block
 def pack_block_info(block):
     block.task_id = block.task_id.ljust(50)
     pack = struct.pack(block_format, block.task_id, \
@@ -68,6 +77,7 @@ def pack_block_info(block):
                     block.retry)
     return pack
 
+#Extract the video block information from received data
 def unpack_block_info(block, data):
     (block.task_id,   \
      block.path_len,  \
