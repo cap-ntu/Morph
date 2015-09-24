@@ -1,3 +1,7 @@
+'''
+A simple web page for listing all of the task id.
+'''
+
 import os
 import web
 import sys
