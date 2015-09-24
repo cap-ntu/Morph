@@ -1,3 +1,7 @@
+'''
+Obtain the system state and extract the feature vectors
+'''
+
 import sys
 sys.path.append("../.")
 import time
