@@ -1,3 +1,7 @@
+'''
+The configuration file for system settings
+'''
+
 #the configuration of the master node
 master_ip       = "10.0.143.229"
 master_rpc_port = "8091"
@@ -8,20 +12,21 @@ master_path = "/data/master/"
 #the configuration of the worker node
 worker_path = "/data/worker/"
 
-#other configuration
+#the duration for each of the video block
 min_seg_dur = 60*2
 max_seg_dur = 60*100
 equal_trans_dur = 60*2
 
-#the number of threads for preprocessing
+#the number of threads for task preprocessing
 preproc_thread_num = 10
 
+#not in use
 blk_retry_times = 3
 
-#select the algorithm for task scheduling
+#algorithm for task scheduling
 sch_alg = 'vbs'
 
-#database name
+#database for system information
 db_name = 'system_info_vbs.db'
 
 #price decaying factor
@@ -35,6 +40,7 @@ service_type = [1, 2, 3]
 #-> price per unite video duration
 price_per_type = {}
 
+#price for transcoding service
 #price_per_type[1] = 0.08
 #price_per_type[2] = 0.05
 #price_per_type[3] = 0.02
@@ -44,10 +50,10 @@ price_per_type[2] = 0.012
 price_per_type[3] = 0.006
 
 
-
-#amazon ec2 instance
+#cost for renting vm instances
 vm_cost_per_hour = 0.252
 
 #default VM number
 machine_num = 15
+
 
