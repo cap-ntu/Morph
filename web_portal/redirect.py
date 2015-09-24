@@ -1,3 +1,8 @@
+'''
+Web protal for submitting transcoding task and querying task progress
+The users can access via RESTful API
+'''
+
 import os
 import web
 import json
@@ -12,8 +17,8 @@ urls = (
     )
 
 work_path = '/tmp'
-cln_path  = '/home/guanyu/Project/distributed_transcoding/client.py'
-qry_path  = '/home/guanyu/Project/distributed_transcoding/query.py'
+cln_path  = '/home/transcoding/client.py'
+qry_path  = '/home/transcoding/query.py'
 
 def gen_key(randomlength = 8):
     str     = ''
