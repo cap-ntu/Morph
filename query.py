@@ -1,3 +1,10 @@
+'''
+The command line interface for querying task progress and system state
+Usage:
+    -k: keyid, get the transcoding progress of a task specified by the keyid
+    -n: none,  get the current number of video blocks in the queue
+'''
+
 import os
 import sys
 import config
@@ -42,13 +49,4 @@ if __name__ == "__main__":
         ret = server.get_blk_num()
         print ret
         sys.exit(ret)
-
-
-
-
-
-
-
-
-
 
