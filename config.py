@@ -56,4 +56,7 @@ vm_cost_per_hour = 0.252
 #default VM number
 machine_num = 15
 
+#whether the video file will be split
 video_split = False
+
+
