@@ -1,5 +1,4 @@
-
-Cloud Video Transcoding System
+Morph: Cloud Transcoding Management System
 ==============================
 Our system provides cost-efficient and QoS-guaranteed cloud-based video transcoding service. It consists of three layers, including the Service Interface Layer, Task Scheduling Layer, and Resource Management Layer. The functionalities of each layer are detailed as follows: 
 
