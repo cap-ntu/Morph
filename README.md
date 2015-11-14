@@ -122,10 +122,8 @@ Query the task status
 -----------
 5. Wiki
 -----------
-6. Issues
+6. [Issues](https://github.com/cap-ntu/Morph/issues)
 -----------
-
-[Visit GitHub!](https://www.github.com)
 
 
 
