@@ -120,6 +120,13 @@ Query the task status
 
 4. Example
 -----------
+Submit a transcoding task, the file path of the original video file is /home/Videos/test.mp4 
+The taget resolutions are 640x360 426x240
+`python submit_task.py -l /home/Videos/test.mp4 -s 640x360 426x240`
+
+Query the progress of the task with the ID 'ddsdd123'
+`python query.py –k ddsdd123`
+
 [5. Wiki](https://github.com/cap-ntu/Morph/wiki)
 -----------
 [6. Issues](https://github.com/cap-ntu/Morph/issues)
