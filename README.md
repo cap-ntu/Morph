@@ -120,9 +120,9 @@ Query the task status
 
 4. Example
 -----------
-Submit a transcoding task, the file path of the original video file is /home/Videos/test.mp4 
+Submit a transcoding task, the file path of the original video file is '/home/Videos/test.mp4' 
 
-The taget resolutions are 640x360 426x240
+The taget resolutions are 640x360, 426x240
 
 `python submit_task.py -l /home/Videos/test.mp4 -s 640x360 426x240`
 
