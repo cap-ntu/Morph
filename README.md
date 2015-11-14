@@ -120,9 +120,9 @@ Query the task status
 
 4. Example
 -----------
-5. Wiki
+[5. Wiki](https://github.com/cap-ntu/Morph/wiki)
 -----------
-6. [Issues](https://github.com/cap-ntu/Morph/issues)
+[6. Issues](https://github.com/cap-ntu/Morph/issues)
 -----------
 
 
