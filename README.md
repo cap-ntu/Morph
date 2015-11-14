@@ -1,5 +1,8 @@
 Morph: Cloud Transcoding Management System
 ==============================
+1. Overview
+-------------------
+
 Our system provides cost-efficient and QoS-guaranteed cloud-based video transcoding service. It consists of three layers, including the Service Interface Layer, Task Scheduling Layer, and Resource Management Layer. The functionalities of each layer are detailed as follows: 
 
 ![GitHub](https://github.com/springlake/akilos/blob/master/DOC/system.png "system")
@@ -17,7 +20,7 @@ It manages a queue of the pending tasks, and determines the execution sequence o
 It manages many virtual machines, on each of which runs a transcoding worker. Since the transcoding request rate is changing over time, the resource manager layer is responsible for dynamically adjusting the number of running VMs to minimize the operational cost, according to the current workload.
 
 
-1. Installation
+2. Installation
 -----------
 
 System Requirement
@@ -45,12 +48,12 @@ Start up the Worker node
 
 `nohup python worker.py &`
 
-2. System Interface
+3. System Interface
 -------------------
 
 The system provides three kinds of interface for providing video transcoding service, including Restful API, Command Line Interface, and RPC. In general, the system interfaces can be divided into two categories: task submission and status query. The details of each kind of interfaces are given in the following sections.
 
-###2.1 Restful API Interface
+###3.1 Restful API Interface
 
 The parameters of HTTP POST method for submitting a new task. The video location is specified with URL. 
 
@@ -81,7 +84,7 @@ The parameter of HTTP Post method for querying the task status.
      
 </html>
 
-###2.2 Command Line Interface
+###3.2 Command Line Interface
 
 Parameters for the command line:
 <html>
@@ -102,7 +105,7 @@ Query task status
 
 `python query.py –k taskid`
 
-###2.3 RPC Interface
+###3.3 RPC Interface
 
 We adopt the SimpleXML as the RPC library, the APIs for submitting transcoding task and querying task status are as follows:
 
