@@ -53,7 +53,7 @@ Start up the Worker node
 
 The system provides three kinds of interface for providing video transcoding service, including Restful API, Command Line Interface, and RPC. In general, the system interfaces can be divided into two categories: task submission and status query. The details of each kind of interfaces are given in the following sections.
 
-###3.1 Restful API Interface
+###3.1 Restful API
 
 The parameters of HTTP POST method for submitting a new task. The video location is specified with URL. 
 
@@ -84,7 +84,7 @@ The parameter of HTTP Post method for querying the task status.
      
 </html>
 
-###3.2 Command Line Interface
+###3.2 Command Line
 
 Parameters for the command line:
 <html>
@@ -105,7 +105,7 @@ Query task status
 
 `python query.py –k taskid`
 
-###3.3 RPC Interface
+###3.3 RPC
 
 We adopt the SimpleXML as the RPC library, the APIs for submitting transcoding task and querying task status are as follows:
 
