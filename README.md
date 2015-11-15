@@ -3,6 +3,8 @@ Morph: Cloud Transcoding Management System
 1. Overview
 -------------------
 
+![GitHub](https://github.com/cap-ntu/Morph/blob/master/DOC/arch.png "system")
+
 Our system provides cost-efficient and QoS-guaranteed cloud-based video transcoding service. It consists of three layers, including the Service Interface Layer, Task Scheduling Layer, and Resource Management Layer. The functionalities of each layer are detailed as follows: 
 
 ![GitHub](https://github.com/springlake/akilos/blob/master/DOC/system.png "system")
