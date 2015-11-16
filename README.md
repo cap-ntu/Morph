@@ -26,7 +26,7 @@ It manages many virtual machines, on each of which runs a transcoding worker. Si
 2. Installation
 -----------
 
-System Requirement
+System Requirement (required libraries)
 
 * [ubuntu 14.04](http://releases.ubuntu.com/14.04/)
 * [NeuroLab](https://pythonhosted.org/neurolab/)
@@ -35,20 +35,20 @@ System Requirement
 * [ffmpeg](https://www.ffmpeg.org/)
 * [SQLite](https://www.sqlite.org/)
 
-Clone the code from Github
+Step 1: Clone the code from Github
 
 `https://github.com/springlake/akilos`
 
-System Configuration
+Step 2: System Configuration
 
 `Set the values of the items in config.py according to system information and requirements.`
 
-Start up the Master node
+Step 3: Start up the Master node
 
 
 `nohup python master.py &`
 
-Start up the Worker node
+Step 4: Start up the Worker node
 
 `nohup python worker.py &`
 
