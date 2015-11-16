@@ -24,6 +24,12 @@ It manages many virtual machines, on each of which runs a transcoding worker. Si
 
 ![GitHub](https://github.com/cap-ntu/Morph/blob/master/DOC/workflow.png "workflow")
 
+The task scheduler, after receiving the transcoding request, will first insert the incoming task into the task queue, and then determines the execution sequence of the pending task. When there is idle transcoding workers in the VM cluster, the task scheduler will select the head-of-queue task to execute. On performing a new task, the task scheduler first splits the video file into several segments, and then distributes the video segments to many transcoding workers. After a segment has been transcoded into the target resolution by the transcoding worker, it will be sent back to the task scheduler. The task scheduler continuously checks whether all of the segments of a video file have been finished. If so, it will merge the transcoded video segments into on entire video file.
+
+
+The execution time for a transcoding task maybe very long if the video file is very large. To address this problem, we provide three alternative modes to perform a transcoding task. First, the system can define video segment duration in the configuration file and each of the video file would be split into video blocks according to the configuration. Each of the video blocks will be transcoded in parallel on multiple VM instances. With this method, all of the video blocks in the system have the same duration. Second, the duration of the video blocks can be determined by the task scheduling algorithms. For instance, the task scheduling algorithm can determine the duration of the video block according to the video deadline and the video size. Third, the system can perform the video transcoding without video segmentation. In this case, the entire video file will be sent to a transcoding worker directly and the transcoding task would be performed on that server. The system can select one model from the three alternatives.
+
+
 
 2. Installation
 -----------
