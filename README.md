@@ -28,6 +28,7 @@ It manages many virtual machines, on each of which runs a transcoding worker. Si
 
 System Requirement
 
+* [ubuntu 14.04](http://releases.ubuntu.com/14.04/)
 * [NeuroLab](https://pythonhosted.org/neurolab/)
 * [Redis](http://redis.io/)
 * [Video Converter](https://github.com/senko/python-video-converter)
