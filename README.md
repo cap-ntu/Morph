@@ -6,6 +6,8 @@ Morph is a cost-efficient and QoS-guaranteed cloud-based video transcoding syste
 
 ![GitHub](https://github.com/cap-ntu/Morph/blob/master/DOC/arch.png "system")
 
+###1.1 System Layers
+
 Our system provides cloud-based video transcoding service for the end-users. It consists of three layers, including the Service Interface Layer, Task Scheduling Layer, and Resource Management Layer. The functionalities of each layer are detailed as follows: 
 
 ![GitHub](https://github.com/springlake/akilos/blob/master/DOC/system.png "system")
@@ -23,6 +25,8 @@ It manages a queue of the pending tasks, and determines the execution sequence o
 It manages many virtual machines, on each of which runs a transcoding worker. Since the transcoding request rate is changing over time, the resource manager layer is responsible for dynamically adjusting the number of running VMs to minimize the operational cost, according to the current workload.
 
 ![GitHub](https://github.com/cap-ntu/Morph/blob/master/DOC/workflow.png "workflow")
+
+###1.2 System Workflows
 
 The task scheduler, after receiving the transcoding request, will first insert the incoming task into the task queue, and then determines the execution sequence of the pending task. When there is idle transcoding workers in the VM cluster, the task scheduler will select the head-of-queue task to execute. On performing a new task, the task scheduler first splits the video file into several segments, and then distributes the video segments to many transcoding workers. After a segment has been transcoded into the target resolution by the transcoding worker, it will be sent back to the task scheduler. The task scheduler continuously checks whether all of the segments of a video file have been finished. If so, it will merge the transcoded video segments into on entire video file.
 
