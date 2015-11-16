@@ -2,10 +2,11 @@ Morph: Cloud Transcoding Management System
 ==============================
 1. Overview
 -------------------
+Morph is a cost-efficient and QoS-guaranteed cloud-based video transcoding system. In this system, we consider two of the most important metrics in the video transcoding service: Quality of Service (QoS) and system operational cost. In terms of QoS, the system needs to finish each of the users’ task within deadline to meet the users’ satisfactory. In terms of system operational cost, the service provide needs to minimize the resource consumption as much as possible, since the transcoding service is rather resource consuming. As such, the system needs to dynamical control the provisioned computing resource and scheduling the task according to the system workload and task requirements. As such, the most important system controls in our system are task scheduling and resource management.
 
 ![GitHub](https://github.com/cap-ntu/Morph/blob/master/DOC/arch.png "system")
 
-Our system provides cost-efficient and QoS-guaranteed cloud-based video transcoding service. It consists of three layers, including the Service Interface Layer, Task Scheduling Layer, and Resource Management Layer. The functionalities of each layer are detailed as follows: 
+Our system provides cloud-based video transcoding service for the end-users. It consists of three layers, including the Service Interface Layer, Task Scheduling Layer, and Resource Management Layer. The functionalities of each layer are detailed as follows: 
 
 ![GitHub](https://github.com/springlake/akilos/blob/master/DOC/system.png "system")
 
@@ -25,35 +26,36 @@ It manages many virtual machines, on each of which runs a transcoding worker. Si
 2. Installation
 -----------
 
-System Requirement
+System Requirement (required libraries)
 
+* [ubuntu 14.04](http://releases.ubuntu.com/14.04/)
 * [NeuroLab](https://pythonhosted.org/neurolab/)
 * [Redis](http://redis.io/)
 * [Video Converter](https://github.com/senko/python-video-converter)
 * [ffmpeg](https://www.ffmpeg.org/)
 * [SQLite](https://www.sqlite.org/)
 
-Clone the code from Github
+Step 1: Clone the code from Github
 
 `https://github.com/springlake/akilos`
 
-System Configuration
+Step 2: System Configuration
 
 `Set the values of the items in config.py according to system information and requirements.`
 
-Start up the Master node
+Step 3: Start up the Master node
 
 
 `nohup python master.py &`
 
-Start up the Worker node
+Step 4: Start up the Worker node
 
 `nohup python worker.py &`
 
 3. Getting Started
 -------------------
 
-The system provides three kinds of interface for providing video transcoding service, including Restful API, Command Line Interface, and RPC. In general, the system interfaces can be divided into two categories: task submission and status query. The details of each kind of interfaces are given in the following sections.
+The system provides three kinds of interface for providing video transcoding service, including Restful API, Command Line Interface, and RPC. In general, the system interfaces can be divided into two categories: task submission and status query. Task submission is to submit a transcoding task to the system by specifying parameters. Status query is to query the progress of the transcoding task. The details of each kind of interfaces are given in the following sections.
 
 ###3.1 Restful API
 
@@ -122,13 +124,15 @@ Query the task status
 
 4. Example
 -----------
-Submit a transcoding task, the file path of the original video file is '/home/Videos/test.mp4' 
+Submit a transcoding task by the command line interface: 
 
-The taget resolutions are 640x360, 426x240
+the file path of the original video file is '/home/Videos/test.mp4', specified by '-l'
+
+The taget resolutions are 640x360, 426x240, specified by '-s'
 
 `python submit_task.py -l /home/Videos/test.mp4 -s 640x360 426x240`
 
-Query the progress of the task with the ID 'ddsdd123'
+Query the progress of the task with the ID 'ddsdd123', specified by '-k'
 
 `python query.py –k ddsdd123`
 
