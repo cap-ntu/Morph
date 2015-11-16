@@ -22,6 +22,8 @@ It manages a queue of the pending tasks, and determines the execution sequence o
 
 It manages many virtual machines, on each of which runs a transcoding worker. Since the transcoding request rate is changing over time, the resource manager layer is responsible for dynamically adjusting the number of running VMs to minimize the operational cost, according to the current workload.
 
+![GitHub](https://github.com/springlake/akilos/blob/master/DOC/workflow.png "workflow")
+
 
 2. Installation
 -----------
