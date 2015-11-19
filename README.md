@@ -2,7 +2,7 @@ Morph: Cloud Transcoding Management System
 ==============================
 1. Overview
 -------------------
-Morph is a cost-efficient and QoS-guaranteed cloud-based video transcoding system. In this system, we consider two of the most important metrics in the video transcoding service: Quality of Service (QoS) and system operational cost. In terms of QoS, the system needs to finish each of the users’ task within deadline to meet the users’ satisfactory. In terms of system operational cost, the service provide needs to minimize the resource consumption as much as possible, since the transcoding service is rather resource consuming. As such, the system needs to dynamical control the provisioned computing resource and scheduling the task according to the system workload and task requirements. As such, the most important system controls in our system are task scheduling and resource management.
+Morph is a cost-efficient and QoS-aware cloud video transcoding system. In this system, we consider two of the most important system metrics in the video transcoding service: Quality of Service (QoS) and system operational cost. In terms of QoS, the system needs to finish each of the users’ task within deadline to meet the users’ satisfactory. In terms of system operational cost, the service provide needs to minimize the resource consumption as much as possible, since the transcoding service is rather resource consuming. As such, the system needs to dynamically provision the computing resource and schedule the transcoding task according to the system workload and QoS requirements.
 
 ![GitHub](https://github.com/cap-ntu/Morph/blob/master/DOC/arch.png "system")
 
