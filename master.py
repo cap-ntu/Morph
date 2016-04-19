@@ -1,5 +1,7 @@
 '''
-The main file for the master node, which is responsible for task
+Author: Guanyu Gao
+Email: guanyugao@gmail.com
+Description: The main file for the master node, which is responsible for task
 scheduling, block dispatching, video splitting and concentration.
 '''
 
