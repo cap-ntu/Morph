@@ -41,6 +41,7 @@ The execution time for a transcoding task maybe very long if the video file is v
 System Requirement (required libraries)
 
 * [ubuntu 14.04](http://releases.ubuntu.com/14.04/)
+* [Python 2.7.6](https://www.python.org/download/releases/2.7.6/)
 * [NeuroLab](https://pythonhosted.org/neurolab/)
 * [Redis](http://redis.io/)
 * [Video Converter](https://github.com/senko/python-video-converter)
