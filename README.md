@@ -1,4 +1,4 @@
-Morph: Cloud Transcoding Management System
+Morph: A Fast and Scalable Cloud Transcoding System
 ==============================
 1. Overview
 -------------------
