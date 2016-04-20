@@ -50,7 +50,7 @@ System Requirement (required libraries)
 
 Step 1: Clone the code from Github
 
-`https://github.com/springlake/akilos`
+`https://github.com/cap-ntu/Morph.git`
 
 Step 2: System Configuration
 
