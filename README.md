@@ -2,7 +2,7 @@ Morph - A Fast and Scalable Cloud Transcoding System
 ==============================
 1. Overview
 -------------------
-Morph is a cost-efficient and QoS-aware cloud video transcoding system. In this system, we consider two of the most important system metrics in the video transcoding service: Quality of Service (QoS) and system operational cost. In terms of QoS, the system needs to finish each of the users’ task within deadline to meet the users’ satisfactory. In terms of system operational cost, the service provider needs to minimize the resource consumption as much as possible, since the transcoding service is rather resource consuming. As such, the system needs to dynamically provision the computing resource and schedule the transcoding task according to the system workload and QoS requirements.
+Morph is an open source cloud transcoding system. It can leverage the scalability of the cloud infrastructure to encode/transcode the video files in fast speed, and dynamically provision the computing resource according to the workload. Morph is implemented in Python, however, it is easy to access the service via RESTful API, command line interface (CLI), and RPC.
 
 ![GitHub](https://github.com/cap-ntu/Morph/blob/master/DOC/arch.png "system")
 
