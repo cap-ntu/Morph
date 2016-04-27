@@ -12,8 +12,7 @@ Morph is an open source cloud transcoding system. It can leverage the scalabilit
 
 Our system provides cloud-based video transcoding service for the end-users. It consists of three layers, including the Service Interface Layer, Task Scheduling Layer, and Resource Management Layer. The functionalities of each layer are detailed as follows: 
 
-![GitHub](https://github.com/cap-ntu/Morph/blob/master/DOC/system.png "system")
-<img src="https://github.com/cap-ntu/Morph/blob/master/DOC/system.png" width="50%" height="50%">
+<img src="https://github.com/cap-ntu/Morph/blob/master/DOC/system.png" width="80%" height="80%">
 
 ####Service Interface Layer
 
