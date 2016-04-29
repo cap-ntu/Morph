@@ -3,7 +3,7 @@
 ##Contents 
 -------------------
 * [Overview](##Overview)
-- [Login](#login)
+* [Installation](#Installation)
 - [Create Server Information](#create-server-information)
 - [Manage Your Own Server Information](#manage-your-own-server-information)
 - [View Server Information in Cloud](#view-server-information-in-cloud)
@@ -11,7 +11,7 @@
 - [License](#license)
 
 
-##Overview
+## Overview
 Morph is an open source cloud transcoding system. It can leverage the scalability of the cloud infrastructure to encode and transcode the video files in fast speed, and dynamically provision the computing resource to accommodate the time-varying workload. Morph is implemented in Python. It can be accessed via RESTful API, command line interface (CLI), and RPC.
 
 ###1.1 System Layers
@@ -43,8 +43,7 @@ The execution time for a transcoding task maybe very long if the video file is v
 
 
 
-2. Installation
------------
+## Installation
 
 System Requirement (required libraries)
 
