@@ -4,7 +4,7 @@
 -------------------
 * [Overview](##overview)
 * [Installation](#installation)
-- [Create Server Information](#create-server-information)
+* [Getting Started](#getting-started)
 - [Manage Your Own Server Information](#manage-your-own-server-information)
 - [View Server Information in Cloud](#view-server-information-in-cloud)
 - [Logout](#logout)
