@@ -31,30 +31,177 @@
         <hr>
 
         <section id="main_content">
-          <h3>
-<a id="welcome" class="anchor" href="#welcome" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Welcome</h3>
+          <h1>
+<a id="morph" class="anchor" href="#morph" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Morph</h1>
 
-<p>Morph is an open source cloud transcoding system. It can leverage the scalability of the cloud infrastructure to encode/transcode the video files in fast speed, and dynamically provision the computing resource according to the workload. Morph is implemented in Python, however, it is easy to access the service via  RESTful API, command line interface (CLI), and RPC. For the details of the system design, please refer to the report.</p>
+<h2>
+<a id="a-fast-and-scalable-cloud-transcoding-system" class="anchor" href="#a-fast-and-scalable-cloud-transcoding-system" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>A Fast and Scalable Cloud Transcoding System</h2>
 
-<h3>
-<a id="designer-templates" class="anchor" href="#designer-templates" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Designer Templates</h3>
+<h2>
+<a id="1-overview" class="anchor" href="#1-overview" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>1. Overview</h2>
 
-<p>We’ve crafted some handsome templates for you to use. Go ahead and click 'Continue to layouts' to browse through them. You can easily go back to edit your page before publishing. After publishing your page, you can revisit the page generator and switch to another theme. Your Page content will be preserved.</p>
-
-<h3>
-<a id="creating-pages-manually" class="anchor" href="#creating-pages-manually" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Creating pages manually</h3>
-
-<p>If you prefer to not use the automatic generator, push a branch named <code>gh-pages</code> to your repository to create a page manually. In addition to supporting regular HTML content, GitHub Pages support Jekyll, a simple, blog aware static site generator. Jekyll makes it easy to create site-wide headers and footers without having to copy them across every page. It also offers intelligent blog support and other advanced templating features.</p>
+<p>Morph is an open source cloud transcoding system. It can leverage the scalability of the cloud infrastructure to encode and transcode the video files in fast speed, and dynamically provision the computing resource to accommodate the time-varying workload. Morph is implemented in Python. It can be accessed via RESTful API, command line interface (CLI), and RPC.</p>
 
 <h3>
-<a id="authors-and-contributors" class="anchor" href="#authors-and-contributors" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Authors and Contributors</h3>
+<a id="11-system-layers" class="anchor" href="#11-system-layers" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>1.1 System Layers</h3>
 
-<p>You can <a href="https://help.github.com/articles/basic-writing-and-formatting-syntax/#mentioning-users-and-teams" class="user-mention">@mention</a> a GitHub username to generate a link to their profile. The resulting <code>&lt;a&gt;</code> element will link to the contributor’s GitHub Profile. For example: In 2007, Chris Wanstrath (<a href="https://github.com/defunkt" class="user-mention">@defunkt</a>), PJ Hyett (<a href="https://github.com/pjhyett" class="user-mention">@pjhyett</a>), and Tom Preston-Werner (<a href="https://github.com/mojombo" class="user-mention">@mojombo</a>) founded GitHub.</p>
+<p>Our system provides cloud-based video transcoding service for the end-users. It consists of three layers, including the Service Interface Layer, Task Scheduling Layer, and Resource Management Layer. The functionalities of each layer are detailed as follows: </p>
+
+<p><img src="https://github.com/cap-ntu/Morph/blob/master/DOC/system.png" width="60%" height="60%"></p>
+
+<h4>
+<a id="service-interface-layer" class="anchor" href="#service-interface-layer" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Service Interface Layer</h4>
+
+<p>It handles the user requests for submitting new transcoding tasks, querying task status and obtaining the transcoded video files. It provides two kinds of interfaces for the video transcoding service, including Restful API and Command Line Interface (CLI). With the Restful API interface, users can submit the request through HTTP POST/GET method; with CLI, users can submit the request by executing command line on the system background.</p>
+
+<h4>
+<a id="task-scheduling-layer" class="anchor" href="#task-scheduling-layer" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Task Scheduling Layer</h4>
+
+<p>It manages a queue of the pending tasks, and determines the execution sequence of the tasks. When there is idle computing resource in the computing cluster, the task scheduler will pick the head-of-queue task to execute. It first partitions the video file into segments, and then distributes the video segments to many workers for transcoding. After transcoding the video segments into the target resolution or bitrate, the transcoding workers will send back the transcoded video segments to the task scheduler. Finally, the task scheduler will concentrate the transcoded video segments into one video file. </p>
+
+<h4>
+<a id="resource-management-layer" class="anchor" href="#resource-management-layer" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Resource Management Layer</h4>
+
+<p>It manages many virtual machines, on each of which runs a transcoding worker. Since the transcoding request rate is changing over time, the resource manager layer is responsible for dynamically adjusting the number of running VMs to minimize the operational cost, according to the current workload.</p>
+
+<p><img src="https://github.com/cap-ntu/Morph/blob/master/DOC/workflow.png" alt="GitHub" title="workflow"></p>
 
 <h3>
-<a id="contact" class="anchor" href="#contact" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Contact</h3>
+<a id="12-system-workflows" class="anchor" href="#12-system-workflows" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>1.2 System Workflows</h3>
 
-<p>Having trouble with it? Please feel free to contact us. Email: <a href="mailto:ggao001@ntu.edu.sg">ggao001@ntu.edu.sg</a>; <a href="mailto:guanyugao@gmail.com">guanyugao@gmail.com</a>; </p>
+<p>The task scheduler, after receiving the transcoding request, will first insert the incoming task into the task queue, and then determines the execution sequence of the pending task. When there is idle transcoding workers in the VM cluster, the task scheduler will select the head-of-queue task to execute. On performing a new task, the task scheduler first splits the video file into several segments, and then distributes the video segments to many transcoding workers. After a segment has been transcoded into the target resolution by the transcoding worker, it will be sent back to the task scheduler. The task scheduler continuously checks whether all of the segments of a video file have been finished. If so, it will merge the transcoded video segments into on entire video file.</p>
+
+<p>The execution time for a transcoding task maybe very long if the video file is very large. To address this problem, we provide three alternative modes to perform a transcoding task. First, the system can define video segment duration in the configuration file and each of the video file would be split into video blocks according to the configuration. Each of the video blocks will be transcoded in parallel on multiple VM instances. With this method, all of the video blocks in the system have the same duration. Second, the duration of the video blocks can be determined by the task scheduling algorithms. For instance, the task scheduling algorithm can determine the duration of the video block according to the video deadline and the video size. Third, the system can perform the video transcoding without video segmentation. In this case, the entire video file will be sent to a transcoding worker directly and the transcoding task would be performed on that server. The system can select one model from the three alternatives.</p>
+
+<h2>
+<a id="2-installation" class="anchor" href="#2-installation" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>2. Installation</h2>
+
+<p>System Requirement (required libraries)</p>
+
+<ul>
+<li><a href="http://releases.ubuntu.com/14.04/">ubuntu 14.04</a></li>
+<li><a href="https://www.python.org/download/releases/2.7.6/">Python 2.7.6</a></li>
+<li><a href="https://pythonhosted.org/neurolab/">NeuroLab</a></li>
+<li><a href="http://redis.io/">Redis</a></li>
+<li><a href="https://github.com/senko/python-video-converter">Video Converter</a></li>
+<li><a href="https://www.ffmpeg.org/">ffmpeg</a></li>
+<li><a href="https://www.sqlite.org/">SQLite</a></li>
+</ul>
+
+<p>Step 1: Clone the code from Github</p>
+
+<p><code>https://github.com/cap-ntu/Morph.git</code></p>
+
+<p>Step 2: System Configuration</p>
+
+<p><code>Set the values of the items in config.py according to system information and requirements.</code></p>
+
+<p>Step 3: Start up the Master node</p>
+
+<p><code>nohup python master.py &amp;</code></p>
+
+<p>Step 4: Start up the Worker node</p>
+
+<p><code>nohup python worker.py &amp;</code></p>
+
+<h2>
+<a id="3-getting-started" class="anchor" href="#3-getting-started" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>3. Getting Started</h2>
+
+<p>The system provides three kinds of interface for providing video transcoding service, including Restful API, Command Line Interface, and RPC. In general, the system interfaces can be divided into two categories: task submission and status query. Task submission is to submit a transcoding task to the system by specifying parameters. Status query is to query the progress of the transcoding task. The details of each kind of interfaces are given in the following sections.</p>
+
+<h3>
+<a id="31-restful-api" class="anchor" href="#31-restful-api" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>3.1 Restful API</h3>
+
+<p>The parameters of HTTP POST method for submitting a new task. The video location is specified with URL. </p>
+
+<p></p>
+
+<pre><code> 'url': 'http://155.69.52.158/test.mp4',
+ 'target_resolution': '100x100 200x200',
+ 'priority': 5
+</code></pre>
+
+<p></p>
+
+<p>The parameters of HTTP POST method for submitting a new task. The video location is specified with a local path. The video file will be uploaded to the server for video transcoding. </p>
+
+<p></p>
+
+<pre><code> 'video_file': open('/home/Public/test.mp4','rb'),
+ 'target_resolution': '100x100 200x200',
+ 'priority': 5
+</code></pre>
+
+<p></p>
+
+<p>The parameter of HTTP Post method for querying the task status. </p>
+
+<p></p>
+
+<pre><code> url = 'http://155.69.52.158/transcoder/get_progress'
+ key = {'key' : 'G8QKmGXX'}
+</code></pre>
+
+<p></p>
+
+<h3>
+<a id="32-command-line" class="anchor" href="#32-command-line" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>3.2 Command Line</h3>
+
+<p>Parameters for the command line:
+</p>
+
+<pre><code> -l: local video file
+ -u: url of the video file
+ -t: task id (optional)
+ -p: priority (optional)
+ -s: resolution
+</code></pre>
+
+<p></p>
+
+<p>Submit a new transcoding task by CLI</p>
+
+<p><code>python submit_task.py -l /home/Videos/test.mp4 -s 640x360 426x240</code></p>
+
+<p>Query task status</p>
+
+<p><code>python query.py –k taskid</code></p>
+
+<h3>
+<a id="33-rpc" class="anchor" href="#33-rpc" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>3.3 RPC</h3>
+
+<p>We adopt the SimpleXML as the RPC library, the APIs for submitting transcoding task and querying task status are as follows:</p>
+
+<p>Submit a new transcoding task (URI can be a URL or local file path)</p>
+
+<p><code>put_trans_task(URI, bitrate, width, height, priority, task_id = None)</code></p>
+
+<p>Query the task status</p>
+
+<p><code>get_progress(task_id)</code></p>
+
+<h2>
+<a id="4-example" class="anchor" href="#4-example" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>4. Example</h2>
+
+<p>Submit a transcoding task by the command line interface: </p>
+
+<p>the file path of the original video file is '/home/Videos/test.mp4', specified by '-l'</p>
+
+<p>The taget resolutions are 640x360, 426x240, specified by '-s'</p>
+
+<p><code>python submit_task.py -l /home/Videos/test.mp4 -s 640x360 426x240</code></p>
+
+<p>Query the progress of the task with the ID 'ddsdd123', specified by '-k'</p>
+
+<p><code>python query.py –k ddsdd123</code></p>
+
+<h2>
+<a id="5-wiki" class="anchor" href="#5-wiki" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><a href="https://github.com/cap-ntu/Morph/wiki">5. Wiki</a>
+</h2>
+
+<h2>
+<a id="6-issues" class="anchor" href="#6-issues" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><a href="https://github.com/cap-ntu/Morph/issues">6. Issues</a>
+</h2>
         </section>
 
         <footer>
