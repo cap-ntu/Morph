@@ -1,8 +1,8 @@
 ##Morph: A Fast and Scalable Cloud Transcoding System
 
-##Content
+##Contents 
 -------------------
-- [Overview](##Overview)
+* [Overview](##Overview)
 - [Login](#login)
 - [Create Server Information](#create-server-information)
 - [Manage Your Own Server Information](#manage-your-own-server-information)
