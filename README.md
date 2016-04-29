@@ -14,27 +14,27 @@
 ## Overview
 Morph is an open source cloud transcoding system. It can leverage the scalability of the cloud infrastructure to encode and transcode the video files in fast speed, and dynamically provision the computing resource to accommodate the time-varying workload. Morph is implemented in Python. It can be accessed via RESTful API, command line interface (CLI), and RPC.
 
-###1.1 System Layers
+### System Layers
 
 Our system provides cloud-based video transcoding service for the end-users. It consists of three layers, including the Service Interface Layer, Task Scheduling Layer, and Resource Management Layer. The functionalities of each layer are detailed as follows: 
 
 <img src="https://github.com/cap-ntu/Morph/blob/master/DOC/system.png" width="60%" height="60%">
 
-####Service Interface Layer
+#### Service Interface Layer
 
 It handles the user requests for submitting new transcoding tasks, querying task status and obtaining the transcoded video files. It provides two kinds of interfaces for the video transcoding service, including Restful API and Command Line Interface (CLI). With the Restful API interface, users can submit the request through HTTP POST/GET method; with CLI, users can submit the request by executing command line on the system background.
 
-####Task Scheduling Layer
+#### Task Scheduling Layer
 
 It manages a queue of the pending tasks, and determines the execution sequence of the tasks. When there is idle computing resource in the computing cluster, the task scheduler will pick the head-of-queue task to execute. It first partitions the video file into segments, and then distributes the video segments to many workers for transcoding. After transcoding the video segments into the target resolution or bitrate, the transcoding workers will send back the transcoded video segments to the task scheduler. Finally, the task scheduler will concentrate the transcoded video segments into one video file. 
 
-####Resource Management Layer
+#### Resource Management Layer
 
 It manages many virtual machines, on each of which runs a transcoding worker. Since the transcoding request rate is changing over time, the resource manager layer is responsible for dynamically adjusting the number of running VMs to minimize the operational cost, according to the current workload.
 
 ![GitHub](https://github.com/cap-ntu/Morph/blob/master/DOC/workflow.png "workflow")
 
-###1.2 System Workflows
+### System Workflows
 
 The task scheduler, after receiving the transcoding request, will first insert the incoming task into the task queue, and then determines the execution sequence of the pending task. When there is idle transcoding workers in the VM cluster, the task scheduler will select the head-of-queue task to execute. On performing a new task, the task scheduler first splits the video file into several segments, and then distributes the video segments to many transcoding workers. After a segment has been transcoded into the target resolution by the transcoding worker, it will be sent back to the task scheduler. The task scheduler continuously checks whether all of the segments of a video file have been finished. If so, it will merge the transcoded video segments into on entire video file.
 
@@ -72,12 +72,12 @@ Step 4: Start up the Worker node
 
 `nohup python worker.py &`
 
-3. Getting Started
+## Getting Started
 -------------------
 
 The system provides three kinds of interface for providing video transcoding service, including Restful API, Command Line Interface, and RPC. In general, the system interfaces can be divided into two categories: task submission and status query. Task submission is to submit a transcoding task to the system by specifying parameters. Status query is to query the progress of the transcoding task. The details of each kind of interfaces are given in the following sections.
 
-###3.1 Restful API
+### Restful API
 
 The parameters of HTTP POST method for submitting a new task. The video location is specified with URL. 
 
@@ -108,7 +108,7 @@ The parameter of HTTP Post method for querying the task status.
      
 </html>
 
-###3.2 Command Line
+### Command Line
 
 Parameters for the command line:
 <html>
@@ -129,7 +129,7 @@ Query task status
 
 `python query.py –k taskid`
 
-###3.3 RPC
+### RPC
 
 We adopt the SimpleXML as the RPC library, the APIs for submitting transcoding task and querying task status are as follows:
 
@@ -142,8 +142,8 @@ Query the task status
 `get_progress(task_id)`
 
 
-4. Example
------------
+## Example
+
 Submit a transcoding task by the command line interface: 
 
 the file path of the original video file is '/home/Videos/test.mp4', specified by '-l'
@@ -156,10 +156,8 @@ Query the progress of the task with the ID 'ddsdd123', specified by '-k'
 
 `python query.py –k ddsdd123`
 
-[5. Wiki](https://github.com/cap-ntu/Morph/wiki)
------------
-[6. Issues](https://github.com/cap-ntu/Morph/issues)
------------
+## [Wiki](https://github.com/cap-ntu/Morph/wiki)
+## [Issues](https://github.com/cap-ntu/Morph/issues)
 
 
 
