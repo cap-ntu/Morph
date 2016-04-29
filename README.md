@@ -1,5 +1,5 @@
-#Morph: 
-###A Fast and Scalable Cloud Transcoding System
+#Morph
+*A Fast and Scalable Cloud Transcoding System*
 
 ##Content
 -------------------
