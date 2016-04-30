@@ -21,15 +21,15 @@ It interacts with the users for processing the transcoding requests and preproce
 
 * Scheduling Layer
 
-It manages a queue of the pending tasks, and determines the execution sequence of the tasks. When there is idle computing resource in the computing cluster, the task scheduler will pick the head-of-queue task to execute. It first partitions the video file into segments, and then distributes the video segments to many workers for transcoding. After transcoding the video segments into the target resolution or bitrate, the transcoding workers will send back the transcoded video segments to the task scheduler. Finally, the task scheduler will concentrate the transcoded video segments into one video file. 
+The user submitted transcoding tasks will be put into the scheduling queue. The task scheduler sequences the pending tasks in the queue according to the scheduling policy and the QoS profiles of the tasks. Whenever the master node receives a transcoding request from the worker, the task scheduler will select a video block from the pending tasks for dispatching by applying the scheduling policy. The transcoded video blocks on the worker will be sent back to the master for video concentration.
 
 * Provisioning Layer
 
-It manages many virtual machines, on each of which runs a transcoding worker. Since the transcoding request rate is changing over time, the resource manager layer is responsible for dynamically adjusting the number of running VMs to minimize the operational cost, according to the current workload.
-
-![GitHub](https://github.com/cap-ntu/Morph/blob/master/DOC/workflow.png "workflow")
+It manages the transcoding workers for dynamic resource provisioning. Our system can adopt the virtual machines (e.g., KVM ) or containers (e.g., Docker) for resource virtualization. Each VM instance or container runs a worker. The worker will request a video block from the master node whenever it it idle. The worker will transcode the video block into the target representations, which will be sent back to the master node.
 
 ## Workflow
+
+![GitHub](https://github.com/cap-ntu/Morph/blob/master/DOC/workflow.png "workflow")
 
 The task scheduler, after receiving the transcoding request, will first insert the incoming task into the task queue, and then determines the execution sequence of the pending task. When there is idle transcoding workers in the VM cluster, the task scheduler will select the head-of-queue task to execute. On performing a new task, the task scheduler first splits the video file into several segments, and then distributes the video segments to many transcoding workers. After a segment has been transcoded into the target resolution by the transcoding worker, it will be sent back to the task scheduler. The task scheduler continuously checks whether all of the segments of a video file have been finished. If so, it will merge the transcoded video segments into on entire video file.
 
