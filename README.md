@@ -12,6 +12,7 @@
 Morph is an open source cloud transcoding system. It can leverage the scalability of the cloud infrastructure to encode and transcode the video files in fast speed, and dynamically provision the computing resource to accommodate the time-varying workload. Morph is implemented in Python. It can be accessed via RESTful API, command line interface (CLI), and RPC. 
 
 The system architecture is shown in the following figure. The system is composed of the following layers:
+
 <img src="https://github.com/cap-ntu/Morph/blob/master/DOC/system.png" width="60%" height="60%">
 
 #### Interface Layer
