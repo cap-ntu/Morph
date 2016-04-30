@@ -31,7 +31,11 @@ It manages the transcoding workers for dynamic resource provisioning. Our system
 
 <img src="https://github.com/cap-ntu/Morph/blob/master/DOC/workflow.png" width="80%" height="80%">
 
-The user submit a transcoding task by uploading a video file and specifying the transcoding parameters. The video content will be segmented into independent video blocks according to the group of pictures (GOP) structure. The video block information of the task will be then put into the scheduling queue. When an idle worker requests a video block from the master node, the scheduler determines which video block in the scheduling queue will be selected for dispatching by applying the scheduling policy. The worker will transcode the video block into the target representation, and then send back the target representation to the master node. Because the system may have many available workers, the video blocks in the scheduling queue can be requested and transcoded by the workers in parallel. The master node continuously checks the transcoding status of the video blocks of each task. If all the video blocks of a task have been finished successfully, the master node will concentrate the video blocks into one video file. Then, the transcoding task is finished and the target representations of the video content are ready to be downloaded by the users.
+The user submit a transcoding task by uploading a video file and specifying the transcoding parameters. The video content will be segmented into independent video blocks according to the group of pictures (GOP) structure. The video block information of the task will be then put into the scheduling queue. 
+
+When an idle worker requests a video block from the master node, the scheduler determines which video block in the scheduling queue will be selected for dispatching by applying the scheduling policy. The worker will transcode the video block into the target representation, and then send back the target representation to the master node. The video blocks in the scheduling queue can be requested and transcoded by the workers in parallel. 
+
+The master node continuously checks the transcoding status of the video blocks of each task. If all the video blocks of a task have been finished successfully, the master node will concentrate the video blocks into one video file. Then, the transcoding task is finished and the target representations of the video content are ready to be downloaded by the users.
 
 
 ## Installation
