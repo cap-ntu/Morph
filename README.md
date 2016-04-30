@@ -13,7 +13,7 @@ Morph is an open source cloud transcoding system. It can leverage the scalabilit
 
 The system architecture is shown in the following figure. The system is composed of the following layers:
 
-<img src="https://github.com/cap-ntu/Morph/blob/master/DOC/system.png" width="50%" height="50%">
+<img src="https://github.com/cap-ntu/Morph/blob/master/DOC/system.png" width="40%" height="40%">
 
 * Interface Layer
 
