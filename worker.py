@@ -1,5 +1,8 @@
 '''
-The main program for the transcoding worker.
+author: Guanyu Gao
+Email:  guanyugao@gmail.com
+Description:
+    The main file for the transcoding worker.
 '''
 
 import os
@@ -231,8 +234,9 @@ if __name__ == '__main__':
         try:
             ret = r.get(host_name)
             if ret == None:
-                time.sleep(10)
-                continue
+                pass
+                #time.sleep(10)
+                #continue
             elif int(ret) == 0:
                 time.sleep(10)
                 continue
