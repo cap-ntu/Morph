@@ -12,6 +12,12 @@ master_path = "/data/master/"
 #the configuration of the worker node
 worker_path = "/data/worker/"
 
+#the configuration of Mysql
+mysql_ip        = "127.0.0.1"
+mysql_user_name = "root"
+mysql_password  = "123"
+mysql_db_name   = "morph"
+
 #the duration for each of the video block
 min_seg_dur = 60*2
 max_seg_dur = 60*100
@@ -59,4 +65,5 @@ machine_num = 15
 #whether the video file will be split
 video_split = False
 
-
+#required library for morph
+mysql_support = False
