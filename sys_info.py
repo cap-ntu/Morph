@@ -1,14 +1,25 @@
+'''
+Author: Guanyu Gao
+Email:  guanyugao@gmail.com
+Description: the interface for accessing the Mysql database.
+'''
+
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
 import sys
 import time
 import config
-import sqlite3 as lite
+import MySQLdb
+
+ip        = config.mysql_ip
+passwd    = config.mysql_password
+user_name = config.mysql_user_name
+db_name   = config.mysql_db_name
 
 def init_db():
     try:
-        con = lite.connect(config.db_name)
+        con = MySQLdb.connect(ip, user_name, passwd, db_name)
         cur = con.cursor()
         cur.execute("create table if not exists task_info(id TEXT, submit_time REAL, start_time REAL, \
                 finish_time REAL, service_type INTEGER, trans_time REAL, task_ongoing INTEGER)")
@@ -16,20 +27,24 @@ def init_db():
 
         cur.execute("create table if not exists server_info(server_num INTEGER, server_list TEXT, id TEXT)")
         con.commit()
+
         sql_cmd = "DELETE FROM server_info WHERE id = 'current'"
         cur.execute(sql_cmd)
         con.commit()
+
         sql_cmd = "INSERT INTO server_info VALUES(-1, '', 'current')"
         cur.execute(sql_cmd)
         con.commit()
+
         con.close()
         return 0
-    except lite.Error, e:
+    except:
+        con.rollback()
         return -1
 
 def db_insert_task_info(task_id, service_type):
     try:
-        con = lite.connect(config.db_name)
+        con = MySQLdb.connect(ip, user_name, passwd, db_name)
         cur = con.cursor()
         cur_time = time.time()
         sql_cmd = "INSERT INTO task_info VALUES('%s', %f, -1, -1, %d, -1, 1)" \
@@ -38,13 +53,13 @@ def db_insert_task_info(task_id, service_type):
         con.commit()
         con.close()
         return 0
-    except lite.Error, e:
-        print e
+    except:
+        con.rollback()
         return -1
 
 def db_update_finish_time(task_id, result):
     try:
-        con = lite.connect(config.db_name)
+        con = MySQLdb.connect(ip, user_name, passwd, db_name)
         cur = con.cursor()
         cur_time = time.time()
         sql_cmd = "UPDATE task_info SET finish_time = %f, task_ongoing = %d WHERE id = '%s'" \
@@ -54,13 +69,13 @@ def db_update_finish_time(task_id, result):
         con.commit()
         con.close()
         return 0
-    except lite.Error, e:
-        print e
+    except:
+        con.rollback()
         return -1
 
 def db_update_start_time(task_id):
     try:
-        con = lite.connect(config.db_name)
+        con = MySQLdb.connect(ip, user_name, passwd, db_name)
         cur = con.cursor()
         cur_time = time.time()
         sql_cmd = "UPDATE task_info SET start_time = %f WHERE id = '%s'" \
@@ -70,14 +85,14 @@ def db_update_start_time(task_id):
         con.commit()
         con.close()
         return 0
-    except lite.Error, e:
-        print e
+    except:
+        con.rollback()
         return -1
 
 
 def db_update_trans_time(task_id, trans_time):
     try:
-        con = lite.connect(config.db_name)
+        con = MySQLdb.connect(ip, user_name, passwd, db_name)
         cur = con.cursor()
         sql_cmd = "UPDATE task_info SET trans_time = %f WHERE id = '%s'" \
                     % (trans_time, task_id)
@@ -86,8 +101,8 @@ def db_update_trans_time(task_id, trans_time):
         con.commit()
         con.close()
         return 0
-    except lite.Error, e:
-        print e
+    except:
+        con.rollback()
         return -1
 
 def get_task_progress():
@@ -95,7 +110,7 @@ def get_task_progress():
 
 def set_server_num(num, serv_list):
     try:
-        con = lite.connect(config.db_name)
+        con = MySQLdb.connect(ip, user_name, passwd, db_name)
         cur = con.cursor()
         sql_cmd = "UPDATE server_info SET server_num = %d, server_list = '%s' WHERE id = 'current'" \
                     % (num, serv_list)
@@ -103,21 +118,8 @@ def set_server_num(num, serv_list):
         con.commit()
         con.close()
         return 0
-    except lite.Error, e:
-        print e
+    except:
+        con.rollback()
         return -1
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
