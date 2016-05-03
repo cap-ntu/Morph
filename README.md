@@ -58,8 +58,9 @@ Step 2: System Configuration
 
 Step 3: Start up the Master node
 
-
-`nohup python master.py &`
+```bash
+nohup python master.py &
+```
 
 Step 4: Start up the Worker node
 
