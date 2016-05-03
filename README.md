@@ -50,7 +50,9 @@ System Requirement
 
 Step 1: Clone the code from Github
 
-`https://github.com/cap-ntu/Morph.git`
+```bash
+git clone https://github.com/cap-ntu/Morph.git
+```
 
 Step 2: System Configuration
 
@@ -64,7 +66,9 @@ nohup python master.py &
 
 Step 4: Start up the Worker node
 
-`nohup python worker.py &`
+```bash
+nohup python worker.py &
+```
 
 ## Getting Started
 -------------------
