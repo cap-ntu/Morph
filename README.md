@@ -22,7 +22,7 @@ It interacts with the users for processing the transcoding requests and preproce
 
 * Scheduling Layer
 
-The user submitted transcoding tasks will be put into the scheduling queue. The task scheduler sequences the pending tasks in the queue according to the scheduling policy and the QoS profiles of the tasks. Whenever the master node receives a transcoding request from the worker, the task scheduler will select a video block from the pending tasks for dispatching by applying the scheduling policy. The transcoded video blocks on the worker will be sent back to the master for video concentration.
+The user submitted transcoding tasks will be put into the scheduling queue. The task scheduler sequences the pending tasks in the queue according to the scheduling policy and the QoS profiles of the tasks. Whenever the master node receives a transcoding request from the worker, the task scheduler will select a video block from the pending tasks for dispatching by applying the scheduling policy. The transcoded video blocks on the worker will be sent back to the master for concentration.
 
 * Provisioning Layer
 
@@ -46,7 +46,6 @@ System Requirement (required libraries)
 * [ubuntu 14.04](http://releases.ubuntu.com/14.04/)
 * [Python 2.7.6](https://www.python.org/download/releases/2.7.6/)
 * [NeuroLab](https://pythonhosted.org/neurolab/)
-* [Redis](http://redis.io/)
 * [Video Converter](https://github.com/senko/python-video-converter)
 * [ffmpeg](https://www.ffmpeg.org/)
 * [SQLite](https://www.sqlite.org/)
