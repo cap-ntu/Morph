@@ -1,15 +1,13 @@
 '''
 author: Guanyu Gao
 Email:  guanyugao@gmail.com
-Description:
-    The main file for the transcoding worker.
+Description: The main file for the transcoding worker.
 '''
 
 import os
 import sys
 import md5
 import time
-import redis
 import socket
 import config
 import struct
@@ -204,18 +202,19 @@ def send_back_data(block_info, master_ip, master_rev_port):
 main program for the transcoding worker
 '''
 if __name__ == '__main__':
+
     #init the log module
     host_name = socket.gethostname()
     host_name = host_name.replace(" ", "").lower()
     if len(host_name) == 0:
-        host_name = "transcoder"
+        host_name = "worker"
     logger = init_log_module("worker", host_name, logging.DEBUG)
-    logger.debug('start the worker')
+    logger.debug('start the worker ...')
 
     #check the work path
     work_path = config.worker_path
     if os.path.exists(work_path) == False:
-        logger.critical('work path does not exist:%s', work_path)
+        logger.critical('work path for worker does not exist:%s', work_path)
         sys.exit()
 
     #master ip information
@@ -226,26 +225,16 @@ if __name__ == '__main__':
     rpc_addr = "http://" + master_ip + ":" + master_rpc_port
     server   = xmlrpclib.ServerProxy(rpc_addr)
 
-    host_name = socket.gethostname()
-    r = redis.StrictRedis(host=master_ip, port=6379, db=0)
 
-    #get video block from master continuously
+    #get video block from master
     while True:
+
         try:
-            ret = r.get(host_name)
-            if ret == None:
-                pass
-                #time.sleep(10)
-                #continue
-            elif int(ret) == 0:
-                time.sleep(10)
-                continue
+            pass
         except:
-            logger.error('cannot connect to the redis server')
+            logger.error('cannot connect to the Mysql server')
             time.sleep(5)
             continue
-
-        r.set(host_name + '_time', time.time())
 
         try:
             num = server.get_blk_num()
@@ -253,6 +242,7 @@ if __name__ == '__main__':
             logger.error('cannot connect to the master server')
             time.sleep(5)
             continue
+
         logger.debug('The current number of blocks in the master: %s', num)
         if num == 0:
             time.sleep(1)

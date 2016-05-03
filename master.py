@@ -1,11 +1,10 @@
 '''
 Author: Guanyu Gao
 Email: guanyugao@gmail.com
-Description: The main file for the master node, which is responsible for task
+Description: The main file for the master, responsible for task
 scheduling, block dispatching, video splitting and concentration.
 '''
 
-import redis
 import config
 import scipy.io
 import numpy as np
@@ -16,17 +15,15 @@ import logging, urlparse, socket
 import struct, threading
 import subprocess, SocketServer
 from common import *
-sys.path.append("algorithms")
-import neurolab as nl
-from scheduling import *
 from sys_info import *
-from converter import Converter
 from Queue import PriorityQueue
 from SocketServer import TCPServer
 from SocketServer import ThreadingMixIn
 from SimpleXMLRPCServer import SimpleXMLRPCServer
 from SimpleXMLRPCServer import SimpleXMLRPCRequestHandler
 
+sys.path.append("algorithms")
+from scheduling import *
 
 #the handler of the log and database module
 logger = None
@@ -52,8 +49,6 @@ master_rev_port = int(config.master_rev_port)
 master_snd_port = int(config.master_snd_port)
 master_rpc_port = int(config.master_rpc_port)
 
-redis_ip = 'localhost'
-red_con  = redis.StrictRedis(host=redis_ip, port=6379, db=0)
 
 class master_rpc_server(ThreadingMixIn, SimpleXMLRPCServer):
     pass
@@ -153,7 +148,7 @@ class task_scheduling(threading.Thread):
         threading.Thread.__init__(self)
         self.times = 0
         #the number of VM instances
-        self.machine_num = config.machine_num
+        #self.machine_num = config.machine_num
 
     def task_to_block(self, task, block):
         block.task_id      = task.task_id
@@ -162,11 +157,12 @@ class task_scheduling(threading.Thread):
         block.height       = task.height
 
     def scheduling(self):
+        '''
         if config.sch_alg == 'vbs' or config.sch_alg == 'hvs':
             self.times = self.times + 1
             if self.times % 10 == 0:
                 try:
-                    ret = red_con.get('server_num')
+                    #ret = red_con.get('server_num')
                     if ret == None:
                         self.machine_num = config.machine_num
                     else:
@@ -178,7 +174,9 @@ class task_scheduling(threading.Thread):
             print 'machine num:', self.machine_num
             schedule_task[config.sch_alg](sched_queue, t, self.machine_num)
         else:
-            schedule_task[config.sch_alg](sched_queue)
+        '''
+
+        schedule_task[config.sch_alg](sched_queue)
 
         if get_blk_num() < 2 and len(sched_queue) > 0:
             task = sched_queue.pop(0)
@@ -187,6 +185,9 @@ class task_scheduling(threading.Thread):
             self.dispatch(task)
 
     def det_seg_dur(self, task):
+        return config.equal_block_dur
+
+        '''
         if task.est_time <= 0:
             return config.equal_trans_dur
 
@@ -194,6 +195,7 @@ class task_scheduling(threading.Thread):
         logger.info('duration: %f, estimated time: %f, block duration: %f', \
                 task.v_duration, task.est_time, blk_dur)
         return blk_dur
+        '''
 
     def dispatch(self, task):
         '''
@@ -267,11 +269,15 @@ class preproc_thread(threading.Thread):
     def __init__(self, index):
         threading.Thread.__init__(self)
         self.index = index
-        self.c = Converter()
-        target   = scipy.io.loadmat('./algorithms/t3_output.mat')
-        self.net = nl.load('./algorithms/t3_estimator.net')
-        t = target['t3_output']
-        self.norm_t = nl.tool.Norm(t)
+
+        if config.neural_net_support == True:
+            import neurolab as nl
+            from converter import Converter
+            self.c = Converter()
+            target   = scipy.io.loadmat('./algorithms/t3_output.mat')
+            self.net = nl.load('./algorithms/t3_estimator.net')
+            t = target['t3_output']
+            self.norm_t = nl.tool.Norm(t)
 
     def trans_time_est(self, task):
         path = task.file_path
@@ -317,9 +323,12 @@ class preproc_thread(threading.Thread):
                 return -1
 
         task.file_path = file_path
-        est_time = self.trans_time_est(task)
-        db_update_trans_time(task.task_id, est_time)
-        task.est_time = est_time
+
+        #use the neural network method for transcoding time estimation
+        if config.neural_net_support == True:
+            est_time = self.trans_time_est(task)
+            db_update_trans_time(task.task_id, est_time)
+            task.est_time = est_time
         return 0
 
     def run(self):
@@ -633,19 +642,21 @@ class RequestHandler(SimpleXMLRPCRequestHandler):
 main program: start up each of the threads
 '''
 if __name__ == '__main__':
+
     #register the logger
     logger = init_log_module("master", master_ip, logging.DEBUG)
     logger.debug('start the master server')
+
     #check the work path
     work_path = config.master_path
     if os.path.exists(work_path) == False:
-        logger.critical('work path does not exist:%s', work_path)
+        logger.critical('work path for master does not exist:%s', work_path)
         sys.exit()
 
     #create database and init the tables
     ret = init_db()
     if ret == -1:
-        logger.critical('cannot initialize the database')
+        logger.critical('cannot initialize the database for master')
         sys.exit()
 
     #start the rpc thread to handle the request
