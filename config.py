@@ -35,28 +35,3 @@ mysql_support = False
 neural_net_support = False
 
 
-'''
-#cost for renting vm instances
-vm_cost_per_hour = 0.252
-
-#price decaying factor
-price_decaying = 0.999
-
-#service types
-service_type = [1, 2, 3]
-
-#pricing for different service types
-#-> 1280x720, 854x480, 640x360, 426x240
-#-> price per unite video duration
-price_per_type = {}
-
-#price for transcoding service
-#price_per_type[1] = 0.08
-#price_per_type[2] = 0.05
-#price_per_type[3] = 0.02
-
-price_per_type[1] = 0.018
-price_per_type[2] = 0.012
-price_per_type[3] = 0.006
-'''
-
