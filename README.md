@@ -41,14 +41,12 @@ The master node continuously checks the transcoding status of the video blocks o
 
 ## Installation
 
-System Requirement (required libraries)
+System Requirement
 
 * [ubuntu 14.04](http://releases.ubuntu.com/14.04/)
 * [Python 2.7.6](https://www.python.org/download/releases/2.7.6/)
-* [NeuroLab](https://pythonhosted.org/neurolab/)
-* [Video Converter](https://github.com/senko/python-video-converter)
 * [ffmpeg](https://www.ffmpeg.org/)
-* [SQLite](https://www.sqlite.org/)
+* [Mysql](https://www.mysql.com/)
 
 Step 1: Clone the code from Github
 
