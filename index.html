@@ -19,61 +19,71 @@
     </section>
 
     <section class="main-content">
-      <h1>
-<a id="morph" class="anchor" href="#morph" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Morph</h1>
+      <h2>
+<a id="morph-a-fast-and-scalable-cloud-transcoding-system" class="anchor" href="#morph-a-fast-and-scalable-cloud-transcoding-system" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Morph: A Fast and Scalable Cloud Transcoding System</h2>
 
 <h2>
-<a id="a-fast-and-scalable-cloud-transcoding-system" class="anchor" href="#a-fast-and-scalable-cloud-transcoding-system" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>A Fast and Scalable Cloud Transcoding System</h2>
+<a id="contents" class="anchor" href="#contents" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Contents</h2>
+
+<hr>
+
+<ul>
+<li><a href="#overview">Overview</a></li>
+<li><a href="#workflow">Workflow</a></li>
+<li><a href="#installation">Installation</a></li>
+<li><a href="#getting-started">Getting Started</a></li>
+<li><a href="#example">Example</a></li>
+<li><a href="#license">License</a></li>
+</ul>
 
 <h2>
-<a id="1-overview" class="anchor" href="#1-overview" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>1. Overview</h2>
+<a id="overview" class="anchor" href="#overview" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Overview</h2>
 
-<p>Morph is an open source cloud transcoding system. It can leverage the scalability of the cloud infrastructure to encode and transcode the video files in fast speed, and dynamically provision the computing resource to accommodate the time-varying workload. Morph is implemented in Python. It can be accessed via RESTful API, command line interface (CLI), and RPC.</p>
+<p>Morph is an open source cloud transcoding system. It can leverage the scalability of the cloud infrastructure to encode and transcode the video files in fast speed, and dynamically provision the computing resource to accommodate the time-varying workload. Morph is implemented in Python. It can be accessed via RESTful API, command line interface (CLI), and RPC. </p>
 
-<h3>
-<a id="11-system-layers" class="anchor" href="#11-system-layers" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>1.1 System Layers</h3>
+<p>The system architecture is shown in the following figure. The system is composed of the following layers:</p>
 
-<p>Our system provides cloud-based video transcoding service for the end-users. It consists of three layers, including the Service Interface Layer, Task Scheduling Layer, and Resource Management Layer. The functionalities of each layer are detailed as follows: </p>
+<p><img src="https://github.com/cap-ntu/Morph/blob/master/DOC/system.png" width="40%" height="40%"></p>
 
-<p><img src="https://github.com/cap-ntu/Morph/blob/master/DOC/system.png" width="60%" height="60%"></p>
+<ul>
+<li>Interface Layer</li>
+</ul>
 
-<h4>
-<a id="service-interface-layer" class="anchor" href="#service-interface-layer" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Service Interface Layer</h4>
+<p>It interacts with the users for processing the transcoding requests and preprocessing the video contents. The system provides 3 types of service interfaces, namely, command line interface (CLI), remote procedure call (RPC), and RESTful API. The users can submit the transcoding tasks and query the transcoding progress via the service interfaces. For each of the user submitted transcoding tasks, it will estimate the required computing time for the task and segment the video files into video blocks for transcoding in parallel on the workers.</p>
 
-<p>It handles the user requests for submitting new transcoding tasks, querying task status and obtaining the transcoded video files. It provides two kinds of interfaces for the video transcoding service, including Restful API and Command Line Interface (CLI). With the Restful API interface, users can submit the request through HTTP POST/GET method; with CLI, users can submit the request by executing command line on the system background.</p>
+<ul>
+<li>Scheduling Layer</li>
+</ul>
 
-<h4>
-<a id="task-scheduling-layer" class="anchor" href="#task-scheduling-layer" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Task Scheduling Layer</h4>
+<p>The user submitted transcoding tasks will be put into the scheduling queue. The task scheduler sequences the pending tasks in the queue according to the scheduling policy and the QoS profiles of the tasks. Whenever the master node receives a transcoding request from the worker, the task scheduler will select a video block from the pending tasks for dispatching by applying the scheduling policy. The transcoded video blocks on the worker will be sent back to the master for concentration.</p>
 
-<p>It manages a queue of the pending tasks, and determines the execution sequence of the tasks. When there is idle computing resource in the computing cluster, the task scheduler will pick the head-of-queue task to execute. It first partitions the video file into segments, and then distributes the video segments to many workers for transcoding. After transcoding the video segments into the target resolution or bitrate, the transcoding workers will send back the transcoded video segments to the task scheduler. Finally, the task scheduler will concentrate the transcoded video segments into one video file. </p>
+<ul>
+<li>Provisioning Layer</li>
+</ul>
 
-<h4>
-<a id="resource-management-layer" class="anchor" href="#resource-management-layer" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Resource Management Layer</h4>
-
-<p>It manages many virtual machines, on each of which runs a transcoding worker. Since the transcoding request rate is changing over time, the resource manager layer is responsible for dynamically adjusting the number of running VMs to minimize the operational cost, according to the current workload.</p>
-
-<p><img src="https://github.com/cap-ntu/Morph/blob/master/DOC/workflow.png" alt="GitHub" title="workflow"></p>
-
-<h3>
-<a id="12-system-workflows" class="anchor" href="#12-system-workflows" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>1.2 System Workflows</h3>
-
-<p>The task scheduler, after receiving the transcoding request, will first insert the incoming task into the task queue, and then determines the execution sequence of the pending task. When there is idle transcoding workers in the VM cluster, the task scheduler will select the head-of-queue task to execute. On performing a new task, the task scheduler first splits the video file into several segments, and then distributes the video segments to many transcoding workers. After a segment has been transcoded into the target resolution by the transcoding worker, it will be sent back to the task scheduler. The task scheduler continuously checks whether all of the segments of a video file have been finished. If so, it will merge the transcoded video segments into on entire video file.</p>
-
-<p>The execution time for a transcoding task maybe very long if the video file is very large. To address this problem, we provide three alternative modes to perform a transcoding task. First, the system can define video segment duration in the configuration file and each of the video file would be split into video blocks according to the configuration. Each of the video blocks will be transcoded in parallel on multiple VM instances. With this method, all of the video blocks in the system have the same duration. Second, the duration of the video blocks can be determined by the task scheduling algorithms. For instance, the task scheduling algorithm can determine the duration of the video block according to the video deadline and the video size. Third, the system can perform the video transcoding without video segmentation. In this case, the entire video file will be sent to a transcoding worker directly and the transcoding task would be performed on that server. The system can select one model from the three alternatives.</p>
+<p>It manages the transcoding workers for dynamic resource provisioning. Our system can adopt the virtual machines (e.g., KVM ) or containers (e.g., Docker) for resource virtualization. Each VM instance or container runs a worker. The worker will request a video block from the master node whenever it it idle. The worker will transcode the video block into the target representations, which will be sent back to the master node.</p>
 
 <h2>
-<a id="2-installation" class="anchor" href="#2-installation" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>2. Installation</h2>
+<a id="workflow" class="anchor" href="#workflow" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Workflow</h2>
 
-<p>System Requirement (required libraries)</p>
+<p><img src="https://github.com/cap-ntu/Morph/blob/master/DOC/workflow.png" width="80%" height="80%"></p>
+
+<p>The user submit a transcoding task by uploading a video file and specifying the transcoding parameters. The video content will be segmented into independent video blocks according to the group of pictures (GOP) structure. The video block information of the task will be then put into the scheduling queue. </p>
+
+<p>When an idle worker requests a video block from the master node, the scheduler determines which video block in the scheduling queue will be selected for dispatching by applying the scheduling policy. The worker will transcode the video block into the target representation, and then send back the target representation to the master node. The video blocks in the scheduling queue can be requested and transcoded by the workers in parallel. </p>
+
+<p>The master node continuously checks the transcoding status of the video blocks of each task. If all the video blocks of a task have been finished successfully, the master node will concentrate the video blocks into one video file. Then, the transcoding task is finished and the target representations of the video content are ready to be downloaded by the users.</p>
+
+<h2>
+<a id="installation" class="anchor" href="#installation" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Installation</h2>
+
+<p>System Requirement</p>
 
 <ul>
 <li><a href="http://releases.ubuntu.com/14.04/">ubuntu 14.04</a></li>
 <li><a href="https://www.python.org/download/releases/2.7.6/">Python 2.7.6</a></li>
-<li><a href="https://pythonhosted.org/neurolab/">NeuroLab</a></li>
-<li><a href="http://redis.io/">Redis</a></li>
-<li><a href="https://github.com/senko/python-video-converter">Video Converter</a></li>
 <li><a href="https://www.ffmpeg.org/">ffmpeg</a></li>
-<li><a href="https://www.sqlite.org/">SQLite</a></li>
+<li><a href="https://www.mysql.com/">Mysql</a></li>
 </ul>
 
 <p>Step 1: Clone the code from Github</p>
@@ -93,12 +103,14 @@
 <p><code>nohup python worker.py &amp;</code></p>
 
 <h2>
-<a id="3-getting-started" class="anchor" href="#3-getting-started" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>3. Getting Started</h2>
+<a id="getting-started" class="anchor" href="#getting-started" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Getting Started</h2>
+
+<hr>
 
 <p>The system provides three kinds of interface for providing video transcoding service, including Restful API, Command Line Interface, and RPC. In general, the system interfaces can be divided into two categories: task submission and status query. Task submission is to submit a transcoding task to the system by specifying parameters. Status query is to query the progress of the transcoding task. The details of each kind of interfaces are given in the following sections.</p>
 
 <h3>
-<a id="31-restful-api" class="anchor" href="#31-restful-api" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>3.1 Restful API</h3>
+<a id="restful-api" class="anchor" href="#restful-api" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Restful API</h3>
 
 <p>The parameters of HTTP POST method for submitting a new task. The video location is specified with URL. </p>
 
@@ -133,7 +145,7 @@
 <p></p>
 
 <h3>
-<a id="32-command-line" class="anchor" href="#32-command-line" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>3.2 Command Line</h3>
+<a id="command-line" class="anchor" href="#command-line" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Command Line</h3>
 
 <p>Parameters for the command line:
 </p>
@@ -156,7 +168,7 @@
 <p><code>python query.py –k taskid</code></p>
 
 <h3>
-<a id="33-rpc" class="anchor" href="#33-rpc" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>3.3 RPC</h3>
+<a id="rpc" class="anchor" href="#rpc" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>RPC</h3>
 
 <p>We adopt the SimpleXML as the RPC library, the APIs for submitting transcoding task and querying task status are as follows:</p>
 
@@ -169,7 +181,7 @@
 <p><code>get_progress(task_id)</code></p>
 
 <h2>
-<a id="4-example" class="anchor" href="#4-example" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>4. Example</h2>
+<a id="example" class="anchor" href="#example" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Example</h2>
 
 <p>Submit a transcoding task by the command line interface: </p>
 
@@ -184,12 +196,16 @@
 <p><code>python query.py –k ddsdd123</code></p>
 
 <h2>
-<a id="5-wiki" class="anchor" href="#5-wiki" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><a href="https://github.com/cap-ntu/Morph/wiki">5. Wiki</a>
-</h2>
+<a id="license" class="anchor" href="#license" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>License</h2>
 
-<h2>
-<a id="6-issues" class="anchor" href="#6-issues" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><a href="https://github.com/cap-ntu/Morph/issues">6. Issues</a>
-</h2>
+<p>THIS SOFTWARE IS RELEASED UNDER THE MIT LICENSE (MIT)
+Copyright (c), 2015, NTU CAP</p>
+
+<p>Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:</p>
+
+<p>The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.</p>
+
+<p>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
 
       <footer class="site-footer">
         <span class="site-footer-owner"><a href="https://github.com/cap-ntu/Morph">Morph</a> is maintained by <a href="https://github.com/cap-ntu">cap-ntu</a>.</span>
