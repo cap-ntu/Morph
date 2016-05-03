@@ -3,19 +3,19 @@ The configuration file for system settings
 '''
 
 #the configuration of the master node
-master_ip       = "127.0.0.1"
+master_ip       = "10.0.146.127"
 master_rpc_port = "8091"
 master_rev_port = "9001"
 master_snd_port = "9011"
-master_path = "/data/master/"
+master_path = "/root/master/"
 
 #the configuration of the worker node
-worker_path = "/data/worker/"
+worker_path = "/root/worker/"
 
 #the configuration of Mysql
-mysql_ip        = "127.0.0.1"
+mysql_ip        = "10.0.146.127"
 mysql_user_name = "root"
-mysql_password  = "123"
+mysql_password  = ""
 mysql_db_name   = "morph"
 
 #the duration for each of the video block
