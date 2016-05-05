@@ -158,6 +158,19 @@ Query the progress of the task with the ID 'ddsdd123', specified by '-k'
 
 
 ## Performance
+The duration of the test video file is 138 minutes. The resolution is 1920x1080, and the bitrate is 2399 kb/s. The video data is encoded in H.264, and the audio data is encoded in AAC. 
+
+We first measure the video segmentation time for splitting the video file into equal-duration video blocks. The duration of each video block is 2 minutes. The FFmpeg command for the video segmentation is show as follow:
+
+```bash
+ffmpeg –i /root/video/ gyI7PV4h.mp4 -f segment -segment_time 120 -c copy -map 0 -segment_list /root/master/gyI7PV4h.list  /root/master/gyI7PV4h_%03d_.mp4
+'''
+
+We measure that the video segmentation for the video file 46 seconds.
+
+
+
+
 | Container Number  | 1     | 5     | 10    | 15    | 20    | 25    | 30    |
 |------------------   |------   |------   |------   |------   |------   |------   |------   |
 | Transcoding Time  | 1775  | 605   | 369   | 271   | 213   | 194   | 181   |
