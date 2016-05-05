@@ -175,7 +175,7 @@ We then measure the transcoding time for the test video file with different numb
 | Transcoding Time (s)  | 1775 | 1843 | 605   | 369   | 271   | 213   | 194   | 181   |
 | Speed-up Ratio    | 1x  | 0.96x | 2.9x  | 4.8x  | 6.5x  | 8.3x  | 9.1x  | 9.8x  |
 
-The transcoding time for using a standalone FFmpeg on a single server is 1775 seconds. If the system has only one active worker, the transcoding time is 1843 seconds, which is larger than the standalone ffmpeg. The overhead comes from the video segmentation, transmission, and concentration for transcoding the video file in a distributed manner. With more active workers to transcode the video blocks in parallel, the transcoding time for the video file decreases, and it can achieve larger speed-up ratio. 
+The transcoding time for using a standalone FFmpeg on a single server is 1775 seconds. If the system has only one active worker, the transcoding time is 1843 seconds, which is larger than the standalone ffmpeg. The overhead comes from the video segmentation, transmission, and concentration for transcoding the video file in a distributed manner. With more active workers to transcode the video blocks in parallel, the transcoding time for the video file decreases, achieving larger speed-up ratio. 
 
 
 ## License
