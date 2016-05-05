@@ -7,6 +7,7 @@
 * [Installation](#installation)
 * [Getting Started](#getting-started)
 * [Example](#example)
+* [Performance](#performance)
 * [License](#license)
 * [Contact](#contact)
 
@@ -154,6 +155,15 @@ The taget resolutions are 640x360, 426x240, specified by '-s'
 Query the progress of the task with the ID 'ddsdd123', specified by '-k'
 
 `python query.py –k ddsdd123`
+
+
+## Performance
+| Container Number  | 1     | 5     | 10    | 15    | 20    | 25    | 30    |
+|------------------   |------   |------   |------   |------   |------   |------   |------   |
+| Transcoding Time  | 1775  | 605   | 369   | 271   | 213   | 194   | 181   |
+| Speed-up Ratio    | 1x    | 2.9x  | 4.8x  | 6.5x  | 8.3x  | 9.1x  | 9.8x  |
+
+
 
 ## License
 THIS SOFTWARE IS RELEASED UNDER THE MIT LICENSE (MIT)
