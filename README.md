@@ -168,7 +168,7 @@ ffmpeg –i PV4h.mp4 -f segment -segment_time 120 -c copy -map 0 -segment_list P
 
 The video segmentation for the video file 46 seconds.
 
-We then measure the transcoding time for the test video file with different number of transcoding workers. We illustrate the transcoding time in the following table:
+We then measure the transcoding time for the test video file with different number of transcoding workers. The target resolution is 480x360. We illustrate the transcoding time in the following table:
 
 | Worker Number  | FFmpeg | 1 | 5     | 10    | 15    | 20    | 25    | 30    |
 |------------------   |------  |------ |------   |------   |------   |------   |------   |------   |
