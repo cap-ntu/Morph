@@ -42,7 +42,7 @@
 
 <p>The system architecture is shown in the following figure. The system is composed of the following layers:</p>
 
-<p><img src="https://github.com/cap-ntu/Morph/blob/master/DOC/system.png" width="40%" height="40%"></p>
+<p><img src="https://raw.githubusercontent.com/cap-ntu/Morph/master/DOC/system.png" width="40%" height="40%"></p>
 
 <ul>
 <li>Interface Layer</li>
@@ -65,7 +65,7 @@
 <h2>
 <a id="workflow" class="anchor" href="#workflow" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Workflow</h2>
 
-<p><img src="https://github.com/cap-ntu/Morph/blob/master/DOC/workflow.png" width="80%" height="80%"></p>
+<p><img src="https://raw.githubusercontent.com/cap-ntu/Morph/master/DOC/workflow.png" width="80%" height="80%"></p>
 
 <p>The user submit a transcoding task by uploading a video file and specifying the transcoding parameters. The video content will be segmented into independent video blocks according to the group of pictures (GOP) structure. The video block information of the task will be then put into the scheduling queue. </p>
 
@@ -197,10 +197,21 @@
 <h2>
 <a id="performance" class="anchor" href="#performance" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Performance</h2>
 
+<p>The duration of the test video file is 138 minutes. The resolution is 1920x1080, and the bitrate is 2399 kb/s. The video data is encoded in H.264, and the audio data is encoded in AAC. The CPU frequency of the servers is 2.10GHz. The master node is allocated with 8 CPU cores, and the memory size is 8GB. The worker node is allocated with 4 CPU cores, and the memory size is 2GB. We use the Docker for the resource allocation. </p>
+
+<p>We first measure the video segmentation time for splitting the video file into equal-duration video blocks. The duration of each video block is 2 minutes. The FFmpeg command for the video segmentation is show as follow:</p>
+
+<div class="highlight highlight-source-shell"><pre>ffmpeg –i PV4h.mp4 -f segment -segment_time 120 -c copy -map 0 -segment_list PV4h.list PV4h_%03d_.mp4</pre></div>
+
+<p>The video segmentation time for the video file is 46 seconds.</p>
+
+<p>We then measure the transcoding time for the test video file with different number of transcoding workers. The target resolution is 480x360. We illustrate the transcoding time in the following table:</p>
+
 <table>
 <thead>
 <tr>
-<th>Container Number</th>
+<th>Worker Number</th>
+<th>FFmpeg</th>
 <th>1</th>
 <th>5</th>
 <th>10</th>
@@ -212,8 +223,9 @@
 </thead>
 <tbody>
 <tr>
-<td>Transcoding Time</td>
+<td>Transcoding Time (s)</td>
 <td>1775</td>
+<td>1843</td>
 <td>605</td>
 <td>369</td>
 <td>271</td>
@@ -224,6 +236,7 @@
 <tr>
 <td>Speed-up Ratio</td>
 <td>1x</td>
+<td>0.96x</td>
 <td>2.9x</td>
 <td>4.8x</td>
 <td>6.5x</td>
@@ -233,6 +246,14 @@
 </tr>
 </tbody>
 </table>
+
+<p>The transcoding time for using a standalone FFmpeg on a single server is 1775 seconds. If the system has only one active worker, the transcoding time is 1843 seconds, which is larger than the standalone ffmpeg. The overhead comes from the video segmentation, transmission, and concentration for transcoding the video file in a distributed manner. With more active workers to transcode the video blocks in parallel, the overall transcoding time decreases, achieving larger speed-up ratio. </p>
+
+<p>The FFmpeg command for video block concentration is as follow</p>
+
+<div class="highlight highlight-source-shell"><pre>ffmpeg -f concat –i PV4h_480x360.list -c copy PV4h_480x360.mp4</pre></div>
+
+<p>The video block concentration time is 13 seconds. </p>
 
 <h2>
 <a id="license" class="anchor" href="#license" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>License</h2>
