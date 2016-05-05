@@ -166,7 +166,7 @@ We first measure the video segmentation time for splitting the video file into e
 ffmpeg –i PV4h.mp4 -f segment -segment_time 120 -c copy -map 0 -segment_list PV4h.list PV4h_%03d_.mp4
 ```
 
-The video segmentation for the video file 46 seconds.
+The video segmentation time for the video file is 46 seconds.
 
 We then measure the transcoding time for the test video file with different number of transcoding workers. The target resolution is 480x360. We illustrate the transcoding time in the following table:
 
@@ -179,7 +179,7 @@ The transcoding time for using a standalone FFmpeg on a single server is 1775 se
 
 The FFmpeg command for video block concentration is as follow
 ```bash
-Ffmpeg -f concat –i PV4h_480x360.list -c copy PV4h_480x360.mp4
+ffmpeg -f concat –i PV4h_480x360.list -c copy PV4h_480x360.mp4
 ```
 The video block concentration time is 13 seconds. 
 
