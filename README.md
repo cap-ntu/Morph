@@ -163,7 +163,7 @@ The duration of the test video file is 138 minutes. The resolution is 1920x1080,
 We first measure the video segmentation time for splitting the video file into equal-duration video blocks. The duration of each video block is 2 minutes. The FFmpeg command for the video segmentation is show as follow:
 
 ```bash
-ffmpeg –i /root/video/ gyI7PV4h.mp4 -f segment -segment_time 120 -c copy -map 0 -segment_list /root/master/gyI7PV4h.list /root/master/gyI7PV4h_%03d_.mp4
+ffmpeg –i PV4h.mp4 -f segment -segment_time 120 -c copy -map 0 -segment_list PV4h.list PV4h_%03d_.mp4
 ```
 
 The video segmentation for the video file 46 seconds.
