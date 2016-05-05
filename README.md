@@ -177,6 +177,13 @@ We then measure the transcoding time for the test video file with different numb
 
 The transcoding time for using a standalone FFmpeg on a single server is 1775 seconds. If the system has only one active worker, the transcoding time is 1843 seconds, which is larger than the standalone ffmpeg. The overhead comes from the video segmentation, transmission, and concentration for transcoding the video file in a distributed manner. With more active workers to transcode the video blocks in parallel, the overall transcoding time decreases, achieving larger speed-up ratio. 
 
+The FFmpeg command for video block concentration is as follow
+```bash
+Ffmpeg -f concat –i PV4h_480x360.list -c copy PV4h_480x360.mp4
+```
+The video block concentration time is 13 seconds. 
+
+
 
 ## License
 THIS SOFTWARE IS RELEASED UNDER THE MIT LICENSE (MIT)
