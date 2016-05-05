@@ -30,7 +30,9 @@
 <li><a href="#installation">Installation</a></li>
 <li><a href="#getting-started">Getting Started</a></li>
 <li><a href="#example">Example</a></li>
+<li><a href="#performance">Performance</a></li>
 <li><a href="#license">License</a></li>
+<li><a href="#contact">Contact</a></li>
 </ul>
 
 <h2>
@@ -40,7 +42,7 @@
 
 <p>The system architecture is shown in the following figure. The system is composed of the following layers:</p>
 
-<p><img src="https://raw.githubusercontent.com/cap-ntu/Morph/master/DOC/system.png" width="50%" height="50%"></p>
+<p><img src="https://github.com/cap-ntu/Morph/blob/master/DOC/system.png" width="40%" height="40%"></p>
 
 <ul>
 <li>Interface Layer</li>
@@ -63,7 +65,7 @@
 <h2>
 <a id="workflow" class="anchor" href="#workflow" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Workflow</h2>
 
-<p><img src="https://raw.githubusercontent.com/cap-ntu/Morph/master/DOC/workflow.png" width="90%" height="90%"></p>
+<p><img src="https://github.com/cap-ntu/Morph/blob/master/DOC/workflow.png" width="80%" height="80%"></p>
 
 <p>The user submit a transcoding task by uploading a video file and specifying the transcoding parameters. The video content will be segmented into independent video blocks according to the group of pictures (GOP) structure. The video block information of the task will be then put into the scheduling queue. </p>
 
@@ -85,7 +87,7 @@
 
 <p>Step 1: Clone the code from Github</p>
 
-<p><code>https://github.com/cap-ntu/Morph.git</code></p>
+<div class="highlight highlight-source-shell"><pre>git clone https://github.com/cap-ntu/Morph.git</pre></div>
 
 <p>Step 2: System Configuration</p>
 
@@ -93,11 +95,11 @@
 
 <p>Step 3: Start up the Master node</p>
 
-<p><code>nohup python master.py &amp;</code></p>
+<div class="highlight highlight-source-shell"><pre>nohup python master.py <span class="pl-k">&amp;</span></pre></div>
 
 <p>Step 4: Start up the Worker node</p>
 
-<p><code>nohup python worker.py &amp;</code></p>
+<div class="highlight highlight-source-shell"><pre>nohup python worker.py <span class="pl-k">&amp;</span></pre></div>
 
 <h2>
 <a id="getting-started" class="anchor" href="#getting-started" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Getting Started</h2>
@@ -193,6 +195,46 @@
 <p><code>python query.py –k ddsdd123</code></p>
 
 <h2>
+<a id="performance" class="anchor" href="#performance" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Performance</h2>
+
+<table>
+<thead>
+<tr>
+<th>Container Number</th>
+<th>1</th>
+<th>5</th>
+<th>10</th>
+<th>15</th>
+<th>20</th>
+<th>25</th>
+<th>30</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Transcoding Time</td>
+<td>1775</td>
+<td>605</td>
+<td>369</td>
+<td>271</td>
+<td>213</td>
+<td>194</td>
+<td>181</td>
+</tr>
+<tr>
+<td>Speed-up Ratio</td>
+<td>1x</td>
+<td>2.9x</td>
+<td>4.8x</td>
+<td>6.5x</td>
+<td>8.3x</td>
+<td>9.1x</td>
+<td>9.8x</td>
+</tr>
+</tbody>
+</table>
+
+<h2>
 <a id="license" class="anchor" href="#license" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>License</h2>
 
 <p>THIS SOFTWARE IS RELEASED UNDER THE MIT LICENSE (MIT)
@@ -203,6 +245,12 @@ Copyright (c), 2015, NTU CAP</p>
 <p>The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.</p>
 
 <p>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
+
+<h2>
+<a id="contact" class="anchor" href="#contact" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Contact</h2>
+
+<p>If you find any problem with this software, please feel free to contact me. 
+Email: <a href="mailto:guanyugao@gmail.com">guanyugao@gmail.com</a></p>
 
       <footer class="site-footer">
         <span class="site-footer-owner"><a href="https://github.com/cap-ntu/Morph">Morph</a> is maintained by <a href="https://github.com/cap-ntu">cap-ntu</a>.</span>
