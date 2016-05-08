@@ -32,6 +32,3 @@ machine_num = 15
 
 #required library for morph
 mysql_support = False
-neural_net_support = False
-
-
