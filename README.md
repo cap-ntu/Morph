@@ -56,7 +56,7 @@ Step 1: Clone the code from Github
 git clone https://github.com/cap-ntu/Morph.git
 ```
 
-Step 2: System Configuration
+Step 2: Revise the configuration file _config.py_
 
 `Set the values of the items in config.py according to system information and requirements.`
 
