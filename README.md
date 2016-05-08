@@ -58,8 +58,8 @@ git clone https://github.com/cap-ntu/Morph.git
 
 Step 2: Revise the configuration file **config.py**
 ```bash
-All of the executable programs in our system read the system configuration information from the file **config.py**.
-Make sure each item is set with appropriate values.
+All executable programs in our system read the configuration information from config.py.
+Make sure each item in the file is set with appropriate value.
 
 #the IP address of the master node
 master_ip       = "10.0.146.127"
@@ -72,7 +72,7 @@ master_snd_port = "9011"
 #The working path of the master node. 
 master_path = "/root/master/"
 
-#the working path of the worker node
+#The working path of the worker node.
 worker_path = "/root/worker/"
 
 #the configuration of Mysql
