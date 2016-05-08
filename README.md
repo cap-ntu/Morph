@@ -58,7 +58,45 @@ git clone https://github.com/cap-ntu/Morph.git
 
 Step 2: Revise the configuration file **config.py**
 ```bash
-Set the values of the items in config.py according to system information and requirements.
+All of the executable programs in our system read the system configuration information from the file **config.py**.
+Make sure each item is set with appropriate values.
+
+#the IP address of the master node
+master_ip       = "10.0.146.127"
+
+#Remain unchanged
+master_rpc_port = "8091" 
+master_rev_port = "9001"
+master_snd_port = "9011"
+
+#The working path of the master node. 
+master_path = "/root/master/"
+
+#the working path of the worker node
+worker_path = "/root/worker/"
+
+#the configuration of Mysql
+mysql_ip        = "10.0.146.127"
+mysql_user_name = "root"
+mysql_password  = ""
+
+#Remain unchanged 
+mysql_db_name   = "morph"
+
+#the duration for each of the video block
+equal_block_dur = 60*2
+
+#the number of threads for task preprocessing
+preproc_thread_num = 10
+
+#algorithm for task scheduling
+sch_alg = 'fifo'
+
+#default VM number
+machine_num = 15
+
+#required library for morph
+mysql_support = False
 ```
 
 Step 3: Start up the Master node
