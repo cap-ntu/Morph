@@ -56,9 +56,10 @@ Step 1: Clone the code from Github
 git clone https://github.com/cap-ntu/Morph.git
 ```
 
-Step 2: Revise the configuration file _config.py_
-
-`Set the values of the items in config.py according to system information and requirements.`
+Step 2: Revise the configuration file **config.py**
+```bash
+Set the values of the items in config.py according to system information and requirements.
+```
 
 Step 3: Start up the Master node
 
