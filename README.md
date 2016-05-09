@@ -188,7 +188,9 @@ get_progress(task_id)
 
 ## Usage
 
-Submit a transcoding task by the command line interface: 
+The easiest way to use this software is via command line. With this method, you do not need to configure the webserver or write the code for calling RPC.
+
+Submit a transcoding task by the command line: 
 
 the file path of the original video file is '/home/Videos/test.mp4', specified by '-l'
 
