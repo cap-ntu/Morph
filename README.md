@@ -6,7 +6,7 @@
 * [Workflow](#workflow)
 * [Installation](#installation)
 * [Getting Started](#getting-started)
-* [Example](#example)
+* [Usage](#usage)
 * [Performance](#performance)
 * [License](#license)
 * [Contact](#contact)
@@ -186,7 +186,7 @@ get_progress(task_id)
 ```
 
 
-## Example
+## Usage
 
 Submit a transcoding task by the command line interface: 
 
