@@ -162,13 +162,13 @@ Parameters for the command line:
 
 Submit a new transcoding task by CLI
 ```bash
-python submit_task.py -l /home/Videos/test.mp4 -s 640x360 426x240
+python cli_submit.py -l /home/Videos/test.mp4 -s 640x360 426x240
 ```
 
 Query task status
 
 ```bash
-python query.py –k taskid
+python cli_query.py –k taskid
 ```
 
 ### RPC
@@ -196,12 +196,12 @@ the file path of the original video file is '/home/Videos/test.mp4', specified b
 
 The taget resolutions are 640x360, 426x240, specified by '-s'
 ```bash
-python submit_task.py -l /home/Videos/test.mp4 -s 640x360 426x240
+python cli_submit.py -l /home/Videos/test.mp4 -s 640x360 426x240
 ```
 
 * Query the transcoding progress of the task with the ID 'ddsdd123', specified by '-k'
 ```bash
-python query.py –k ddsdd123
+python cli_query.py –k ddsdd123
 ```
 
 
