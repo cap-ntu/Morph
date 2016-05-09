@@ -99,14 +99,17 @@ machine_num = 15
 mysql_support = False
 ```
 
-Step 3: Start up the Master node
+Step 3: Initialize the database and tables in Mysql   
+```bash
+python init_db.py
+```
 
+Step 4: Start up the Master node
 ```bash
 nohup python master.py &
 ```
 
-Step 4: Start up the Worker node
-
+Step 5: Start up the Worker node
 ```bash
 nohup python worker.py &
 ```
