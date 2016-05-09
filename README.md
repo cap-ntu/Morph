@@ -114,7 +114,7 @@ nohup python worker.py &
 ## Getting Started
 -------------------
 
-The system provides three kinds of interface for providing video transcoding service, including Restful API, Command Line Interface, and RPC. In general, the system interfaces can be divided into two categories: task submission and status query. Task submission is to submit a transcoding task to the system by specifying parameters. Status query is to query the progress of the transcoding task. The details of each kind of interfaces are given in the following sections.
+The system provides three kinds of interface for accessing the service, including Restful API, Command Line Interface, and RPC. The users can use these interfaces to submit new transcoding tasks and to query the transcoding progress of a submitted task.
 
 ### Restful API
 
