@@ -106,12 +106,12 @@ python init_db.py
 
 Step 4: Start up the Master node
 ```bash
-nohup python master.py &
+nohup python master.py > /dev/null &
 ```
 
 Step 5: Start up the Worker node
 ```bash
-nohup python worker.py &
+nohup python worker.py > /dev/null &
 ```
 
 ## Programming Interface
