@@ -193,12 +193,14 @@ Submit a transcoding task by the command line interface:
 the file path of the original video file is '/home/Videos/test.mp4', specified by '-l'
 
 The taget resolutions are 640x360, 426x240, specified by '-s'
-
-`python submit_task.py -l /home/Videos/test.mp4 -s 640x360 426x240`
+```bash
+python submit_task.py -l /home/Videos/test.mp4 -s 640x360 426x240
+```
 
 Query the progress of the task with the ID 'ddsdd123', specified by '-k'
-
-`python query.py –k ddsdd123`
+```bash
+python query.py –k ddsdd123
+```
 
 
 ## Performance
