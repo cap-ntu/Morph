@@ -47,7 +47,7 @@ System Requirement
 
 * [ubuntu 14.04](http://releases.ubuntu.com/14.04/)
 * [Python 2.7.6](https://www.python.org/download/releases/2.7.6/)
-* [ffmpeg](https://www.ffmpeg.org/)
+* [ffmpeg](https://trac.ffmpeg.org/wiki/CompilationGuide/Ubuntu)
 * [Mysql](https://help.ubuntu.com/12.04/serverguide/mysql.html)
   
 
