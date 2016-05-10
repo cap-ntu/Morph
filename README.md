@@ -204,7 +204,7 @@ In the above case, the file path of the original video file is '/home/Videos/tes
 ```bash
 python cli_submit.py -u http://aidynamic.com/video/bunny.mp4 -s 640x360 426x240
 ```
-The user can also specify the URL of the original video file by '-u' to submit a task. In the above case, the URL of the original video file is 'http://aidynamic.com/video/bunny.mp4', specified by '-u'.
+The user can also specify the URL of the original video file by '-u' to submit a task. In the above case, the URL of the original video file is 'http://aidynamic.com/video/bunny.mp4', specified by '-u'. The master node will first download the video file and then perform the transcoding operations. 
 
 * Query the transcoding progress of a task with the task ID
 ```bash
