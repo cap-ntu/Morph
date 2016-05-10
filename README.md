@@ -201,6 +201,11 @@ Return: TASK ID
 ```
 In the above case, the file path of the original video file is '/home/Videos/test.mp4', specified by '-l'. This needs to be a valid local video file in the master node. The taget resolutions are 640x360, 426x240, specified by '-s'.
 
+```bash
+python cli_submit.py -u http://aidynamic.com/video/bunny.mp4 -s 640x360 426x240
+```
+The user can also specify the URL of the original video file by '-u' to submit a task. In the above case, the URL of the original video file is 'http://aidynamic.com/video/bunny.mp4', specified by '-u'.
+
 * Query the transcoding progress of a task with the task ID
 ```bash
 python cli_query.py –k ddsdd123
