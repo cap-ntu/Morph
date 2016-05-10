@@ -49,6 +49,7 @@ System Requirement
 * [Python 2.7.6](https://www.python.org/download/releases/2.7.6/)
 * [ffmpeg](https://www.ffmpeg.org/)
 * [Mysql](https://www.mysql.com/)
+
   [Installation for Mysql](https://help.ubuntu.com/12.04/serverguide/mysql.html)
 
 Step 1: Clone the code from Github
