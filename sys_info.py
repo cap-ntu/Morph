@@ -25,15 +25,7 @@ def init_db():
                 finish_time REAL, service_type INTEGER, trans_time REAL, task_ongoing INTEGER)")
         con.commit()
 
-        cur.execute("create table if not exists server_info(server_num INTEGER, server_list TEXT, id TEXT)")
-        con.commit()
-
-        sql_cmd = "DELETE FROM server_info WHERE id = 'current'"
-        cur.execute(sql_cmd)
-        con.commit()
-
-        sql_cmd = "INSERT INTO server_info VALUES(-1, '', 'current')"
-        cur.execute(sql_cmd)
+        cur.execute("create table if not exists server_info(id TEXT NOT NULL PRIMARY KEY, last_time REAL, state INTEGER)")
         con.commit()
 
         con.close()
@@ -108,18 +100,60 @@ def db_update_trans_time(task_id, trans_time):
 def get_task_progress():
     pass
 
-def set_server_num(num, serv_list):
+
+'''
+add worker information in MySQL
+'''
+def db_add_worker_info(host_name):
     try:
         con = MySQLdb.connect(ip, user_name, passwd, db_name)
         cur = con.cursor()
-        sql_cmd = "UPDATE server_info SET server_num = %d, server_list = '%s' WHERE id = 'current'" \
-                    % (num, serv_list)
+
+        sql_cmd = "INSERT INTO server_info VALUES('%s', 0, 1) ON DUPLICATE KEY UPDATE \
+                last_time = 0 and state = 1" % host_name
+        cur.execute(sql_cmd)
+        con.commit()
+
+        con.close()
+        return 0
+    except Exception, e:
+        con.rollback()
+        print str(e)
+        return -1
+
+'''
+get worker state
+'''
+def db_get_worker_state(host_name):
+    try:
+        con = MySQLdb.connect(ip, user_name, passwd, db_name)
+        cur = con.cursor()
+
+        sql_cmd = "SELECT state FROM server_info where id = '%s'" % host_name
+        cur.execute(sql_cmd)
+        rows = cur.fetchall()
+        ret  = rows[0][0]
+        con.close()
+        return ret
+    except Exception, e:
+        print str(e)
+        return -1
+
+'''
+update the last access time for a worker
+'''
+def db_update_last_access(host_name):
+    try:
+        con = MySQLdb.connect(ip, user_name, passwd, db_name)
+        cur = con.cursor()
+
+        cur_time = time.time()
+        sql_cmd  = "update server_info set last_time = %f where id = '%s'" % (cur_time, host_name)
         cur.execute(sql_cmd)
         con.commit()
         con.close()
         return 0
-    except:
-        con.rollback()
+    except Exception, e:
+        print str(e)
         return -1
-
 
