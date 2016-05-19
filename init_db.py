@@ -41,7 +41,7 @@ if __name__ == '__main__':
                 finish_time REAL, service_type INTEGER, trans_time REAL, task_ongoing INTEGER)"
         cursor.execute(sql)
 
-        sql = "create table if not exists server_info(server_num INTEGER, server_list TEXT, id TEXT)"
+        sql = "create table if not exists server_info(id VARCHAR(100) NOT NULL PRIMARY KEY, last_time REAL, state INTEGER)"
         cursor.execute(sql)
 
 
