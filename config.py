@@ -3,19 +3,19 @@ The configuration file for system settings
 '''
 
 #the configuration of the master node
-master_ip       = "10.0.146.127"
+master_ip       = "127.0.0.1"
 master_rpc_port = "8091"
 master_rev_port = "9001"
 master_snd_port = "9011"
-master_path = "/root/master/"
+master_path = "./master/"
 
 #the configuration of the worker node
-worker_path = "/root/worker/"
+worker_path = "./worker/"
 
 #the configuration of Mysql
-mysql_ip        = "10.0.146.127"
+mysql_ip        = "127.0.0.1"
 mysql_user_name = "root"
-mysql_password  = ""
+mysql_password  = "123"
 mysql_db_name   = "morph"
 
 #the duration for each of the video block
@@ -30,5 +30,3 @@ sch_alg = 'fifo'
 #default VM number
 machine_num = 15
 
-#required library for morph
-mysql_support = False
