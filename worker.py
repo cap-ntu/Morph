@@ -225,6 +225,11 @@ if __name__ == '__main__':
     rpc_addr = "http://" + master_ip + ":" + master_rpc_port
     server   = xmlrpclib.ServerProxy(rpc_addr)
 
+    #MySQL ip information
+    mysql_ip       = config.mysql_ip
+    mysql_user     = config.mysql_user_name
+    mysql_passwd   = config.password
+    mysql_db       = config.db_name
 
     #get video block from master
     while True:
