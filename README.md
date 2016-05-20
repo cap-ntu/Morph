@@ -120,6 +120,18 @@ Step 5: Change to the directory 'Morph', start up the Worker node. This needs to
 nohup python worker.py > worker_error_msg &
 ```
 
+Step 6: Check the log and the error message of the master node.
+```bash
+tail master_error_msg
+tail master.*.log
+```
+
+Check the log and the error message of the worker nodes.
+```bash
+tail worker_error_msg
+tail worker.*.log
+```
+
 ## Programming Interface
 -------------------
 
