@@ -16,7 +16,7 @@ worker_path = "./worker_data/"
 #the configuration of Mysql
 mysql_ip        = "127.0.0.1"
 mysql_user_name = "root"
-mysql_password  = "123"
+mysql_password  = ""
 mysql_db_name   = "morph"
 
 #the duration for each of the video block
