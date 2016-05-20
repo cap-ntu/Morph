@@ -1,6 +1,7 @@
 '''
 The configuration file for system settings
 '''
+import os
 
 #the configuration of the master node
 master_ip       = "127.0.0.1"
@@ -15,7 +16,7 @@ worker_path = "./worker/"
 #the configuration of Mysql
 mysql_ip        = "127.0.0.1"
 mysql_user_name = "root"
-mysql_password  = "123"
+mysql_password  = ""
 mysql_db_name   = "morph"
 
 #the duration for each of the video block
@@ -26,4 +27,8 @@ preproc_thread_num = 10
 
 #algorithm for task scheduling
 sch_alg = 'fifo'
+
+
+master_path = os.path.abspath(master_path)
+worker_path = os.path.abspath(worker_path)
 

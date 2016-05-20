@@ -37,7 +37,7 @@ if __name__ == '__main__':
         cursor.execute(sql)
 
         print 'create table:' + 'task_info'
-        sql = "create table if not exists task_info(id TEXT, submit_time REAL, start_time REAL, \
+        sql = "create table if not exists task_info(id VARCHAR(100), submit_time REAL, start_time REAL, \
                 finish_time REAL, service_type INTEGER, trans_time REAL, task_ongoing INTEGER)"
         cursor.execute(sql)
 

@@ -270,14 +270,6 @@ class preproc_thread(threading.Thread):
         threading.Thread.__init__(self)
         self.index = index
 
-        if config.neural_net_support == True:
-            import neurolab as nl
-            from converter import Converter
-            self.c = Converter()
-            target   = scipy.io.loadmat('./algorithms/t3_output.mat')
-            self.net = nl.load('./algorithms/t3_estimator.net')
-            t = target['t3_output']
-            self.norm_t = nl.tool.Norm(t)
 
     def trans_time_est(self, task):
         path = task.file_path
@@ -323,12 +315,6 @@ class preproc_thread(threading.Thread):
                 return -1
 
         task.file_path = file_path
-
-        #use the neural network method for transcoding time estimation
-        if config.neural_net_support == True:
-            est_time = self.trans_time_est(task)
-            db_update_trans_time(task.task_id, est_time)
-            task.est_time = est_time
         return 0
 
     def run(self):
@@ -656,8 +642,8 @@ if __name__ == '__main__':
     #create database and init the tables
     ret = init_db()
     if ret == -1:
-        logger.critical('cannot initialize the database for master')
-        sys.exit()
+        logger.error('cannot initialize the database for master')
+
 
     #start the rpc thread to handle the request
     server = master_rpc_server((master_ip, master_rpc_port), \

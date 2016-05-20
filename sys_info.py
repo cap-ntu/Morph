@@ -21,16 +21,18 @@ def init_db():
     try:
         con = MySQLdb.connect(ip, user_name, passwd, db_name)
         cur = con.cursor()
-        cur.execute("create table if not exists task_info(id TEXT, submit_time REAL, start_time REAL, \
+        cur.execute("create table if not exists task_info(id VARCHAR(100), submit_time REAL, start_time REAL, \
                 finish_time REAL, service_type INTEGER, trans_time REAL, task_ongoing INTEGER)")
         con.commit()
 
-        cur.execute("create table if not exists server_info(id TEXT NOT NULL PRIMARY KEY, last_time REAL, state INTEGER)")
+        cur.execute("create table if not exists server_info(id VARCHAR(100) NOT NULL PRIMARY KEY, \
+                last_time REAL, state INTEGER)")
         con.commit()
 
         con.close()
         return 0
-    except:
+    except Exception, e:
+        print str(e)
         con.rollback()
         return -1
 
