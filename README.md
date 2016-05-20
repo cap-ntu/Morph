@@ -112,12 +112,12 @@ python init_db.py
 
 Step 4: Change to the directory 'Morph', and start up the Master node by executing the following command.
 ```bash
-nohup python master.py > /dev/null &
+nohup python master.py > master_error_msg &
 ```
 
 Step 5: Change to the directory 'Morph', start up the Worker node. This needs to be executed on each of the worker node. 
 ```bash
-nohup python worker.py > /dev/null &
+nohup python worker.py > worker_error_msg &
 ```
 
 ## Programming Interface
