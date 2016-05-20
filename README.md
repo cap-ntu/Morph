@@ -107,12 +107,12 @@ Step 3: Initialize the database and tables in Mysql
 python init_db.py
 ```
 
-Step 4: Start up the Master node
+Step 4: Change to the directory 'Morph', and start up the Master node by executing the following command.
 ```bash
 nohup python master.py > /dev/null &
 ```
 
-Step 5: Start up the Worker node
+Step 5: Change to the directory 'Morph', start up the Worker node. This needs to be executed on each of the worker node. 
 ```bash
 nohup python worker.py > /dev/null &
 ```
