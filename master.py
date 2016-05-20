@@ -575,9 +575,6 @@ class task_tracker(threading.Thread):
             for task_id in task_status.keys():
                 task = task_status[task_id]
                 if task.fin_num == task.block_num and task.block_num > 0:
-                    msg = "%s: task has been finished" % task_id
-                    logger.debug(msg)
-                    task_status.pop(task_id)
                     ret = 0
                     try:
                         ret = self.concat_block(task)
@@ -596,8 +593,14 @@ class task_tracker(threading.Thread):
                         task.progress = -3
                         db_update_finish_time(task_id, -3)
 
+                    #write the task information to file
                     self.write_pkl(task_id, task)
+                    #pop the task from the task list
+                    msg = "%s: task has been finished" % task_id
+                    logger.debug(msg)
+                    task_status.pop(task_id)
                     continue
+
                 if task.progress < 0:
                     task_status.pop(task_id)
                     self.write_pkl(task_id, task)
