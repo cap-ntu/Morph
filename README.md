@@ -52,6 +52,12 @@ System Requirement
 
 Please click the above links for the installation of the dependent software.
 
+Required Libraries
+```bash
+sudo apt-get update    
+sudo apt-get install  python-pycurl;
+sudo apt-get install python-mysqldb;
+```
 
 Step 1: Clone the code from Github
 
