@@ -6,7 +6,6 @@ scheduling, block dispatching, video splitting and concentration.
 '''
 
 import config
-import scipy.io
 import numpy as np
 import os, sys, md5
 import time, pycurl
