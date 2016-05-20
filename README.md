@@ -66,26 +66,28 @@ git clone https://github.com/cap-ntu/Morph.git
 ```
 
 Step 2: Revise the configuration file **config.py**
+
+All executable programs read the configuration information from config.py.
+Make sure each item is set with appropriate value according to your system configuration.
+
 ```bash
-All executable programs in our system read the configuration information from config.py.
-Make sure each item in the file is set with appropriate value.
 
 #the IP address of the master node
-master_ip       = "10.0.146.127"
+master_ip       = "127.0.0.1"
 
 #Remain unchanged
 master_rpc_port = "8091" 
 master_rev_port = "9001"
 master_snd_port = "9011"
 
-#The working path of the master node. 
-master_path = "/root/master/"
+#The working path of the master node, keep unchanged
+master_path = "./master/"
 
-#The working path of the worker node.
-worker_path = "/root/worker/"
+#The working path of the worker node, keep unchanged
+worker_path = "./worker/"
 
 #the configuration of Mysql
-mysql_ip        = "10.0.146.127"
+mysql_ip        = "127.0.0.1"
 mysql_user_name = "root"
 mysql_password  = ""
 
@@ -101,11 +103,6 @@ preproc_thread_num = 10
 #algorithm for task scheduling
 sch_alg = 'fifo'
 
-#default VM number
-machine_num = 15
-
-#required library for morph
-mysql_support = False
 ```
 
 Step 3: Initialize the database and tables in Mysql   
