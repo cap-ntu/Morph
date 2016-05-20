@@ -27,6 +27,3 @@ preproc_thread_num = 10
 #algorithm for task scheduling
 sch_alg = 'fifo'
 
-#default VM number
-machine_num = 15
-
