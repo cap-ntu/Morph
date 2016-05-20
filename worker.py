@@ -15,6 +15,7 @@ import logging
 import subprocess
 import xmlrpclib
 from common import *
+from sys_info import *
 
 #log module for transcoder
 logger = None
@@ -225,21 +226,25 @@ if __name__ == '__main__':
     rpc_addr = "http://" + master_ip + ":" + master_rpc_port
     server   = xmlrpclib.ServerProxy(rpc_addr)
 
-    #MySQL ip information
-    mysql_ip       = config.mysql_ip
-    mysql_user     = config.mysql_user_name
-    mysql_passwd   = config.password
-    mysql_db       = config.db_name
+    #add the worker information in DB
+    ret = db_add_worker_info(host_name)
+    if ret == -1:
+        logger.error('cannot add the worker information in MySQL')
 
     #get video block from master
     while True:
-
-        try:
-            pass
-        except:
-            logger.error('cannot connect to the Mysql server')
-            time.sleep(5)
+        ret = db_get_worker_state(host_name)
+        if ret == 0:
+            logger.info('the worker turns to sleep')
+            time.sleep(10)
             continue
+
+        if ret == -1:
+            logger.error('cannot connect to MySQL, but perfer to go on')
+
+        ret = db_update_last_access(host_name)
+        if ret == -1:
+            logger.error('cannot update the last access time in Mysql')
 
         try:
             num = server.get_blk_num()
