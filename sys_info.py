@@ -33,7 +33,7 @@ def init_db():
         return 0
     except Exception, e:
         print str(e)
-        con.rollback()
+        #con.rollback()
         return -1
 
 def db_insert_task_info(task_id, service_type):
@@ -48,7 +48,7 @@ def db_insert_task_info(task_id, service_type):
         con.close()
         return 0
     except:
-        con.rollback()
+        #con.rollback()
         return -1
 
 def db_update_finish_time(task_id, result):
@@ -64,7 +64,7 @@ def db_update_finish_time(task_id, result):
         con.close()
         return 0
     except:
-        con.rollback()
+        #con.rollback()
         return -1
 
 def db_update_start_time(task_id):
@@ -80,7 +80,7 @@ def db_update_start_time(task_id):
         con.close()
         return 0
     except:
-        con.rollback()
+        #con.rollback()
         return -1
 
 
@@ -96,7 +96,7 @@ def db_update_trans_time(task_id, trans_time):
         con.close()
         return 0
     except:
-        con.rollback()
+        #con.rollback()
         return -1
 
 def get_task_progress():
@@ -119,7 +119,7 @@ def db_add_worker_info(host_name):
         con.close()
         return 0
     except Exception, e:
-        con.rollback()
+        #con.rollback()
         print str(e)
         return -1
 
