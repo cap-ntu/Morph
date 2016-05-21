@@ -132,6 +132,33 @@ def get_progress(task_id):
     return -10
 
 '''
+get target files of the transcoded video file.
+'''
+def get_target_file(task_id):
+    work_path = config.master_path
+    f_name = os.path.join(work_path, task_id + '.pkl')
+    if os.path.isfile(f_name) == True:
+        pkl_file = open(f_name, 'rb')
+        task = pickle.load(pkl_file)
+        pkl_file.close()
+
+        width  = task.width.replace(' ', '').split('%')
+        width  = filter(lambda a: a != '', width)
+        height = task.height.replace(' ', '').split('%')
+        height = filter(lambda a: a != '', height)
+
+        f_list = ''
+        for i in range(len(width)):
+            f_path = ''
+            res = width[i] + 'x' + height[i]
+            f_path = os.path.join(work_path, \
+                    task_id + '_' + res + '.mp4')
+            f_list = f_list + f_path + '%'
+        return f_list
+    else:
+        return None
+
+'''
 get the current number of blocks in dispatching queue
 '''
 def get_blk_num():
@@ -652,6 +679,7 @@ if __name__ == '__main__':
              requestHandler = RequestHandler, allow_none=True)
     server.register_function(put_trans_task, "put_trans_task")
     server.register_function(get_progress, "get_progress")
+    server.register_function(get_target_file, "get_target_file")
     server.register_function(get_blk_num, "get_blk_num")
 
     #create the thread for preprocessing video files

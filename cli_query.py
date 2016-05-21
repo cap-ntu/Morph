@@ -43,6 +43,11 @@ if __name__ == "__main__":
         ret = server.get_progress(task_key)
         print ret
         ret = int(ret)
+        if ret == 100:
+            f_list = server.get_target_file(task_key)
+            f_list = f_list.replace(' ', '').split('%')
+            f_list = filter(lambda a: a != '', f_list)
+            print f_list
         sys.exit(ret)
 
     if task_num == True:
