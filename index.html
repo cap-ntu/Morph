@@ -20,6 +20,9 @@
 
     <section class="main-content">
       <h2>
+<a id="morph-a-fast-and-scalable-cloud-transcoding-system" class="anchor" href="#morph-a-fast-and-scalable-cloud-transcoding-system" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Morph: A Fast and Scalable Cloud Transcoding System</h2>
+
+<h2>
 <a id="contents" class="anchor" href="#contents" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Contents</h2>
 
 <hr>
@@ -28,8 +31,8 @@
 <li><a href="#overview">Overview</a></li>
 <li><a href="#workflow">Workflow</a></li>
 <li><a href="#installation">Installation</a></li>
-<li><a href="#getting-started">Getting Started</a></li>
-<li><a href="#example">Example</a></li>
+<li><a href="#programming-interface">Programming Interface</a></li>
+<li><a href="#usage">Usage</a></li>
 <li><a href="#performance">Performance</a></li>
 <li><a href="#license">License</a></li>
 <li><a href="#contact">Contact</a></li>
@@ -42,7 +45,7 @@
 
 <p>The system architecture is shown in the following figure. The system is composed of the following layers:</p>
 
-<p><img src="https://raw.githubusercontent.com/cap-ntu/Morph/master/DOC/system.png" width="40%" height="40%"></p>
+<p><img src="https://github.com/cap-ntu/Morph/blob/master/DOC/system.png" width="40%" height="40%"></p>
 
 <ul>
 <li>Interface Layer</li>
@@ -65,7 +68,7 @@
 <h2>
 <a id="workflow" class="anchor" href="#workflow" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Workflow</h2>
 
-<p><img src="https://raw.githubusercontent.com/cap-ntu/Morph/master/DOC/workflow.png" width="80%" height="80%"></p>
+<p><img src="https://github.com/cap-ntu/Morph/blob/master/DOC/workflow.png" width="80%" height="80%"></p>
 
 <p>The user submit a transcoding task by uploading a video file and specifying the transcoding parameters. The video content will be segmented into independent video blocks according to the group of pictures (GOP) structure. The video block information of the task will be then put into the scheduling queue. </p>
 
@@ -81,32 +84,88 @@
 <ul>
 <li><a href="http://releases.ubuntu.com/14.04/">ubuntu 14.04</a></li>
 <li><a href="https://www.python.org/download/releases/2.7.6/">Python 2.7.6</a></li>
-<li><a href="https://www.ffmpeg.org/">ffmpeg</a></li>
-<li><a href="https://www.mysql.com/">Mysql</a></li>
+<li><a href="https://trac.ffmpeg.org/wiki/CompilationGuide/Ubuntu">ffmpeg</a></li>
+<li><a href="https://help.ubuntu.com/12.04/serverguide/mysql.html">Mysql</a></li>
 </ul>
+
+<p>Please click the above links for the installation of the dependent software.</p>
+
+<p>It may require to install some lacked libraries, e.g., pycurl, mysqldb.</p>
+
+<div class="highlight highlight-source-shell"><pre>sudo apt-get update    
+sudo apt-get install python-pycurl
+sudo apt-get install python-mysqldb</pre></div>
 
 <p>Step 1: Clone the code from Github</p>
 
 <div class="highlight highlight-source-shell"><pre>git clone https://github.com/cap-ntu/Morph.git</pre></div>
 
-<p>Step 2: System Configuration</p>
+<p>Step 2: Revise the configuration file <strong>config.py</strong></p>
 
-<p><code>Set the values of the items in config.py according to system information and requirements.</code></p>
+<p>All executable programs read the configuration information from config.py.
+Make sure each item is set with appropriate value according to your system configuration.</p>
 
-<p>Step 3: Start up the Master node</p>
+<div class="highlight highlight-source-shell"><pre>
+<span class="pl-c">#the IP address of the master node</span>
+master_ip       = <span class="pl-s"><span class="pl-pds">"</span>127.0.0.1<span class="pl-pds">"</span></span>
 
-<div class="highlight highlight-source-shell"><pre>nohup python master.py <span class="pl-k">&amp;</span></pre></div>
+<span class="pl-c">#Remain unchanged</span>
+master_rpc_port = <span class="pl-s"><span class="pl-pds">"</span>8091<span class="pl-pds">"</span></span> 
+master_rev_port = <span class="pl-s"><span class="pl-pds">"</span>9001<span class="pl-pds">"</span></span>
+master_snd_port = <span class="pl-s"><span class="pl-pds">"</span>9011<span class="pl-pds">"</span></span>
 
-<p>Step 4: Start up the Worker node</p>
+<span class="pl-c">#The working path of the master node, keep unchanged</span>
+master_path = <span class="pl-s"><span class="pl-pds">"</span>./master/<span class="pl-pds">"</span></span>
 
-<div class="highlight highlight-source-shell"><pre>nohup python worker.py <span class="pl-k">&amp;</span></pre></div>
+<span class="pl-c">#The working path of the worker node, keep unchanged</span>
+worker_path = <span class="pl-s"><span class="pl-pds">"</span>./worker/<span class="pl-pds">"</span></span>
+
+<span class="pl-c">#the configuration of Mysql</span>
+mysql_ip        = <span class="pl-s"><span class="pl-pds">"</span>127.0.0.1<span class="pl-pds">"</span></span>
+mysql_user_name = <span class="pl-s"><span class="pl-pds">"</span>root<span class="pl-pds">"</span></span>
+mysql_password  = <span class="pl-s"><span class="pl-pds">"</span><span class="pl-pds">"</span></span>
+
+<span class="pl-c">#Remain unchanged </span>
+mysql_db_name   = <span class="pl-s"><span class="pl-pds">"</span>morph<span class="pl-pds">"</span></span>
+
+<span class="pl-c">#the duration for each of the video block</span>
+equal_block_dur = 60<span class="pl-k">*</span>2
+
+<span class="pl-c">#the number of threads for task preprocessing</span>
+preproc_thread_num = 10
+
+<span class="pl-c">#algorithm for task scheduling</span>
+sch_alg = <span class="pl-s"><span class="pl-pds">'</span>fifo<span class="pl-pds">'</span></span>
+</pre></div>
+
+<p>Step 3: Initialize the database and tables in Mysql   </p>
+
+<div class="highlight highlight-source-shell"><pre>python init_db.py</pre></div>
+
+<p>Step 4: Change to the directory 'Morph', and start up the Master node by executing the following command.</p>
+
+<div class="highlight highlight-source-shell"><pre>nohup python master.py <span class="pl-k">&gt;</span> master_error_msg <span class="pl-k">&amp;</span></pre></div>
+
+<p>Step 5: Change to the directory 'Morph', start up the Worker node. This needs to be executed on each of the worker node. </p>
+
+<div class="highlight highlight-source-shell"><pre>nohup python worker.py <span class="pl-k">&gt;</span> worker_error_msg <span class="pl-k">&amp;</span></pre></div>
+
+<p>Step 6: Check the log and the error message of the master node.</p>
+
+<div class="highlight highlight-source-shell"><pre>tail master_error_msg
+tail master.<span class="pl-k">*</span>.log</pre></div>
+
+<p>Check the log and the error message of the worker nodes.</p>
+
+<div class="highlight highlight-source-shell"><pre>tail worker_error_msg
+tail worker.<span class="pl-k">*</span>.log</pre></div>
 
 <h2>
-<a id="getting-started" class="anchor" href="#getting-started" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Getting Started</h2>
+<a id="programming-interface" class="anchor" href="#programming-interface" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Programming Interface</h2>
 
 <hr>
 
-<p>The system provides three kinds of interface for providing video transcoding service, including Restful API, Command Line Interface, and RPC. In general, the system interfaces can be divided into two categories: task submission and status query. Task submission is to submit a transcoding task to the system by specifying parameters. Status query is to query the progress of the transcoding task. The details of each kind of interfaces are given in the following sections.</p>
+<p>The system provides three kinds of interface for accessing the service, including Restful API, Command Line Interface, and RPC. The users can use these interfaces to submit new transcoding tasks and to query the transcoding progress of a task.</p>
 
 <h3>
 <a id="restful-api" class="anchor" href="#restful-api" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Restful API</h3>
@@ -160,11 +219,11 @@
 
 <p>Submit a new transcoding task by CLI</p>
 
-<p><code>python submit_task.py -l /home/Videos/test.mp4 -s 640x360 426x240</code></p>
+<div class="highlight highlight-source-shell"><pre>python cli_submit.py -l /home/Videos/test.mp4 -s 640x360 426x240</pre></div>
 
 <p>Query task status</p>
 
-<p><code>python query.py –k taskid</code></p>
+<div class="highlight highlight-source-shell"><pre>python cli_query.py –k taskid</pre></div>
 
 <h3>
 <a id="rpc" class="anchor" href="#rpc" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>RPC</h3>
@@ -173,26 +232,42 @@
 
 <p>Submit a new transcoding task (URI can be a URL or local file path)</p>
 
-<p><code>put_trans_task(URI, bitrate, width, height, priority, task_id = None)</code></p>
+<div class="highlight highlight-source-shell"><pre>put_trans_task(URI, bitrate, width, height, priority, task_id = None)</pre></div>
 
 <p>Query the task status</p>
 
-<p><code>get_progress(task_id)</code></p>
+<div class="highlight highlight-source-shell"><pre>get_progress(task_id)</pre></div>
 
 <h2>
-<a id="example" class="anchor" href="#example" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Example</h2>
+<a id="usage" class="anchor" href="#usage" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Usage</h2>
 
-<p>Submit a transcoding task by the command line interface: </p>
+<p>The easiest way to use this software is via command line. With this method, you do not need to configure the webserver or write the code for calling RPC. There are two programs serving as the command line, <strong>cli_query.py</strong> and <strong>cli_submit.py</strong>. Note that the <strong>config.py</strong> should be kept a copy with these two programs, since they need to the configuration information from it. </p>
 
-<p>the file path of the original video file is '/home/Videos/test.mp4', specified by '-l'</p>
+<ul>
+<li>Submit a transcoding task by the command line<br>
+</li>
+</ul>
 
-<p>The taget resolutions are 640x360, 426x240, specified by '-s'</p>
+<div class="highlight highlight-source-shell"><pre>python cli_submit.py -l /home/Videos/test.mp4 -s 640x360 426x240
+Return: Task ID</pre></div>
 
-<p><code>python submit_task.py -l /home/Videos/test.mp4 -s 640x360 426x240</code></p>
+<p>In the above command, the file path of the original video file is '/home/Videos/test.mp4', specified by '-l'. This needs to be a valid local video file in the master node. The taget resolutions are 640x360, 426x240, specified by '-s'.</p>
 
-<p>Query the progress of the task with the ID 'ddsdd123', specified by '-k'</p>
+<div class="highlight highlight-source-shell"><pre>python cli_submit.py -u http://aidynamic.com/video/bunny.mp4 -s 640x360 426x240
+Return: Task ID</pre></div>
 
-<p><code>python query.py –k ddsdd123</code></p>
+<p>The user can also specify the URL of the original video file by '-u' to submit a task. In the above command, the URL of the original video file is '<a href="http://aidynamic.com/video/bunny.mp4">http://aidynamic.com/video/bunny.mp4</a>', specified by '-u'. The master node will first download the video file and then perform the transcoding operations. </p>
+
+<ul>
+<li>Query the transcoding progress of a task with the task ID</li>
+</ul>
+
+<div class="highlight highlight-source-shell"><pre>python cli_query.py –k ddsdd123
+Return: 
+1. Progress of the task.
+2. The file path of the target video file <span class="pl-k">if</span> it has been finished. </pre></div>
+
+<p>In the above command, the task ID is 'ddsdd123', specified by '-k'. </p>
 
 <h2>
 <a id="performance" class="anchor" href="#performance" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Performance</h2>
@@ -270,8 +345,9 @@ Copyright (c), 2015, NTU CAP</p>
 <h2>
 <a id="contact" class="anchor" href="#contact" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Contact</h2>
 
-<p>If you find any problem with this software, please feel free to contact me. 
-Email: <a href="mailto:guanyugao@gmail.com">guanyugao@gmail.com</a></p>
+<p>If you find any problem with this software, please feel free to contact us, your feedback is appreciated. </p>
+
+<p>Email: <a href="mailto:guanyugao@gmail.com">guanyugao@gmail.com</a>; <a href="mailto:ggao001@e.ntu.edu.sg">ggao001@e.ntu.edu.sg</a></p>
 
       <footer class="site-footer">
         <span class="site-footer-owner"><a href="https://github.com/cap-ntu/Morph">Morph</a> is maintained by <a href="https://github.com/cap-ntu">cap-ntu</a>.</span>
