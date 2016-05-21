@@ -33,13 +33,23 @@ if __name__ == "__main__":
         print 'error: you can only specify a local file or a url'
         sys.exit(-1)
     if input_file != None:
+        _, ext = os.path.splitext(input_file)
+        if ext != '.mp4':
+            print 'The current verison only supports the input file in container of MP4'
+            sys.exit(-1)
         if os.path.isfile(input_file) == False:
             print 'error: input file does not exist'
             sys.exit(-1)
         else:
             file_path = "L" + input_file
+
     if input_url != None:
+        _, ext = os.path.splitext(input_url)
+        if ext != '.mp4':
+            print 'The current verison only supports the input file in container of MP4'
+            sys.exit(-1)
         file_path = "U" + input_url
+
     if task_id != None and len(task_id) > 50:
         print 'error: the length of the task id cannot exceed 50'
         sys.exit(-1)
