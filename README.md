@@ -32,7 +32,7 @@ It manages the transcoding workers for dynamic resource provisioning. Our system
 
 ## Workflow
 
-<img src="https://github.com/cap-ntu/Morph/blob/master/DOC/workflow.png" width="80%" height="80%">
+<img src="https://raw.githubusercontent.com/cap-ntu/Morph/master/DOC/workflow.png" width="80%" height="80%">
 
 The user submit a transcoding task by uploading a video file and specifying the transcoding parameters. The video content will be segmented into independent video blocks according to the group of pictures (GOP) structure. The video block information of the task will be then put into the scheduling queue. 
 
