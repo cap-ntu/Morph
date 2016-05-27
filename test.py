@@ -25,9 +25,9 @@ def get_pending_task():
         sql_cmd = 'SELECT * FROM task_info WHERE task_ongoing = 1'
         cur.execute(sql_cmd)
         rows = cur.fetchall()
-        print rows
+        print len(rows)
         con.close()
-        return ret
+        return 0
     except Exception, e:
         print str(e)
         return -1
