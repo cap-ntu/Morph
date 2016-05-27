@@ -175,10 +175,9 @@ Parameters for the command line:
 
      -l: local video file
      -u: url of the video file
-     -t: task id (optional)
      -p: priority (optional)
-     -s: resolution
-
+     -s: target resolutions
+     
 </html>
 
 Submit a new transcoding task by CLI
