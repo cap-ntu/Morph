@@ -193,7 +193,7 @@ python cli_query.py –k taskid
 
 ### RPC
 
-We adopt the SimpleXML as the RPC library, the APIs for submitting transcoding task and querying task status are as follows:
+We adopt [SimpleXMLRPCServer](https://docs.python.org/2/library/simplexmlrpcserver.html) for implementing RPC, the APIs for submitting transcoding task and querying task status are as follows:
 
 Submit a new transcoding task (URI can be a URL or local file path)
 ```bash
