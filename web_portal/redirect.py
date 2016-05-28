@@ -96,12 +96,14 @@ class home:
             data = homepage.read()
             return data
 
-class submit_request:
     def POST(self):
-        x = web.input(myfile={})
-        web.debug(x['myfile'].filename) # This is the filename
-        web.debug(x['myfile'].value) # This is the file contents
-        web.debug(x['myfile'].file.read()) # Or use a file(-like) object
+        x = web.input(file_name={}, )
+        web.debug(x['file_name'].filename) # This is the filename
+        web.debug(x['file_name'].value) # This is the file contents
+        web.debug(x['file_name'].file.read()) # Or use a file(-like) object
+        print x.keys()
+
+
         raise web.seeother('/')
 
 application = web.application(urls, globals()).wsgifunc()
