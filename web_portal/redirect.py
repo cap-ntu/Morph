@@ -1,7 +1,7 @@
 '''
 Author: Guanyu Gao
 Email: guanyugao@gmail.com
-Description: 
+Description:
 Web protal for submitting transcoding task and querying task progress.
 The users can access via RESTful API.
 '''
@@ -94,6 +94,13 @@ class home:
         with open('/var/www/Morph/web_portal/home.html', 'r') as homepage:
             data = homepage.read()
             return data
+
+    def POST(self):
+        x = web.input(myfile={})
+        web.debug(x['myfile'].filename) # This is the filename
+        web.debug(x['myfile'].value) # This is the file contents
+        web.debug(x['myfile'].file.read()) # Or use a file(-like) object
+        raise web.seeother('/')
 
 application = web.application(urls, globals()).wsgifunc()
 
