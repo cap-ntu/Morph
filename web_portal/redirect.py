@@ -1,6 +1,9 @@
 '''
-Web protal for submitting transcoding task and querying task progress
-The users can access via RESTful API
+Author: Guanyu Gao
+Email: guanyugao@gmail.com
+Description: 
+Web protal for submitting transcoding task and querying task progress.
+The users can access via RESTful API.
 '''
 
 import os
@@ -88,7 +91,9 @@ class get_progress:
 
 class home:
     def GET(self):
-        return "Restful API for Video Transcoding"
+        with open('/var/www/Morph/web_portal/home.html', 'r') as homepage:
+            data = homepage.read()
+            return data
 
 application = web.application(urls, globals()).wsgifunc()
 
