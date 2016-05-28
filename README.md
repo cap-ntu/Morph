@@ -235,6 +235,16 @@ Return:
 In the above command, the task ID is 'ddsdd123', specified by '-k'. 
 
 ## Advanced Usage
+We can start the controller to dynamically control the transcoding workers. To do this, we first need to add the information of the available VM instances or containers to the file **vm.list**. In this file, each line corresponds to the host name of an instance or a container. We can execute the command **hostname** to obtain the name of an instance or a container, and then, file the host name into the file **vm.list**. After that, we can start the controller.
+```bash
+python controller.py
+```
+We can observe the state of each worker in the MySQL database.
+```bash
+use morph
+select * from server_info;
+```
+The worker node will read the value of the field **state** from the database to control itself. 
 
 ## Performance
 The duration of the test video file is 138 minutes. The resolution is 1920x1080, and the bitrate is 2399 kb/s. The video data is encoded in H.264, and the audio data is encoded in AAC. The CPU frequency of the servers is 2.10GHz. The master node is allocated with 8 CPU cores, and the memory size is 8GB. The worker node is allocated with 4 CPU cores, and the memory size is 2GB. We use the Docker for the resource allocation. 
