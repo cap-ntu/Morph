@@ -2,11 +2,30 @@
 <html>
 <body>
 
-<form action="upload.php" method="post" enctype="multipart/form-data">
-    Select image to upload:
-        <input type="file" name="fileToUpload" id="fileToUpload">
-            <input type="submit" value="Upload Image" name="submit">
-            </form>
+Demo page of Morph
+<br>
+<br>
 
-            </body>
-            </html>
+<form action = "submit_request" method="post" enctype="multipart/form-data">
+
+<fieldset>
+Select video file <br>
+<input type   = "file" name = "file_name" id = "video_file_name"> <br>
+<br>
+
+Target resolutions <br>
+<input type="checkbox" name="res_240p" value="res_240">240p <br>
+<input type="checkbox" name="res_360p" value="res_360">360p <br>
+<input type="checkbox" name="res_480p" value="res_480">480p <br>
+<input type="checkbox" name="res_720p" value="res_720">720p <br>
+</fieldset>
+<br>
+<input type="submit" value="Submit Request">
+
+</form>
+
+
+</body>
+</html>
+
+
