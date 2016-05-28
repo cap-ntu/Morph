@@ -12,7 +12,7 @@ import MySQLdb
 from sys_info import *
 
 
-sched_feq = 60
+sched_feq = 20
 list_name = 'vm.list'
 ip        = config.mysql_ip
 passwd    = config.mysql_password
@@ -42,7 +42,7 @@ def db_update_worker_state(host_name, state):
         cur = con.cursor()
         sql_cmd = "UPDATE server_info SET state = %d WHERE id = '%s'" \
                     % (state, host_name)
-        print sql_cmd
+        #print sql_cmd
         cur.execute(sql_cmd)
         con.commit()
         con.close()
@@ -84,9 +84,12 @@ if __name__ == '__main__':
         #get the pending tasks
         task_list = get_pending_task()
         value = feature_extraction(task_list)
+        print 'current workload:', value
+
         opt_num = policy(value)
         if opt_num > capacity:
             opt_num = capacity
+        print 'number of instances that should be provisioned:', opt_num
 
         up_set   = []
         up_num   = 0
