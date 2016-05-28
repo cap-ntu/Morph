@@ -14,9 +14,10 @@ from random import Random
 
 urls = (
     '/', 'home',
-    '/get_progress', 'get_progress',
-    '/submit_file', 'submit_file',
-    '/submit_url', 'submit_url'
+    '/get_progress',    'get_progress',
+    '/submit_file',     'submit_file',
+    '/submit_url',      'submit_url',
+    '/submit_request',  'submit_request'
     )
 
 work_path = '/tmp'
@@ -95,6 +96,7 @@ class home:
             data = homepage.read()
             return data
 
+class submit_request:
     def POST(self):
         x = web.input(myfile={})
         web.debug(x['myfile'].filename) # This is the filename
