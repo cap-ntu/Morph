@@ -6,7 +6,8 @@
 * [Workflow](#workflow)
 * [Installation](#installation)
 * [Programming Interface](#programming-interface)
-* [Usage](#usage)
+* [Basic Usage](#basic-usage)
+* [Advanced Usage](#advanced-usage)
 * [Performance](#performance)
 * [License](#license)
 * [Contact](#contact)
@@ -206,7 +207,7 @@ get_progress(task_id)
 ```
 
 
-## Usage
+##Basic Usage
 
 The easiest way to use this software is via command line. With this method, you do not need to configure the webserver or write the code for calling RPC. There are two programs serving as the command line, **cli_query.py** and **cli_submit.py**. Note that the **config.py** should be kept a copy with these two programs, since they need to the configuration information from it. 
 
@@ -233,6 +234,7 @@ Return:
 ```
 In the above command, the task ID is 'ddsdd123', specified by '-k'. 
 
+## Advanced Usage
 
 ## Performance
 The duration of the test video file is 138 minutes. The resolution is 1920x1080, and the bitrate is 2399 kb/s. The video data is encoded in H.264, and the audio data is encoded in AAC. The CPU frequency of the servers is 2.10GHz. The master node is allocated with 8 CPU cores, and the memory size is 8GB. The worker node is allocated with 4 CPU cores, and the memory size is 2GB. We use the Docker for the resource allocation. 
