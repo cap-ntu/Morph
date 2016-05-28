@@ -29,7 +29,8 @@
 <li><a href="#workflow">Workflow</a></li>
 <li><a href="#installation">Installation</a></li>
 <li><a href="#programming-interface">Programming Interface</a></li>
-<li><a href="#usage">Usage</a></li>
+<li><a href="#basic-usage">Basic Usage</a></li>
+<li><a href="#advanced-usage">Advanced Usage</a></li>
 <li><a href="#performance">Performance</a></li>
 <li><a href="#license">License</a></li>
 <li><a href="#contact">Contact</a></li>
@@ -207,9 +208,8 @@ tail worker.<span class="pl-k">*</span>.log</pre></div>
 
 <pre><code> -l: local video file
  -u: url of the video file
- -t: task id (optional)
  -p: priority (optional)
- -s: resolution
+ -s: target resolutions
 </code></pre>
 
 <p></p>
@@ -225,7 +225,7 @@ tail worker.<span class="pl-k">*</span>.log</pre></div>
 <h3>
 <a id="rpc" class="anchor" href="#rpc" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>RPC</h3>
 
-<p>We adopt the SimpleXML as the RPC library, the APIs for submitting transcoding task and querying task status are as follows:</p>
+<p>We adopt <a href="https://docs.python.org/2/library/simplexmlrpcserver.html">SimpleXMLRPCServer</a> for implementing RPC, the APIs for submitting transcoding task and querying task status are as follows:</p>
 
 <p>Submit a new transcoding task (URI can be a URL or local file path)</p>
 
@@ -236,7 +236,7 @@ tail worker.<span class="pl-k">*</span>.log</pre></div>
 <div class="highlight highlight-source-shell"><pre>get_progress(task_id)</pre></div>
 
 <h2>
-<a id="usage" class="anchor" href="#usage" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Usage</h2>
+<a id="basic-usage" class="anchor" href="#basic-usage" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Basic Usage</h2>
 
 <p>The easiest way to use this software is via command line. With this method, you do not need to configure the webserver or write the code for calling RPC. There are two programs serving as the command line, <strong>cli_query.py</strong> and <strong>cli_submit.py</strong>. Note that the <strong>config.py</strong> should be kept a copy with these two programs, since they need to the configuration information from it. </p>
 
@@ -265,6 +265,20 @@ Return:
 2. The file path of the target video file <span class="pl-k">if</span> it has been finished. </pre></div>
 
 <p>In the above command, the task ID is 'ddsdd123', specified by '-k'. </p>
+
+<h2>
+<a id="advanced-usage" class="anchor" href="#advanced-usage" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Advanced Usage</h2>
+
+<p>We can start the controller to dynamically control the transcoding workers. To do this, we first need to add the information of the available VM instances or containers to the file <strong>vm.list</strong>. In this file, each line corresponds to the host name of an instance or a container. We can execute the command <strong>hostname</strong> to obtain the name of an instance or a container, and then, file the host name into the file <strong>vm.list</strong>. After that, we can start the controller.</p>
+
+<div class="highlight highlight-source-shell"><pre>python controller.py</pre></div>
+
+<p>We can observe the state of each worker in the MySQL database.</p>
+
+<div class="highlight highlight-source-shell"><pre>use morph
+<span class="pl-k">select</span> <span class="pl-k">*</span> from server_info<span class="pl-k">;</span></pre></div>
+
+<p>The worker node will read the value of the field <strong>state</strong> from the database to control itself. </p>
 
 <h2>
 <a id="performance" class="anchor" href="#performance" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Performance</h2>
