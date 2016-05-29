@@ -20,8 +20,8 @@ urls = (
     )
 
 work_path = '/tmp'
-cln_path  = '/home/transcoding/client.py'
-qry_path  = '/home/transcoding/query.py'
+cln_path  = '/var/www/Morph/cli_submit.py'
+qry_path  = '/var/www/Morph/cli_query.py'
 
 '''
 generate a random key for the task
@@ -40,10 +40,13 @@ start a transcoding operation
 '''
 def start_transcoding(file_name, key, res):
     cmd = "python " + cln_path + " -l " + file_name + " -t " + key + " -s " + res
+    web.debug(cmd)
+    os.chdir('/var/www/Morph/')
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
     stdout, stderr = p.communicate()
     ret = p.returncode
-    ret = json.dumps({"key": key, "ret": ret})
+    web.debug(stdout)
+    web.debug(stderr)
     return ret
 
 '''
@@ -59,19 +62,19 @@ def save_file(upload_file, key):
     return file_name
 
 '''
-The restful API interface for submitting a task
+The restful API interface for submitting a video file
 '''
-class submit_file:
+class rest_submit_file:
     def POST(self):
         upload_file = web.input(video_file = {}, target_resolution = None, priority = None)
         key = gen_key()
         res = upload_file['target_resolution']
-        file_name = save_file(upload_file, key):
-        return start_transcoding(file_name, key, res)
+        file_name = save_file(upload_file, key)
+        ret = start_transcoding(file_name, key, res)
+        ret = json.dumps({"key": key, "ret": ret})
+        return ret
 
-
-class submit_url:
-
+class rest_submit_url:
     def POST(self):
         new_task = web.input(url = None, target_resolution = None, priority = None)
         url = new_task['url']
@@ -87,19 +90,30 @@ class submit_url:
         return ret
 
 
-class get_progress:
-
+class rest_get_progress:
     def POST(self):
         s = web.input(key = None)
-
+        os.chdir('/var/www/Morph/')
         cmd = "python " + qry_path + " -k " + str(s.key)
         web.debug(cmd)
         p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
         stdout, stderr = p.communicate()
         prg = p.returncode
-
         ret = json.dumps({"key": str(s.key), "ret": str(prg)})
         return ret
+
+class get_progress:
+    def POST(self):
+        data = web.data()
+        web.debug(data)
+        (_, key) = data.split('=')
+        os.chdir('/var/www/Morph/')
+        cmd = "python " + qry_path + " -k " + key
+        web.debug(cmd)
+        p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+        stdout, stderr = p.communicate()
+        prg = p.returncode
+        return str(prg)
 
 '''
 The home page for the Demo
@@ -114,7 +128,7 @@ class home:
         x = web.input(video_file={}, p_240=None, p_360=None,\
                 p_480=None, p_720=None)
         key = gen_key()
-        file_name = save_file(x['video_file'], key)
+        file_name = save_file(x, key) 
         res = ''
         if x['p_240'] == '240':
             res += '426x240 '
@@ -124,13 +138,19 @@ class home:
             res += '854x480 '
         if x['p_720'] == '720':
             res += '1280x720 '
-        return start_transcoding(file_name, key, res)
+        ret = start_transcoding(file_name, key, res)
+        state = ''
+        if ret == 0:
+            state = 'successful'
+        else:
+            state = 'failed'
+        render = web.template.frender('/var/www/Morph/web_portal/result.html')
+        return render(key, state, res)
 
 '''
 the main program for wsgi
 '''
 application = web.application(urls, globals()).wsgifunc()
-
 
 
 

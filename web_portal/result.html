@@ -1,0 +1,48 @@
+$def with (task_id, state, res)
+
+
+<!DOCTYPE html>
+<html>
+<body onload="update_progress();">
+<script language="javascript">
+var timer = null;
+function update_progress() 
+{
+    timer = setInterval(get_progress, 5000);
+}
+
+function get_progress()
+{
+    var xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function()
+    {
+        if(xhr.readyState == 4 && xhr.status == 200){
+            document.getElementById("trans_prog").value = xhr.responseText;
+            prog = parseInt(xhr.responseText)
+            if(prog < 0 || prog >= 100){
+                clearInterval(timer);
+            }
+        }
+    };
+    xhr.open("POST", "morph/get_progress", true);
+    xhr.send("key=$task_id");
+}
+</script>
+
+Demo page of Morph
+<br>
+<br>
+
+<fieldset>
+Task ID: $task_id       <br>
+Submit state: $state    <br>
+Target resolution: $res <br>
+Progress: <input type="text" name="progress" id="trans_prog" value="0" readonly><br>
+</fieldset>
+
+
+
+</body>
+</html>
+
+
