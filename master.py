@@ -580,7 +580,7 @@ class task_tracker(threading.Thread):
 
             new_file = os.path.join(config.master_path, \
                         task_id + '_' + resolution + suf)
-            cmd = 'ffmpeg -f concat -i ' + list_path + ' -c copy ' + new_file
+            cmd = 'ffmpeg -f concat -safe 0 -i ' + list_path + ' -c copy ' + new_file
             logger.debug('%s', cmd)
             p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
             stdout, stderr = p.communicate()
