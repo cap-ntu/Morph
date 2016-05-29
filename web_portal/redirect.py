@@ -16,8 +16,7 @@ urls = (
     '/', 'home',
     '/get_progress',    'get_progress',
     '/submit_file',     'submit_file',
-    '/submit_url',      'submit_url',
-    '/submit_request',  'submit_request'
+    '/submit_url',      'submit_url'
     )
 
 work_path = '/tmp'
@@ -97,10 +96,11 @@ class home:
             return data
 
     def POST(self):
-        x = web.input(file_name={}, )
-        web.debug(x['file_name'].filename) # This is the filename
-        web.debug(x['file_name'].value) # This is the file contents
-        web.debug(x['file_name'].file.read()) # Or use a file(-like) object
+        x = web.input(video_file=None, p_240=None, p_360=None,\
+                p_480=None, p_720=None)
+        web.debug(x['video_file'].filename) # This is the filename
+        web.debug(x['video_file'].value) # This is the file contents
+        web.debug(x['video_file'].file.read()) # Or use a file(-like) object
         print x.keys()
 
 
