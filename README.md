@@ -58,6 +58,7 @@ It may require to install some lacked libraries, e.g., pycurl, mysqldb.
 sudo apt-get update    
 sudo apt-get install python-pycurl
 sudo apt-get install python-mysqldb
+sudo apt-get install python-numpy
 ```
 
 Step 1: Clone the code from Github
