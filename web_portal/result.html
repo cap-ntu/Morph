@@ -21,6 +21,8 @@ function get_progress()
             prog = parseInt(xhr.responseText)
             if(prog < 0 || prog >= 100){
                 clearInterval(timer);
+                if (prog != 100)
+                    document.getElementById("trans_prog").value = 'Error';
             }
         }
     };
