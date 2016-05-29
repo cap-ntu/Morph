@@ -23,6 +23,9 @@ work_path = '/tmp'
 cln_path  = '/home/transcoding/client.py'
 qry_path  = '/home/transcoding/query.py'
 
+'''
+generate a random key for the task
+'''
 def gen_key(randomlength = 8):
     str     = ''
     chars   = 'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz0123456789'
@@ -32,30 +35,39 @@ def gen_key(randomlength = 8):
         str += chars[random.randint(0, length)]
     return str
 
+'''
+start a transcoding operation
+'''
+def start_transcoding(file_name, key, res):
+    cmd = "python " + cln_path + " -l " + file_name + " -t " + key + " -s " + res
+    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+    stdout, stderr = p.communicate()
+    ret = p.returncode
+    ret = json.dumps({"key": key, "ret": ret})
+    return ret
 
+'''
+save the uploaded video file
+'''
+def save_file(upload_file, key):
+    file_name = upload_file['video_file'].filename
+    _, ext = os.path.splitext(file_name)
+    file_name = os.path.join(work_path, key + ext)
+    f = open(file_name, "wb")
+    f.write(upload_file['video_file'].value)
+    f.close()
+    return file_name
+
+'''
+The restful API interface for submitting a task
+'''
 class submit_file:
-
     def POST(self):
-
         upload_file = web.input(video_file = {}, target_resolution = None, priority = None)
-        file_name = upload_file['video_file'].filename
-        _, ext = os.path.splitext(file_name)
-
         key = gen_key()
-        file_name = os.path.join(work_path, key + ext)
-        f = open(file_name, "wb")
-        f.write(upload_file['video_file'].value)
-        f.close()
-
         res = upload_file['target_resolution']
-
-        cmd = "python " + cln_path + " -l " + file_name + " -t " + key + " -s " + res
-        p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-        stdout, stderr = p.communicate()
-        ret = p.returncode
-
-        ret = json.dumps({"key": key, "ret": 0})
-        return ret
+        file_name = save_file(upload_file, key):
+        return start_transcoding(file_name, key, res)
 
 
 class submit_url:
@@ -89,6 +101,9 @@ class get_progress:
         ret = json.dumps({"key": str(s.key), "ret": str(prg)})
         return ret
 
+'''
+The home page for the Demo
+'''
 class home:
     def GET(self):
         with open('/var/www/Morph/web_portal/home.html', 'r') as homepage:
@@ -96,17 +111,26 @@ class home:
             return data
 
     def POST(self):
-        x = web.input(video_file=None, p_240=None, p_360=None,\
+        x = web.input(video_file={}, p_240=None, p_360=None,\
                 p_480=None, p_720=None)
-        web.debug(x['video_file'].filename) # This is the filename
-        web.debug(x['video_file'].value) # This is the file contents
-        web.debug(x['video_file'].file.read()) # Or use a file(-like) object
-        print x.keys()
+        key = gen_key()
+        file_name = save_file(x['video_file'], key)
+        res = ''
+        if x['p_240'] == '240':
+            res += '426x240 '
+        if x['p_360'] == '360':
+            res += '640x360 '
+        if x['p_480'] == '480':
+            res += '854x480 '
+        if x['p_720'] == '720':
+            res += '1280x720 '
+        return start_transcoding(file_name, key, res)
 
-
-        raise web.seeother('/')
-
+'''
+the main program for wsgi
+'''
 application = web.application(urls, globals()).wsgifunc()
+
 
 
 
