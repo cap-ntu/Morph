@@ -11,6 +11,19 @@ function update_progress()
     timer = setInterval(get_progress, 5000);
 }
 
+function get_tgt_files()
+{
+    var xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function()
+    {
+        if(xhr.readyState == 4 && xhr.status == 200){
+            document.getElementById("final_msg").value = xhr.responseText;
+            }
+    }
+    xhr.open("POST", "/morph/get_tgt_files", true);
+    xhr.send("key=$task_id");
+}
+
 function get_progress()
 {
     var xhr = new XMLHttpRequest();
@@ -23,6 +36,8 @@ function get_progress()
                 clearInterval(timer);
                 if (prog != 100)
                     document.getElementById("trans_prog").value = 'Error';
+                if (prog == 100)
+                    get_tgt_files();
             }
         }
     };
@@ -41,9 +56,8 @@ Submit state: $state    <br>
 Target resolution: $res <br>
 Progress: <input type="text" name="progress" id="trans_prog" value="waiting" readonly><br>
 Don't refresh, the progress can be updated automatically! <br>
+<div id="final_msg" value="hello"></div>
 </fieldset>
-
-
 
 </body>
 </html>

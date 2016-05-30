@@ -14,13 +14,15 @@ from random import Random
 
 urls = (
     '/', 'home',
-    '/get_progress',    'get_progress',
-    '/submit_file',     'submit_file',
-    '/submit_url',      'submit_url',
-    '/get_result',      'get_result'
+    '/get_progress',         'get_progress',
+    '/rest_submit_file',     'rest_submit_file',
+    '/rest_submit_url',      'rest_submit_url',
+    '/rest_get_progress',    'rest_get_progress',
+    '/get_result',           'get_result',
+    '/get_tgt_files',        'get_tgt_files'
     )
 
-work_path = '/tmp'
+work_path = '/data/4/tmp/'
 cln_path  = '/var/www/Morph/cli_submit.py'
 qry_path  = '/var/www/Morph/cli_query.py'
 
@@ -103,6 +105,9 @@ class rest_get_progress:
         ret = json.dumps({"key": str(s.key), "ret": str(prg)})
         return ret
 
+'''
+Get the transcoding progress
+'''
 class get_progress:
     def POST(self):
         data = web.data()
@@ -114,6 +119,7 @@ class get_progress:
         p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
         stdout, stderr = p.communicate()
         prg = p.returncode
+        web.debug(stdout)
         return str(prg)
 
 '''
@@ -156,7 +162,23 @@ class get_result:
         web.debug(data)
         render = web.template.frender('/var/www/Morph/web_portal/result.html')
         return render(data.key, data.state, data.res) 
-        
+
+class get_tgt_files:
+    def POST(self):
+        data = web.data()
+        web.debug(data)
+        (_, key) = data.split('=')
+        os.chdir('/var/www/Morph/')
+        cmd = "python " + qry_path + " -k " + key
+        web.debug(cmd)
+        p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+        stdout, stderr = p.communicate()
+        web.debug(stdout)
+        prg = p.returncode
+        if prg == 100:
+            return stdout
+        else:
+            return ""
 
 '''
 the main program for wsgi
