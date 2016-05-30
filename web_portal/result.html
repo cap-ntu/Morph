@@ -17,7 +17,7 @@ function get_tgt_files()
     xhr.onreadystatechange = function()
     {
         if(xhr.readyState == 4 && xhr.status == 200){
-            document.getElementById("final_msg").value = xhr.responseText;
+            document.getElementById("final_msg").innerHTML = xhr.responseText;
             }
     }
     xhr.open("POST", "/morph/get_tgt_files", true);
@@ -49,16 +49,15 @@ function get_progress()
 Demo page of Morph
 <br>
 <br>
-
 <fieldset>
 Task ID: $task_id       <br>
 Submit state: $state    <br>
 Target resolution: $res <br>
 Progress: <input type="text" name="progress" id="trans_prog" value="waiting" readonly><br>
 Don't refresh, the progress can be updated automatically! <br>
-<div id="final_msg" value="hello"></div>
 </fieldset>
-
+<br>
+<div id="final_msg"/>
 </body>
 </html>
 
