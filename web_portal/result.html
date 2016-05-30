@@ -26,7 +26,7 @@ function get_progress()
             }
         }
     };
-    xhr.open("POST", "morph/get_progress", true);
+    xhr.open("POST", "/morph/get_progress", true);
     xhr.send("key=$task_id");
 }
 </script>
@@ -39,7 +39,8 @@ Demo page of Morph
 Task ID: $task_id       <br>
 Submit state: $state    <br>
 Target resolution: $res <br>
-Progress: <input type="text" name="progress" id="trans_prog" value="0" readonly><br>
+Progress: <input type="text" name="progress" id="trans_prog" value="waiting" readonly><br>
+Don't refresh, the progress can be updated automatically! <br>
 </fieldset>
 
 

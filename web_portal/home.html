@@ -9,26 +9,124 @@ This is the home page of Morph
 <html>
 <body>
 
+<script language="javascript">
+function validation(thisform)
+{
+   var x_1 = document.getElementById("p_240").checked;
+   var x_2 = document.getElementById("p_360").checked;
+   var x_3 = document.getElementById("p_480").checked;
+   var x_4 = document.getElementById("p_720").checked;
+   if(x_1 == false && x_2 == false && x_3 == false && x_4 == false)
+   {
+        document.getElementById("valid_msg").innerHTML = "At least one target resolution should be selected";
+        return false;
+   }
+   
+   with(thisform)
+   {
+      if(validateFileExtension(video_file, "valid_msg", "Only MP4 container is accepted now!",
+      new Array("mp4")) == false)
+      {
+         return false;
+      }
+      if(validateFileSize(video_file, 150*1048576, "valid_msg", "Video size should be less than 150MB!")==false)
+      {
+         return false;
+      }
+   }
+   document.getElementById("valid_msg").innerHTML = "Don't refresh, the video file is being uploaded!";
+   document.getElementById("submit_btn_id").disabled = true;
+}
+
+function validateFileExtension(component,msg_id,msg,extns)
+{
+   var flag=0;
+   with(component)
+   {
+      var ext=value.substring(value.lastIndexOf('.')+1);
+      for(i=0;i<extns.length;i++)
+      {
+         if(ext==extns[i])
+         {
+            flag=0;
+            break;
+         }
+         else
+         {
+            flag=1;
+         }
+      }
+      if(flag!=0)
+      {
+         document.getElementById(msg_id).innerHTML=msg;
+         component.value="";
+         component.style.backgroundColor="#eab1b1";
+         component.style.border="thin solid #FF0000";
+         component.focus();
+         return false;
+      }
+      else
+      {
+         return true;
+      }
+   }
+}
+
+function validateFileSize(component,maxSize,msg_id,msg)
+{
+   if(navigator.appName=="Microsoft Internet Explorer")
+   {
+      if(component.value)
+      {
+         var oas=new ActiveXObject("Scripting.FileSystemObject");
+         var e=oas.getFile(component.value);
+         var size=e.size;
+      }
+   }
+   else
+   {
+      if(component.files[0]!=undefined)
+      {
+         size = component.files[0].size;
+      }
+   }
+   if(size!=undefined && size>maxSize)
+   {
+      document.getElementById(msg_id).innerHTML=msg;
+      component.value="";
+      component.style.backgroundColor="#eab1b1";
+      component.style.border="thin solid #FF0000";
+      component.focus();
+      return false;
+   }
+   else
+   {
+      return true;
+   }
+}
+</script>
+
+
 Demo page of Morph
 <br>
 <br>
 
-<form action = "" method="post" enctype="multipart/form-data">
+<form action = "" method="post" enctype="multipart/form-data" onsubmit="return validation(this)">
 
 <fieldset>
 Select video file <br>
-<input type   = "file" name = "video_file" id = "id_video_file"> <br>
+<input type="file" name="video_file" id="id_video_file" accept=".mp4"> <br>
 <br>
 
 Target resolutions <br>
-<input type="checkbox" name="p_240" value="240">240p <br>
-<input type="checkbox" name="p_360" value="360">360p <br>
-<input type="checkbox" name="p_480" value="480">480p <br>
-<input type="checkbox" name="p_720" value="720">720p <br>
+<input type="checkbox" name="p_240" id="p_240" value="240">240p <br>
+<input type="checkbox" name="p_360" id="p_360" value="360">360p <br>
+<input type="checkbox" name="p_480" id="p_480" value="480">480p <br>
+<input type="checkbox" name="p_720" id="p_720" value="720">720p <br>
 </fieldset>
 <br>
-<input type="submit" value="Submit Request">
-
+<input type="submit" name="submit_btn" id="submit_btn_id" value="Submit Request">
+<div id="valid_msg"/>
 </form>
 
 

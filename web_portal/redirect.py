@@ -16,7 +16,8 @@ urls = (
     '/', 'home',
     '/get_progress',    'get_progress',
     '/submit_file',     'submit_file',
-    '/submit_url',      'submit_url'
+    '/submit_url',      'submit_url',
+    '/get_result',      'get_result'
     )
 
 work_path = '/tmp'
@@ -144,8 +145,18 @@ class home:
             state = 'successful'
         else:
             state = 'failed'
+        other_page = "get_result?" + "key=" + key + "&" + \
+                     "res=" + res + '&' + \
+                     "state=" + state
+        raise web.seeother(other_page)
+
+class get_result:
+    def GET(self):
+        data = web.input(res=None, state=None, key=None)
+        web.debug(data)
         render = web.template.frender('/var/www/Morph/web_portal/result.html')
-        return render(key, state, res)
+        return render(data.key, data.state, data.res) 
+        
 
 '''
 the main program for wsgi
