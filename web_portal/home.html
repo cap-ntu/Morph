@@ -29,7 +29,7 @@ function validation(thisform)
       {
          return false;
       }
-      if(validateFileSize(video_file, 150*1048576, "valid_msg", "Video size should be less than 150MB!")==false)
+      if(validateFileSize(video_file, 1000*1048576, "valid_msg", "Video size should be less than 1000MB!")==false)
       {
          return false;
       }
@@ -114,7 +114,7 @@ Demo page of Morph
 <form action = "" method="post" enctype="multipart/form-data" onsubmit="return validation(this)">
 
 <fieldset>
-Select video file <br>
+Select video file (MP4 container, less than 1000MB) <br>
 <input type="file" name="video_file" id="id_video_file" accept=".mp4"> <br>
 <br>
 
