@@ -177,11 +177,12 @@ class get_tgt_files:
         prg = p.returncode
         if prg == 100:
             f = stdout.split('\'')
-            ret = 'Transcoded video files:' + '<br>'
+            ret = '<h2>Transcoded video files</h2>' + '<pre><code>'
             for i in f:
                 if i.find('Morph') < 0:
                     continue
                 ret += i.replace('/var/www', 'http://155.69.146.43') + '<br>'
+            ret += '</code></pre>'
             web.debug(ret)
             return ret
         if prg != 100:
