@@ -1,115 +1,135 @@
-<!--
-Author: Guanyu Gao
-Email:  guanyugao@gmail.com
-Description:
-This is the home page of Morph
--->
-
-<!DOCTYPE html>
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN">
 <html>
-<body>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"> 
+        <title>Welcome to Morph!</title> 
+        <link rel="stylesheet" type="text/css" href="/morph/static/morph.css"> 
+        <link rel="SHORTCUT ICON" href="./static/favicon.ico"> 
+    </head>
+    
+    <body> 
+        <script language="javascript">
+            function validation(thisform) {
+                var x_1 = document.getElementById("p_240").checked;
+                var x_2 = document.getElementById("p_360").checked;
+                var x_3 = document.getElementById("p_480").checked;
+                var x_4 = document.getElementById("p_720").checked;
+                if (x_1 == false && x_2 == false && x_3 == false && x_4 == false) {
+                    document.getElementById("valid_msg").innerHTML = "At least one target resolution should be selected";
+                    return false;
+                }
 
-<script language="javascript">
-function validation(thisform)
-{
-   var x_1 = document.getElementById("p_240").checked;
-   var x_2 = document.getElementById("p_360").checked;
-   var x_3 = document.getElementById("p_480").checked;
-   var x_4 = document.getElementById("p_720").checked;
-   if(x_1 == false && x_2 == false && x_3 == false && x_4 == false)
-   {
-        document.getElementById("valid_msg").innerHTML = "At least one target resolution should be selected";
-        return false;
-   }
-   
-   with(thisform)
-   {
-      if(validateFileExtension(video_file, "valid_msg", "Only MP4 container is accepted now!",
-      new Array("mp4")) == false)
-      {
-         return false;
-      }
-      if(validateFileSize(video_file, 1000*1048576, "valid_msg", "Video size should be less than 1000MB!")==false)
-      {
-         return false;
-      }
-   }
-   document.getElementById("valid_msg").innerHTML = "Don't refresh, the video file is being uploaded!";
-   document.getElementById("submit_btn_id").disabled = true;
-}
+                with (thisform) {
+                    if (validateFileExtension(video_file, "valid_msg", "Only MP4 container is accepted now!",
+                    new Array("mp4")) == false) {
+                        return false;
+                    }
+                    if (validateFileSize(video_file, 1000 * 1048576, "valid_msg", "Video size should be less than 1000MB!") == false) {
+                        return false;
+                    }
+                }
+                document.getElementById("valid_msg").innerHTML = "Don't refresh, the video file is being uploaded!";
+                document.getElementById("submit_btn_id").disabled = true;
+            }
 
-function validateFileExtension(component,msg_id,msg,extns)
-{
-   var flag=0;
-   with(component)
-   {
-      var ext=value.substring(value.lastIndexOf('.')+1);
-      for(i=0;i<extns.length;i++)
-      {
-         if(ext==extns[i])
-         {
-            flag=0;
-            break;
-         }
-         else
-         {
-            flag=1;
-         }
-      }
-      if(flag!=0)
-      {
-         document.getElementById(msg_id).innerHTML=msg;
-         component.value="";
-         component.style.backgroundColor="#eab1b1";
-         component.style.border="thin solid #FF0000";
-         component.focus();
-         return false;
-      }
-      else
-      {
-         return true;
-      }
-   }
-}
+            function validateFileExtension(component, msg_id, msg, extns) {
+                var flag = 0;
+                with (component) {
+                    var ext = value.substring(value.lastIndexOf('.') + 1);
+                    for (i = 0; i < extns.length; i++) {
+                        if (ext == extns[i]) {
+                            flag = 0;
+                            break;
+                        }
+                        else {
+                            flag = 1;
+                        }
+                    }
+                    if (flag != 0) {
+                        document.getElementById(msg_id).innerHTML = msg;
+                        component.value = "";
+                        component.style.backgroundColor = "#eab1b1";
+                        component.style.border = "thin solid #FF0000";
+                        component.focus();
+                        return false;
+                    }
+                    else {
+                        return true;
+                    }
+                }
+            }
 
-function validateFileSize(component,maxSize,msg_id,msg)
-{
-   if(navigator.appName=="Microsoft Internet Explorer")
-   {
-      if(component.value)
-      {
-         var oas=new ActiveXObject("Scripting.FileSystemObject");
-         var e=oas.getFile(component.value);
-         var size=e.size;
-      }
-   }
-   else
-   {
-      if(component.files[0]!=undefined)
-      {
-         size = component.files[0].size;
-      }
-   }
-   if(size!=undefined && size>maxSize)
-   {
-      document.getElementById(msg_id).innerHTML=msg;
-      component.value="";
-      component.style.backgroundColor="#eab1b1";
-      component.style.border="thin solid #FF0000";
-      component.focus();
-      return false;
-   }
-   else
-   {
-      return true;
-   }
-}
-</script>
+            function validateFileSize(component, maxSize, msg_id, msg) {
+                if (navigator.appName == "Microsoft Internet Explorer") {
+                    if (component.value) {
+                        var oas = new ActiveXObject("Scripting.FileSystemObject");
+                        var e = oas.getFile(component.value);
+                        var size = e.size;
+                    }
+                }
+                else {
+                    if (component.files[0] != undefined) {
+                        size = component.files[0].size;
+                    }
+                }
+                if (size != undefined && size > maxSize) {
+                    document.getElementById(msg_id).innerHTML = msg;
+                    component.value = "";
+                    component.style.backgroundColor = "#eab1b1";
+                    component.style.border = "thin solid #FF0000";
+                    component.focus();
+                    return false;
+                }
+                else {
+                    return true;
+                }
+            }
+        </script>
+ 
+        <div id="header">
+            <table class="header">
+                <tbody>
+                    <tr>
+                        <td class="logo"><a href="http://155.69.146.43/morph" title="Home"><img src="/morph/static/morph.gif" alt=""></a></td> 
+                        <td class="blurb">“Morph is a fast and scalable cloud transcoding system.” [<a href="http://morph.aidynamic.com/">more...</a>]</td> 
+                    </tr>
+                </tbody>
+            </table>
+        </div> 
 
+        <div id="location"> 
+                <a href="http://155.69.146.43/morph">home</a> &gt; Welcome to Morph!
+        </div>
+         
+        <div id="container"> 
+        <div id="sidebar">
+        <strong>get started</strong>
+        <ul class="body">
+            <li><a href="http://webpy.org/install">install</a></li>
+            <li><a href="http://webpy.org/docs/0.3/tutorial">tutorial</a></li>
+        </ul>
 
-Demo page of Morph
-<br>
-<br>
+        <strong>system info</strong>
+            <ul class="body">
+                <li><a href="http://webpy.org/docs/0.3/api">api reference</a></li>
+                <li><a href="http://webpy.org/cookbook/">cookbook</a></li>
+                <li><a href="http://webpy.org/src/">code examples</a></li>
+            </ul>
+
+        <strong>dive in</strong>
+            <ul class="body"> 
+                <li><a href="https://github.com/cap-ntu/Morph">source code</a></li>
+                <li><a href="https://github.com/cap-ntu/Morph/wiki">wiki page</a></li>
+                <li><a href="https://github.com/cap-ntu/Morph/issues">issue tracker</a></li>
+            </ul>
+        </div>
+
+        <div id="main"> 
+        <div id="content" class="body"> 
+        <p><strong>Morph</strong> is a cloud transcoding system that is as simple as it is powerful.</p>
+
+        <h2>Get Started!</h2>
+        <br>
 
 <form action = "" method="post" enctype="multipart/form-data" onsubmit="return validation(this)">
 
@@ -117,7 +137,6 @@ Demo page of Morph
 Select video file (MP4 container, less than 1000MB) <br>
 <input type="file" name="video_file" id="id_video_file" accept=".mp4"> <br>
 <br>
-
 Target resolutions <br>
 <input type="checkbox" name="p_240" id="p_240" value="240">240p <br>
 <input type="checkbox" name="p_360" id="p_360" value="360">360p <br>
@@ -130,7 +149,13 @@ Target resolutions <br>
 </form>
 
 
-</body>
-</html>
+</div> 
+</div>
 
+    <div id="footer"> 
+        <p>started by <a style="color: gray;" href="http://cap.sce.ntu.edu.sg/">CAP, NTU</a> (<a style="color: black;" href="mailto:ggao001@ntu.edu.sg">ggao001@ntu.edu.sg</a>)</p>
+        <p><a href="https://github.com/cap-ntu/Morph">fork this page on GitHub</a></p>
+        <p>with thanks to Web.py!</p>
+    </div> 
 
+<audio controls="controls" style="display: none;"></audio></body><style type="text/css">#yddContainer{display:block;font-family:Microsoft YaHei;position:relative;width:100%;height:100%;top:-4px;left:-4px;font-size:12px;border:1px solid}#yddTop{display:block;height:22px}#yddTopBorderlr{display:block;position:static;height:17px;padding:2px 28px;line-height:17px;font-size:12px;color:#5079bb;font-weight:bold;border-style:none solid;border-width:1px}#yddTopBorderlr .ydd-sp{position:absolute;top:2px;height:0;overflow:hidden}.ydd-icon{left:5px;width:17px;padding:0px 0px 0px 0px;padding-top:17px;background-position:-16px -44px}.ydd-close{right:5px;width:16px;padding-top:16px;background-position:left -44px}#yddKeyTitle{float:left;text-decoration:none}#yddMiddle{display:block;margin-bottom:10px}.ydd-tabs{display:block;margin:5px 0;padding:0 5px;height:18px;border-bottom:1px solid}.ydd-tab{display:block;float:left;height:18px;margin:0 5px -1px 0;padding:0 4px;line-height:18px;border:1px solid;border-bottom:none}.ydd-trans-container{display:block;line-height:160%}.ydd-trans-container a{text-decoration:none;}#yddBottom{position:absolute;bottom:0;left:0;width:100%;height:22px;line-height:22px;overflow:hidden;background-position:left -22px}.ydd-padding010{padding:0 10px}#yddWrapper{color:#252525;z-index:10001;background:url(chrome-extension://eopjamdnofihpioajgfdikhhbobonhbb/ab20.png);}#yddContainer{background:#fff;border-color:#4b7598}#yddTopBorderlr{border-color:#f0f8fc}#yddWrapper .ydd-sp{background-image:url(chrome-extension://eopjamdnofihpioajgfdikhhbobonhbb/ydd-sprite.png)}#yddWrapper a,#yddWrapper a:hover,#yddWrapper a:visited{color:#50799b}#yddWrapper .ydd-tabs{color:#959595}.ydd-tabs,.ydd-tab{background:#fff;border-color:#d5e7f3}#yddBottom{color:#363636}#yddWrapper{min-width:250px;max-width:400px;}</style></html>
