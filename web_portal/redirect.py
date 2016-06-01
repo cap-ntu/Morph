@@ -9,6 +9,7 @@ The users can access via RESTful API.
 import os
 import web
 import json
+import time
 import subprocess
 from random import Random
 
@@ -19,12 +20,16 @@ urls = (
     '/rest_submit_url',      'rest_submit_url',
     '/rest_get_progress',    'rest_get_progress',
     '/get_result',           'get_result',
-    '/get_tgt_files',        'get_tgt_files'
+    '/get_tgt_files',        'get_tgt_files',
+    '/download',             'download',
+    '/instance',             'instance'
     )
 
 work_path = '/data/4/tmp/'
 cln_path  = '/var/www/Morph/cli_submit.py'
 qry_path  = '/var/www/Morph/cli_query.py'
+tmpt_path = '/var/www/Morph/web_portal/templates' 
+
 
 '''
 generate a random key for the task
@@ -127,9 +132,9 @@ The home page for the Demo
 '''
 class home:
     def GET(self):
-        with open('/var/www/Morph/web_portal/home.html', 'r') as homepage:
-            data = homepage.read()
-            return data
+        render = web.template.render(tmpt_path, base='layout')
+        return render.home()
+        
 
     def POST(self):
         x = web.input(video_file={}, p_240=None, p_360=None,\
@@ -187,6 +192,28 @@ class get_tgt_files:
             return ret
         if prg != 100:
             return ""
+
+class instance:
+    def GET(self):
+        db    = web.database(dbn='mysql', db='morph', user='root', pw='ntu_BDP_2o14')
+        res   = db.query("SELECT * FROM server_info")
+        data  = ""
+        cur_t = time.time()
+        state = ['sleep', 'active']
+        for i in res:
+            data += "<tr>"
+            data += "<td>" + str(i.id) + "</td>"
+            data += "<td>" + str(format(cur_t-i.last_time, '.2f')) + ' seconds ago' + "</td>"
+            data += "<td>" + state[i.state] + "</td>"
+            data += "</tr>"
+        render = web.template.render(tmpt_path, base='layout')
+        return render.instance_info(data)
+
+class download:
+    def GET(self):
+        render = web.template.render(tmpt_path, base='layout')
+        return render.download()
+
 
 '''
 the main program for wsgi
