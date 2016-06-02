@@ -1,0 +1,54 @@
+﻿$def with (task_id, state, res)
+
+    <br>
+    <h2>Transcoding progress</h2>
+    <br>
+    <fieldset>
+        Task ID: $task_id       <br>
+        Submit state: $state    <br>
+        Target resolution: $res <br>
+        Progress: <input type="text" name="progress" id="trans_prog" value="waiting" readonly><br>
+        If the progress is not updated automatically, please refresh! <br>
+    </fieldset>
+    <br>
+    <div id="final_msg"/>
+    <br>
+    <br>
+
+    <script language="javascript" onload="update_progress();">
+    var timer = null;
+    function update_progress() {
+        timer = setInterval(get_progress, 2000);
+    }
+
+    function get_tgt_files() {
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState == 4 && xhr.status == 200) {
+                document.getElementById("final_msg").innerHTML = xhr.responseText;
+            }
+        }
+        xhr.open("POST", "/morph/get_tgt_files", true);
+        xhr.send("key=$task_id");
+    }
+
+    function get_progress() {
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState == 4 && xhr.status == 200) {
+                document.getElementById("trans_prog").value = xhr.responseText;
+                prog = parseInt(xhr.responseText)
+                if (prog < 0 || prog >= 100) {
+                    clearInterval(timer);
+                    if (prog != 100)
+                        document.getElementById("trans_prog").value = 'Error';
+                    if (prog == 100)
+                        get_tgt_files();
+                }
+            }
+        };
+        xhr.open("POST", "/morph/get_progress", true);
+        xhr.send("key=$task_id");
+    }
+    </script>
+
