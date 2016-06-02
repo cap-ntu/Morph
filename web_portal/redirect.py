@@ -10,6 +10,7 @@ import os
 import web
 import json
 import time
+import datetime
 import subprocess
 from random import Random
 
@@ -22,14 +23,15 @@ urls = (
     '/get_result',           'get_result',
     '/get_tgt_files',        'get_tgt_files',
     '/download',             'download',
-    '/instance',             'instance'
+    '/instance',             'instance',
+    '/task',                 'task',
+    '/view_video',           'view_video'
     )
 
 work_path = '/data/4/tmp/'
 cln_path  = '/var/www/Morph/cli_submit.py'
 qry_path  = '/var/www/Morph/cli_query.py'
 tmpt_path = '/var/www/Morph/web_portal/templates' 
-
 
 '''
 generate a random key for the task
@@ -42,6 +44,12 @@ def gen_key(randomlength = 8):
     for i in range(randomlength):
         str += chars[random.randint(0, length)]
     return str
+
+def ts_to_date(ts):
+    if ts <= 0:
+        return "unavailable"
+    st = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
+    return st
 
 '''
 start a transcoding operation
@@ -97,7 +105,6 @@ class rest_submit_url:
 
         return ret
 
-
 class rest_get_progress:
     def POST(self):
         s = web.input(key = None)
@@ -135,7 +142,6 @@ class home:
         render = web.template.render(tmpt_path, base='layout')
         return render.home()
         
-
     def POST(self):
         x = web.input(video_file={}, p_240=None, p_360=None,\
                 p_480=None, p_720=None)
@@ -165,33 +171,46 @@ class get_result:
     def GET(self):
         data = web.input(res=None, state=None, key=None)
         web.debug(data)
-        render = web.template.frender('/var/www/Morph/web_portal/result.html')
-        return render(data.key, data.state, data.res) 
+        render = web.template.render(tmpt_path, base='layout')
+        return render.result(data.key, data.state, data.res) 
+
+def gen_dl_links(key):
+    os.chdir('/var/www/Morph/')
+    cmd = "python " + qry_path + " -k " + key
+    web.debug(cmd)
+    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+    stdout, stderr = p.communicate()
+    web.debug(stdout)
+    prg = p.returncode
+    if prg == 100:
+        f = stdout.split('\'')
+        ret = '<h2>Transcoded video files</h2>' + '<pre><code>'
+        for i in f:
+            if i.find('Morph') < 0:
+                continue
+            ret += i.replace('/var/www', 'http://155.69.146.43') + '<br>'
+        ret += '</code></pre>'
+        web.debug(ret)
+        return ret
+    if prg != 100:
+        web.debug(prg)
+        ret = '<h2>Warning</h2>' + '<pre><code>'
+        if prg == (-100 & 255):
+            ret += "key format error" + '<br>'
+        if prg == (-10 & 255):
+            ret += "invalidated key" + '<br>'
+        if prg >= 0 and prg < 100:
+            ret += "in progress, waiting..." + '<br>'
+        ret += '</code></pre>'
+        return ret
 
 class get_tgt_files:
     def POST(self):
         data = web.data()
         web.debug(data)
         (_, key) = data.split('=')
-        os.chdir('/var/www/Morph/')
-        cmd = "python " + qry_path + " -k " + key
-        web.debug(cmd)
-        p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-        stdout, stderr = p.communicate()
-        web.debug(stdout)
-        prg = p.returncode
-        if prg == 100:
-            f = stdout.split('\'')
-            ret = '<h2>Transcoded video files</h2>' + '<pre><code>'
-            for i in f:
-                if i.find('Morph') < 0:
-                    continue
-                ret += i.replace('/var/www', 'http://155.69.146.43') + '<br>'
-            ret += '</code></pre>'
-            web.debug(ret)
-            return ret
-        if prg != 100:
-            return ""
+        res = gen_dl_links(key)
+        return res
 
 class instance:
     def GET(self):
@@ -212,7 +231,97 @@ class instance:
 class download:
     def GET(self):
         render = web.template.render(tmpt_path, base='layout')
-        return render.download()
+        return render.download("")
+
+    def POST(self): 
+        data = web.data()
+        (_, tmp_key) = data.split('=')
+        web.debug(tmp_key)
+        key = ""
+        for s in tmp_key:
+            if s.isdigit() or s.isalpha():
+                key += s 
+        if len(key) == 0:
+            render = web.template.render(tmpt_path, base='layout')
+            return render.download("")
+        else: 
+            res = gen_dl_links(key)
+            render = web.template.render(tmpt_path, base='layout')
+            return render.download(res)
+
+class task:
+    def GET(self):
+        db    = web.database(dbn='mysql', db='morph', user='root', pw='ntu_BDP_2o14')
+        res   = db.query("SELECT * FROM task_info")
+        data  = ""
+        state_code = {0: 'finished', 1: 'in progress', -3: 'merge error', \
+                        -2: 'block error', -1: 'split error'}      
+        for i in res:
+            data += "<tr>"
+            data += "<td>" + str(i.id) + "</td>"
+            data += "<td>" + ts_to_date(i.submit_time)  + "</td>"
+            data += "<td>" + ts_to_date(i.start_time)   + "</td>"
+            data += "<td>" + ts_to_date(i.finish_time)  + "</td>"
+            data += "<td>" + state_code[i.task_ongoing] + "</td>"
+            data += "</tr>"
+        render = web.template.render(tmpt_path, base='layout')
+        return render.task_info(data)
+
+def gen_formats(key):
+    os.chdir('/var/www/Morph/')
+    cmd = "python " + qry_path + " -k " + key
+    web.debug(cmd)
+    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+    stdout, stderr = p.communicate()
+    web.debug(stdout)
+    prg = p.returncode
+    ret = []
+    if prg == 100:
+        f = stdout.split('\'')
+        for i in f:
+            if i.find('Morph') < 0:
+                continue
+            ret.append(i.replace('/var/www', 'http://155.69.146.43'))
+        return ret
+    else:
+        return ret
+
+class view_video:
+    def GET(self):
+        render = web.template.render(tmpt_path, base='layout')
+        return render.view_video("")
+    
+    def POST(self):
+        data = web.data()
+        (_, tmp_key) = data.split('=')
+        web.debug(tmp_key)
+        key = ""
+        for s in tmp_key:
+            if s.isdigit() or s.isalpha():
+                key += s 
+        if len(key) == 0:
+            render = web.template.render(tmpt_path, base='layout')
+            return render.view_video("")
+        else: 
+            res = gen_formats(key)
+            if len(res) == 0:
+                ret = '<h2>Warning</h2>' + '<pre><code>'
+                ret += "No available video" + '<br>'
+                ret += '</code></pre>' 
+                render = web.template.render(tmpt_path, base='layout')
+                return render.view_video(ret)
+            else:
+                ret = '<h2>Enjoy it!</h2> <br><br>'
+                for r in res:
+                    tmp  = r.split('_')
+                    tmp  = tmp[len(tmp)-1].replace('.mp4', '')
+                    w, h = tmp.split('x')
+                    ret  += "<video width=\"" + w + "\" height=\"" + h + "\" controls>"
+                    ret  += "<source src=\""  + r + "\" type=\"video/mp4\">"
+                    ret  += "</video>"
+                    ret  += "<br><br><br>"
+                render = web.template.render(tmpt_path, base='layout')
+                return render.view_video(ret)
 
 
 '''
