@@ -1,53 +1,53 @@
 ﻿<script language="javascript">
     function validation(thisform) {
         var x_1 = document.getElementById("p_240").checked;
-                var x_2 = document.getElementById("p_360").checked;
-                var x_3 = document.getElementById("p_480").checked;
-                var x_4 = document.getElementById("p_720").checked;
-                if (x_1 == false && x_2 == false && x_3 == false && x_4 == false) {
-                    document.getElementById("valid_msg").innerHTML = "At least one target resolution should be selected";
-                    return false;
-                }
+        var x_2 = document.getElementById("p_360").checked;
+        var x_3 = document.getElementById("p_480").checked;
+        var x_4 = document.getElementById("p_720").checked;
+        if (x_1 == false && x_2 == false && x_3 == false && x_4 == false) {
+            document.getElementById("valid_msg").innerHTML = "At least one target resolution should be selected";
+            return false;
+        }
 
-                with (thisform) {
-                    if (validateFileExtension(video_file, "valid_msg", "Only MP4 container is accepted now!",
-                    new Array("mp4")) == false) {
-                        return false;
-                    }
-                    if (validateFileSize(video_file, 1000 * 1048576, "valid_msg", "Video size should be less than 1000MB!") == false) {
-                        return false;
-                    }
-                }
-                document.getElementById("valid_msg").innerHTML = "Don't refresh, the video file is being uploaded!";
-                document.getElementById("submit_btn_id").disabled = true;
+        with (thisform) {
+            if (validateFileExtension(video_file, "valid_msg", "Only MP4 container is accepted now!",
+                new Array("mp4")) == false) {
+                return false;
             }
+            if (validateFileSize(video_file, 1000 * 1048576, "valid_msg", "Video size should be less than 1000MB!") == false) {
+                return false;
+            }
+        }
+        document.getElementById("valid_msg").innerHTML = "Don't refresh, the video file is being uploaded!";
+        document.getElementById("submit_btn_id").disabled = true;
+    }
 
-            function validateFileExtension(component, msg_id, msg, extns) {
-                var flag = 0;
-                with (component) {
-                    var ext = value.substring(value.lastIndexOf('.') + 1);
-                    for (i = 0; i < extns.length; i++) {
-                        if (ext == extns[i]) {
-                            flag = 0;
-                            break;
-                        }
-                        else {
-                            flag = 1;
-                        }
-                    }
-                    if (flag != 0) {
-                        document.getElementById(msg_id).innerHTML = msg;
-                        component.value = "";
-                        component.style.backgroundColor = "#eab1b1";
-                        component.style.border = "thin solid #FF0000";
-                        component.focus();
-                        return false;
-                    }
-                    else {
-                        return true;
-                    }
+    function validateFileExtension(component, msg_id, msg, extns) {
+        var flag = 0;
+        with (component) {
+            var ext = value.substring(value.lastIndexOf('.') + 1);
+            for (i = 0; i < extns.length; i++) {
+                if (ext == extns[i]) {
+                    flag = 0;
+                    break;
+                }
+                else {
+                    flag = 1;
                 }
             }
+            if (flag != 0) {
+                document.getElementById(msg_id).innerHTML = msg;
+                component.value = "";
+                component.style.backgroundColor = "#eab1b1";
+                component.style.border = "thin solid #FF0000";
+                component.focus();
+                return false;
+            }
+            else {
+                return true;
+            }
+        }
+      }
 
             function validateFileSize(component, maxSize, msg_id, msg) {
                 if (navigator.appName == "Microsoft Internet Explorer") {
@@ -76,10 +76,9 @@
             }
         </script>
  
-        <p><strong>Morph</strong> is a cloud transcoding system that is as simple as it is powerful.</p>
-
-        <h2>Get Started!</h2>
-        <br>
+<p><strong>Morph</strong> is a cloud transcoding system that is as simple as it is powerful.</p>
+<h2>Get Started!</h2>
+<br>
 
 <form action = "" method="post" enctype="multipart/form-data" onsubmit="return validation(this)">
 
