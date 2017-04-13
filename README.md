@@ -1,6 +1,6 @@
-##Morph: A Fast and Scalable Cloud Transcoding System
+## Morph: A Fast and Scalable Cloud Transcoding System
 
-##Contents 
+## Contents 
 -------------------
 * [Overview](#overview)
 * [Workflow](#workflow)
@@ -208,7 +208,7 @@ get_progress(task_id)
 ```
 
 
-##Basic Usage
+## Basic Usage
 
 The easiest way to use this software is via command line. With this method, you do not need to configure the webserver or write the code for calling RPC. There are two programs serving as the command line, **cli_query.py** and **cli_submit.py**. Note that the **config.py** should be kept a copy with these two programs, since they need to the configuration information from it. 
 
