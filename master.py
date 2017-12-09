@@ -90,6 +90,9 @@ def put_trans_task(URI, bitrate, width, height, priority, task_id = None):
     #insert the task information into database
     db_insert_task_info(task_id, priority)
 
+    width  = (width + '%').ljust(30)
+    height = (height + '%').ljust(30)
+
     new_task            = task()
     new_task.task_id    = task_id
     new_task.file_path  = URI
@@ -677,6 +680,7 @@ if __name__ == '__main__':
     #start the rpc thread to handle the request
     server = master_rpc_server((master_ip, master_rpc_port), \
              requestHandler = RequestHandler, allow_none=True)
+    # Register a function that can respond to XML-RPC requests
     server.register_function(put_trans_task, "put_trans_task")
     server.register_function(get_progress, "get_progress")
     server.register_function(get_target_file, "get_target_file")
@@ -712,6 +716,5 @@ if __name__ == '__main__':
 
     #never stop
     server.serve_forever()
-
 
 
