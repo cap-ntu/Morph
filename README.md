@@ -208,6 +208,35 @@ Query the task status
 get_progress(task_id)
 ```
 
+Call from php script
+```php
+<?php
+    public function _rpc()
+    {
+        $request = xmlrpc_encode_request('put_trans_task',  array(
+                    'http://aidynamic.com/video/bunny.mp4',
+                    '2000',
+                    '420',
+                    '240',
+                    '5'));
+
+        $context = stream_context_create(array('http' => array(
+            'method'  => "POST",
+            'header'  => "Content-Type: text/xml",
+            'content' => $request
+        )));
+
+        $file = file_get_contents('http://127.0.0.1:8888', true, $context);
+        $response = xmlrpc_decode($file);
+
+        if (is_array($response) && xmlrpc_is_fault($response)) {
+            return ($response);
+        } else {
+            return ($response);
+        }
+    }
+?>
+```
 
 ## Basic Usage
 
