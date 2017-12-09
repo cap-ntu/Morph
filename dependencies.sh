@@ -1,3 +1,22 @@
+echo "Installing handbrake"
+sudo add-apt-repository ppa:stebbins/handbrake-releases
+sudo apt-get update
+sudo apt-get install handbrake-cli
+
+##compile handbrak from the source
+#sudo apt-get install bzr subversion yasm build-essential \
+#autoconf libtool zlib1g-dev libbz2-dev libfribidi-dev \
+#intltool libglib2.0-dev libdbus-glib-1-dev libgtk2.0-dev \
+#libgudev-1.0-dev libwebkit-dev libnotify-dev \
+#libgstreamer0.10-dev libgstreamer-plugins-base0.10-dev
+
+#bzr branch lp:handbrake
+#cd handbrake
+#./configure
+#cd ./build
+#sudo make
+#sudo make install
+
 echo "Installing ffmpeg"
 sudo apt-get install ffmpeg
 
