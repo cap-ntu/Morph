@@ -41,8 +41,7 @@ def db_insert_task_info(task_id, service_type):
         con = MySQLdb.connect(ip, user_name, passwd, db_name)
         cur = con.cursor()
         cur_time = time.time()
-        sql_cmd = "INSERT INTO task_info VALUES('%s', %f, -1, -1, %d, -1, 1)" \
-                    % (task_id, cur_time, service_type)
+        sql_cmd = 'INSERT INTO task_info VALUES("{task_id}", {cur_time}, -1, -1, {service_type}, -1, 1)'.format(task_id = task_id, cur_time = cur_time, service_type = service_type)
         cur.execute(sql_cmd)
         con.commit()
         con.close()
