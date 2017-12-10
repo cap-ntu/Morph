@@ -48,8 +48,10 @@ System Requirement
 
 * [ubuntu 14.04](http://releases.ubuntu.com/14.04/)
 * [Python 2.7.6](https://www.python.org/download/releases/2.7.6/)
-* [ffmpeg](https://trac.ffmpeg.org/wiki/CompilationGuide/Ubuntu)
 * [Mysql](https://help.ubuntu.com/12.04/serverguide/mysql.html)
+* [FFmpeg](https://trac.ffmpeg.org/wiki/CompilationGuide/Ubuntu)
+* [MP4box](https://gpac.wp.imt.fr/mp4box/mp4box-documentation/)
+* [HandBrake](https://handbrake.fr/docs/en/latest/cli/cli-guide.html)
 
 Please click the above links for the installation of the dependent software.
 
@@ -130,7 +132,7 @@ Check the log and the error message of the worker nodes.
 tail worker_error_msg
 tail worker.*.log
 ```
-Step 6: Access web portal
+Step 7: Access web portal
 
 ```bash
 http://webpy.org/install#install
@@ -167,9 +169,9 @@ The parameters of HTTP POST method for submitting a new task. The video location
 
 The parameter of HTTP Post method for querying the task status. 
 
-     ```bash
-     curl -d "key=G8QKmGXX" -X POST http://127.0.0.1:8888/get_progress
-     ```
+ ```bash
+ curl -d "key=G8QKmGXX" -X POST http://127.0.0.1:8888/get_progress
+ ```
 
 ### Command Line
 
