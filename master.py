@@ -553,9 +553,58 @@ class task_tracker(threading.Thread):
         pickle.dump(task, output)
         output.close()
 
+    def combine_blocks(self, video_files, path_out_file):
+
+        mp4box_path = 'MP4Box'
+
+        # First delete the existing out video file
+        if os.path.exists(str(path_out_file)):
+            os.remove(str(path_out_file))
+
+        # Construct the args to mp4box
+        prog_args = [mp4box_path]
+        for video_file in video_files:
+            prog_args.append("-cat")
+            prog_args.append(str(video_file))
+
+        # prog_args.append("-isma")
+
+        prog_args.append("-new")
+        # Add the output file at the very end
+        prog_args.append(str(path_out_file))
+
+        # Run the app and collect the output
+        ret = subprocess.Popen(prog_args,
+                               stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True)
+
+        longest_line = 0
+        while True:
+            try:
+                line = ret.stdout.readline()
+                if not line:
+                    break
+                line = line.strip()[
+                       :65]  # Limit the max length of the line, otherwise it will screw up our console window
+                longest_line = max(longest_line, len(line))
+                sys.stdout.write('\r ' + line.ljust(longest_line))
+                sys.stdout.flush()
+            except UnicodeDecodeError:
+                continue  # Ignore all unicode errors
+
+        # Ensure that the return code was ok before continuing
+        retcode = ret.poll()
+        while retcode is None:
+            retcode = ret.poll()
+
+        logger.info('MP4Box concat return code: %s', retcode)
+
+        # Move the input to the beginning of the line again
+        # subsequent output text will look nicer :)
+        sys.stdout.write('\r')
+        return retcode
+
     def concat_block(self, task):
-        msg = "%s: concatenate the blocks" % task.task_id
-        logger.debug(msg)
+        logger.debug("%s: concatenate the blocks" % task.task_id)
         total_no = task.block_num
         width    = task.width.replace(' ', '').split('%')
         width    = filter(lambda a: a != '', width)
@@ -564,10 +613,11 @@ class task_tracker(threading.Thread):
 
         suf     = ''
         task_id = task.task_id
+        block_list = []
         for i in range(len(width)):
             resolution = width[i] + 'x' + height[i]
-            list_path  = os.path.join(config.master_path, \
-                            task_id + '_' + resolution + '.list')
+            list_path  = os.path.join(config.master_path,
+                                      task_id + '_' + resolution + '.list')
             f = open(list_path, 'w')
             for i in range(0, total_no):
                 path        = task.block[i].file_path
@@ -575,23 +625,18 @@ class task_tracker(threading.Thread):
                 base_name   = os.path.basename(path)
                 base_name   = base_name.replace('_package', '')
                 (pre, suf)  = os.path.splitext(base_name)
-                file_name   = os.path.join(dir_name, \
-                                 pre + resolution + suf)
+                file_name   = os.path.join(dir_name, pre + resolution + suf)
+                block_list.append(file_name)
                 line = 'file ' + '\'' + file_name + '\'' + '\n'
                 f.write(line)
             f.close()
 
-            new_file = os.path.join(config.master_path, \
-                        task_id + '_' + resolution + suf)
-            cmd = 'ffmpeg -f concat -safe 0 -i ' + list_path + ' -c copy ' + new_file
-            logger.debug('%s', cmd)
-            p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-            stdout, stderr = p.communicate()
-            ret = p.returncode
-            logger.info('ffmpeg concat return code: %s', ret)
-            if ret != 0:
-                print stderr
-                print stdout
+            new_file = os.path.join(config.master_path,
+                                    task_id + '_' + resolution + suf)
+            ret = self.combine_blocks(block_list, new_file)
+
+            if ret is not 0:
+                logger.error("Error while concatenating file")
                 return ret
         return 0
 
