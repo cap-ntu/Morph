@@ -55,10 +55,7 @@ Please click the above links for the installation of the dependent software.
 
 It may require to install some lacked libraries, e.g., pycurl, mysqldb.
 ```bash
-sudo apt-get update    
-sudo apt-get install python-pycurl
-sudo apt-get install python-mysqldb
-sudo apt-get install python-numpy
+sh dependencies.sh
 ```
 
 Step 1: Clone the code from Github
@@ -133,6 +130,13 @@ Check the log and the error message of the worker nodes.
 tail worker_error_msg
 tail worker.*.log
 ```
+Step 6: Access web portal
+
+```bash
+http://webpy.org/install#install
+python web_portal/redirect.py
+http://127.0.0.1:8888
+```
 
 ## Programming Interface
 -------------------
@@ -163,12 +167,9 @@ The parameters of HTTP POST method for submitting a new task. The video location
 
 The parameter of HTTP Post method for querying the task status. 
 
-<html>
-
-     url = 'http://155.69.52.158/transcoder/get_progress'
-     key = {'key' : 'G8QKmGXX'}
-     
-</html>
+     ```bash
+     curl -d "key=G8QKmGXX" -X POST http://127.0.0.1:8888/get_progress
+     ```
 
 ### Command Line
 
@@ -207,6 +208,35 @@ Query the task status
 get_progress(task_id)
 ```
 
+Call from php script
+```php
+<?php
+    public function _rpc()
+    {
+        $request = xmlrpc_encode_request('put_trans_task',  array(
+                    'http://aidynamic.com/video/bunny.mp4',
+                    '2000',
+                    '420',
+                    '240',
+                    '5'));
+
+        $context = stream_context_create(array('http' => array(
+            'method'  => "POST",
+            'header'  => "Content-Type: text/xml",
+            'content' => $request
+        )));
+
+        $file = file_get_contents('http://127.0.0.1:8888', true, $context);
+        $response = xmlrpc_decode($file);
+
+        if (is_array($response) && xmlrpc_is_fault($response)) {
+            return ($response);
+        } else {
+            return ($response);
+        }
+    }
+?>
+```
 
 ## Basic Usage
 
