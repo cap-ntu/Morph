@@ -1,3 +1,11 @@
+echo "Installing mp4box"
+wget -O mp4box.tar.gz https://github.com/gpac/gpac/archive/v0.7.1.tar.gz
+tar -zxvf mp4box.tar.gz
+cd gpac-0.7.1
+./configure --static-mp4box --use-zlib=no
+make -j4
+sudo make install
+
 echo "Installing handbrake"
 sudo add-apt-repository ppa:stebbins/handbrake-releases
 sudo apt-get update
