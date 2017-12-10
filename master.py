@@ -671,9 +671,10 @@ class task_tracker(threading.Thread):
                     #write the task information to file
                     self.write_pkl(task_id, task)
                     #pop the task from the task list
-                    msg = "%s: task has been finished" % task_id
-                    logger.debug(msg)
+                    logger.debug("%s: task has been finished" % task_id)
                     task_status.pop(task_id)
+                    # Indicate that a formerly enqueued task is complete
+                    preproc_queue.task_done()
                     continue
 
                 if task.progress < 0:
