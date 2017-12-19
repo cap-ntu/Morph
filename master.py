@@ -101,7 +101,7 @@ def put_trans_task(URI, bitrate, width, height, priority, task_id = None):
 
     new_task            = task()
     new_task.task_id    = task_id
-    new_task.file_path  = "U" + URI
+    new_task.file_path  = URI
     new_task.bitrate    = bitrate
     new_task.width      = width
     new_task.height     = height
