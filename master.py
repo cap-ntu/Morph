@@ -22,6 +22,7 @@ from SimpleXMLRPCServer import SimpleXMLRPCServer
 from SimpleXMLRPCServer import SimpleXMLRPCRequestHandler
 
 from algorithms.scheduling import *
+from conversion import conversion
 
 #the handler of the log and database module
 logger = None
@@ -233,30 +234,22 @@ class task_scheduling(threading.Thread):
         '''
 
     def dispatch(self, task):
-        '''
-        The video segment command should be:
-        ffmpeg -i china.mp4 -f segment -segment_time 10 -c copy -map 0 \
-            -segment_list china.list china%03d.mp4
-        '''
+
         seg_dur         = self.det_seg_dur(task)
         file_path       = task.file_path
-        base_name       = os.path.basename(file_path)
-        (prefix,suffix) = os.path.splitext(base_name)
+        (prefix,suffix) = os.path.splitext(os.path.basename(file_path))
         work_path       = config.master_path
         list_file_path  = os.path.join(work_path, task.task_id + ".list")
-        segm_file_path  = os.path.join(work_path, task.task_id + "_%03d_" + suffix)
+        seg_file_path  = os.path.join(work_path, task.task_id + "_%03d_" + suffix)
 
-        cmd = "ffmpeg -i " + file_path + " -f segment -segment_time " + str(seg_dur) + \
-                " -c copy -map 0 -segment_list " + list_file_path + "  " + segm_file_path
-        logger.debug('%s: %s', task.task_id, cmd)
+        is_segmented = conversion.ConversionEngine().segmentation(
+                file_path, seg_file_path,list_file_path,seg_dur)
 
-        p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-        stdout, stderr = p.communicate()
-        ret = p.returncode
-        logger.info('video segmentation result: %s', ret)
-        if ret != 0:
+        if not is_segmented:
             task.progress = -1
             return
+
+        logger.info('video segmented successfully')
 
         lines = ""
         with open(list_file_path) as f:
