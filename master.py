@@ -59,6 +59,7 @@ def download_video(url, task_id):
     name, ext = os.path.splitext(file_name)
     file_name = task_id + ext
     file_name = os.path.join(config.master_path, file_name)
+    download_time = 0
 
     try:
         with open(file_name, 'wb') as f:
@@ -66,10 +67,16 @@ def download_video(url, task_id):
             c.setopt(c.URL, url)
             c.setopt(c.WRITEDATA, f)
             c.perform()
+            if c.getinfo(c.RESPONSE_CODE) is 200:
+                # Elapsed time for the transfer.
+                download_time = c.getinfo(c.TOTAL_TIME)
+                logger.info('Status: %f' % c.getinfo(c.TOTAL_TIME))
+
             c.close()
     except:
         file_name = ''
     finally:
+        db_update_download_time(task_id, download_time)
         return file_name
 
 '''

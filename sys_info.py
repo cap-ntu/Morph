@@ -82,7 +82,7 @@ db = DB()
 
 def init_db():
     db.query("CREATE TABLE IF NOT EXISTS task_info(id VARCHAR(100), submit_time REAL, start_time REAL, \
-                        finish_time REAL, service_type INTEGER, trans_time REAL, task_ongoing INTEGER)")
+                        download_time REAL, finish_time REAL, service_type INTEGER, trans_time REAL, task_ongoing INTEGER)")
 
     db.query("CREATE TABLE IF NOT EXISTS server_info(id VARCHAR(100) NOT NULL PRIMARY KEY, \
                         last_time REAL, state INTEGER)")
@@ -90,7 +90,7 @@ def init_db():
 
 def db_insert_task_info(task_id, service_type):
     cur_time = time.time()
-    return db.query('INSERT INTO task_info VALUES("{task_id}", {cur_time}, -1, -1, {service_type}, -1, 1)'.format(
+    return db.query('INSERT INTO task_info VALUES("{task_id}", {cur_time}, -1, -1, -1, {service_type}, -1, 1)'.format(
             task_id=task_id, cur_time=cur_time, service_type=service_type))
 
 
@@ -146,3 +146,13 @@ update the last access time for a worker
 def db_update_last_access(host_name):
     cur_time = time.time()
     return db.query("update server_info set last_time = %f where id = '%s'" % (cur_time, host_name))
+
+
+'''
+update download time
+'''
+
+
+def db_update_download_time(task_id, download_time):
+    return db.query("UPDATE task_info SET download_time = %f WHERE id = '%s'" \
+                    % (download_time, task_id))
