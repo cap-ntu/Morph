@@ -699,7 +699,7 @@ class block_tracker(threading.Thread):
 
     def run(self):
         while True:
-            check_blocks()
+            self.check_blocks()
 
 '''
 log module for XML RPC
