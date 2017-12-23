@@ -21,8 +21,8 @@ from SocketServer import ThreadingMixIn
 from SimpleXMLRPCServer import SimpleXMLRPCServer
 from SimpleXMLRPCServer import SimpleXMLRPCRequestHandler
 
-sys.path.append("algorithms")
-from scheduling import *
+from algorithms.scheduling import *
+from conversion import conversion
 
 #the handler of the log and database module
 logger = None
@@ -60,6 +60,7 @@ def download_video(url, task_id):
     name, ext = os.path.splitext(file_name)
     file_name = task_id + ext
     file_name = os.path.join(config.master_path, file_name)
+    download_time = 0
 
     try:
         with open(file_name, 'wb') as f:
@@ -67,10 +68,16 @@ def download_video(url, task_id):
             c.setopt(c.URL, url)
             c.setopt(c.WRITEDATA, f)
             c.perform()
+            if c.getinfo(c.RESPONSE_CODE) is 200:
+                # Elapsed time for the transfer.
+                download_time = c.getinfo(c.TOTAL_TIME)
+                logger.info('Status: %f' % c.getinfo(c.TOTAL_TIME))
+
             c.close()
     except:
         file_name = ''
     finally:
+        db_update_download_time(task_id, download_time)
         return file_name
 
 '''
@@ -95,7 +102,7 @@ def put_trans_task(URI, bitrate, width, height, priority, task_id = None):
 
     new_task            = task()
     new_task.task_id    = task_id
-    new_task.file_path  = "U" + URI
+    new_task.file_path  = URI
     new_task.bitrate    = bitrate
     new_task.width      = width
     new_task.height     = height
@@ -227,30 +234,22 @@ class task_scheduling(threading.Thread):
         '''
 
     def dispatch(self, task):
-        '''
-        The video segment command should be:
-        ffmpeg -i china.mp4 -f segment -segment_time 10 -c copy -map 0 \
-            -segment_list china.list china%03d.mp4
-        '''
+
         seg_dur         = self.det_seg_dur(task)
         file_path       = task.file_path
-        base_name       = os.path.basename(file_path)
-        (prefix,suffix) = os.path.splitext(base_name)
+        (prefix,suffix) = os.path.splitext(os.path.basename(file_path))
         work_path       = config.master_path
         list_file_path  = os.path.join(work_path, task.task_id + ".list")
-        segm_file_path  = os.path.join(work_path, task.task_id + "_%03d_" + suffix)
+        seg_file_path  = os.path.join(work_path, task.task_id + "_%03d_" + suffix)
 
-        cmd = "ffmpeg -i " + file_path + " -f segment -segment_time " + str(seg_dur) + \
-                " -c copy -map 0 -segment_list " + list_file_path + "  " + segm_file_path
-        logger.debug('%s: %s', task.task_id, cmd)
+        is_segmented = conversion.ConversionEngine().segmentation(
+                file_path, seg_file_path,list_file_path,seg_dur)
 
-        p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-        stdout, stderr = p.communicate()
-        ret = p.returncode
-        logger.info('video segmentation result: %s', ret)
-        if ret != 0:
+        if not is_segmented:
             task.progress = -1
             return
+
+        logger.info('video segmented successfully')
 
         lines = ""
         with open(list_file_path) as f:
@@ -671,9 +670,10 @@ class task_tracker(threading.Thread):
                     #write the task information to file
                     self.write_pkl(task_id, task)
                     #pop the task from the task list
-                    msg = "%s: task has been finished" % task_id
-                    logger.debug(msg)
+                    logger.debug("%s: task has been finished" % task_id)
                     task_status.pop(task_id)
+                    # Indicate that a formerly enqueued task is complete
+                    preproc_queue.task_done()
                     continue
 
                 if task.progress < 0:
@@ -692,7 +692,7 @@ class block_tracker(threading.Thread):
 
     def run(self):
         while True:
-            check_blocks()
+            self.check_blocks()
 
 '''
 log module for XML RPC
